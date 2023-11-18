@@ -1,5 +1,7 @@
 #include "E57ReaderImpl.h"
 
+#include <filesystem>
+
 template <typename T>
 std::shared_ptr<T> convertE57StructureNode(const e57::StructureNode& node)
 {
@@ -90,5 +92,6 @@ void E57ReaderImpl::parseNodeTree()
 {
     e57::StructureNode root = m_imageFile.root();
     m_root = parseRoot(root);
-    m_root->setName(m_imageFile.fileName());
+    m_root->setName(
+        std::filesystem::path(m_imageFile.fileName()).stem().string());
 }

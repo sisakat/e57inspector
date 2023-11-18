@@ -1,6 +1,10 @@
 #include "E57Tree.h"
 
-E57Tree::E57Tree(QWidget* parent) : QTreeWidget(parent) {}
+E57Tree::E57Tree(QWidget* parent) : QTreeWidget(parent)
+{
+    setColumnCount(1);
+    setHeaderHidden(true);
+}
 
 void E57Tree::init(const E57RootPtr& root)
 {
@@ -28,6 +32,9 @@ void E57Tree::init(const E57RootPtr& root)
         auto* node = createTNode(image2D);
         image2DNode->addChild(node);
     }
+
+    expandAll();
+    resizeColumnToContents(0);
 }
 
 void E57Tree::selectionChanged(const QItemSelection& selected,
@@ -42,5 +49,9 @@ void E57Tree::selectionChanged(const QItemSelection& selected,
     if (selectedItem)
     {
         emit nodeSelected(selectedItem);
+    }
+    else
+    {
+        emit nodeSelected(nullptr);
     }
 }

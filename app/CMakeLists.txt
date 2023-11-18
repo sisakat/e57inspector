@@ -13,7 +13,10 @@ add_executable(${PROJECT_NAME}
         E57TreeNode.cpp
         E57TreeNode.h
         E57Tree.cpp
-        E57Tree.h)
+        E57Tree.h
+        E57PropertyTree.cpp
+        E57PropertyTree.h
+        utils.h)
 target_link_libraries(${PROJECT_NAME} PRIVATE
         E57Format
         Qt6::Widgets

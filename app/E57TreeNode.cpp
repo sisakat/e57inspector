@@ -4,6 +4,8 @@
 
 TNode::TNode(E57NodePtr node) : m_node(std::move(node)) {}
 
+E57NodePtr TNode::node() { return m_node; }
+
 TNodeE57::TNodeE57(const E57RootPtr& root) : TNode(root)
 {
     setText(0, QString::fromStdString(root->name()));
@@ -23,6 +25,10 @@ TNode* createTNode(const E57NodePtr& e57Node)
     else if (std::dynamic_pointer_cast<E57Data3D>(e57Node))
     {
         return new TNodeData3D(std::dynamic_pointer_cast<E57Data3D>(e57Node));
+    }
+    else
+    {
+        return new TNode(e57Node);
     }
 
     return nullptr;

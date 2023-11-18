@@ -20,31 +20,40 @@
      <verstretch>0</verstretch>
     </sizepolicy>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QSplitter" name="splitter">
+     <widget class="QSplitter" name="splitter_2">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
-      <widget class="QWidget" name="layoutWidget">
-       <layout class="QVBoxLayout" name="verticalLayout">
-        <item>
-         <widget class="E57Tree" name="twMain">
-          <column>
-           <property name="text">
-            <string notr="true">1</string>
-           </property>
-          </column>
-         </widget>
-        </item>
-        <item>
-         <widget class="QTableWidget" name="twProperties">
-          <attribute name="horizontalHeaderStretchLastSection">
-           <bool>true</bool>
-          </attribute>
-         </widget>
-        </item>
-       </layout>
+      <widget class="QSplitter" name="splitter">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <widget class="E57Tree" name="twMain">
+        <property name="styleSheet">
+         <string notr="true">QTreeWidget::item{
+	height: 25px;
+}</string>
+        </property>
+        <column>
+         <property name="text">
+          <string notr="true">1</string>
+         </property>
+        </column>
+       </widget>
+       <widget class="E57PropertyTree" name="twProperties">
+        <property name="styleSheet">
+         <string notr="true">QTreeWidget::item{
+	height: 25px;
+}</string>
+        </property>
+        <column>
+         <property name="text">
+          <string notr="true">1</string>
+         </property>
+        </column>
+       </widget>
       </widget>
       <widget class="QTabWidget" name="tabWidget">
        <property name="sizePolicy">
@@ -54,7 +63,7 @@
         </sizepolicy>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="tab">
         <attribute name="title">
@@ -136,6 +145,11 @@
    <class>E57Tree</class>
    <extends>QTreeWidget</extends>
    <header>E57Tree.h</header>
+  </customwidget>
+  <customwidget>
+   <class>E57PropertyTree</class>
+   <extends>QTreeWidget</extends>
+   <header>E57PropertyTree.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

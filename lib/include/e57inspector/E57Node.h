@@ -27,9 +27,15 @@ public:
     [[nodiscard]] integers_t& integers() { return m_integers; }
     [[nodiscard]] floats_t& floats() { return m_floats; }
 
-    [[nodiscard]] std::string getString(const std::string& name) const
+    [[nodiscard]] std::string
+    getString(const std::string& name,
+              const std::string& defaultValue = "") const
     {
-        return m_strings.at(name);
+        if (m_strings.find(name) != m_strings.end())
+        {
+            return m_strings.at(name);
+        }
+        return defaultValue;
     }
 
     [[nodiscard]] int64_t getInteger(const std::string& name) const

@@ -39,4 +39,7 @@ void MainWindow::loadE57(const std::string& filename)
     ui->twMain->init(m_reader->root());
 }
 
-void MainWindow::twMain_nodeSelected(TNode* node) { qDebug() << node; }
+void MainWindow::twMain_nodeSelected(TNode* node)
+{
+    ui->twProperties->init(node);
+}

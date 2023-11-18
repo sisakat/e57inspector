@@ -8,6 +8,7 @@ class TNode : public QTreeWidgetItem
 {
 public:
     explicit TNode(E57NodePtr node);
+    E57NodePtr node();
 
 private:
     E57NodePtr m_node;
