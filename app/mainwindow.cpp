@@ -6,6 +6,7 @@
 #include <QFileDialog>
 #include <QGraphicsScene>
 #include <QGraphicsView>
+#include <QImageReader>
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
@@ -111,6 +112,9 @@ void MainWindow::openImageBlob(const E57NodePtr& node,
     auto imageData = m_reader->blobData(node->blobs().at(blobName));
     QByteArray data = QByteArray::fromRawData(
         reinterpret_cast<const char*>(imageData.data()), imageData.size());
+
+    // Disable image allocation limit (else 128MB)
+    QImageReader::setAllocationLimit(0);
 
     QImage img;
     img.loadFromData(reinterpret_cast<const uchar*>(imageData.data()),
