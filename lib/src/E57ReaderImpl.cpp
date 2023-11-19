@@ -31,6 +31,11 @@ void E57ReaderImpl::parseFields(E57NodePtr result,
             result->integers()[child.elementName()] =
                 e57::IntegerNode(child).value();
         }
+        else if (child.type() == e57::TypeScaledInteger)
+        {
+            result->integers()[child.elementName()] =
+                e57::ScaledIntegerNode(child).rawValue();
+        }
         else if (child.type() == e57::TypeFloat)
         {
             result->floats()[child.elementName()] =
@@ -47,6 +52,14 @@ void E57ReaderImpl::parseFields(E57NodePtr result,
             auto blob = e57::BlobNode(child);
             uint32_t blobId = registerBlob(blob);
             result->blobs()[blob.elementName()] = blobId;
+        }
+        else if (child.type() == e57::TypeCompressedVector)
+        {
+            auto compressedVectorNode = e57::CompressedVectorNode(child);
+            std::string elementName = compressedVectorNode.elementName();
+            elementName[0] = static_cast<char>(std::toupper(elementName[0]));
+            result->integers()["Num" + elementName] =
+                compressedVectorNode.childCount();
         }
     }
 }
