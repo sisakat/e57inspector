@@ -17,8 +17,6 @@ MainWindow::MainWindow(QWidget* parent)
             &MainWindow::actionOpen_triggered);
     connect(ui->twMain, &E57Tree::nodeSelected, this,
             &MainWindow::twMain_nodeSelected);
-    //    connect(ui->tabWidget->tabBar(), &QTabBar::tabCloseRequested,
-    //            ui->tabWidget->tabBar(), &QTabBar::removeTab);
     connect(ui->tabWidget, &QTabWidget::tabCloseRequested, this,
             &MainWindow::tabWidget_tabClosesRequested);
     connect(ui->twMain, &E57Tree::itemDoubleClicked, this,
