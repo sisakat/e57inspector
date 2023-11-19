@@ -74,7 +74,7 @@ E57Image2DPtr E57ReaderImpl::parseImage2D(const e57::StructureNode& node)
     {
         auto sphericalRepr = std::make_shared<E57SphericalRepresentation>();
         parseFields(sphericalRepr,
-                    e57::StructureNode(node.get("sphericalRepr")));
+                    e57::StructureNode(node.get("sphericalRepresentation")));
         result->setSphericalRepresentation(sphericalRepr);
     }
 
@@ -82,7 +82,7 @@ E57Image2DPtr E57ReaderImpl::parseImage2D(const e57::StructureNode& node)
     {
         auto cylindricalRepr = std::make_shared<E57CylindricalRepresentation>();
         parseFields(cylindricalRepr,
-                    e57::StructureNode(node.get("cylindricalRepr")));
+                    e57::StructureNode(node.get("cylindricalRepresentation")));
         result->setCylindricalRepresentation(cylindricalRepr);
     }
 

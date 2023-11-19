@@ -35,6 +35,8 @@ private:
 
     void openFile();
     void loadE57(const std::string& filename);
+    void openImageBlob(const E57NodePtr& node, const std::string& blobName,
+                       const std::string& tabName);
 };
 
 #endif // E57INSPECTOR_MAINWINDOW_H

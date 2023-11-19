@@ -71,32 +71,57 @@ void MainWindow::twMain_itemDoubleClicked(QTreeWidgetItem* item, int column)
         auto* image2D = dynamic_cast<TNodeImage2D*>(node);
         // load image
         auto e57Image2D = std::dynamic_pointer_cast<E57Image2D>(node->node());
-        auto pinholeRepr = e57Image2D->pinholeRepresentation();
-        if (pinholeRepr->blobs().contains("jpegImage"))
+
+        E57NodePtr imageRepresentation = nullptr;
+        if (e57Image2D->pinholeRepresentation())
         {
-            auto jpegImageData =
-                m_reader->blobData(pinholeRepr->blobs().at("jpegImage"));
+            imageRepresentation = e57Image2D->pinholeRepresentation();
+        }
+        else if (e57Image2D->sphericalRepresentation())
+        {
+            imageRepresentation = e57Image2D->sphericalRepresentation();
+        }
+        else if (e57Image2D->cylindricalRepresentation())
+        {
+            imageRepresentation = e57Image2D->cylindricalRepresentation();
+        }
 
-            QByteArray data = QByteArray::fromRawData(
-                reinterpret_cast<const char*>(jpegImageData.data()),
-                jpegImageData.size());
-            //            QBuffer buffer(data);
-            //            QImageReader reader(&buffer);
-            //            QImage img = reader.read();
-            QImage img;
-            img.loadFromData(
-                reinterpret_cast<const uchar*>(jpegImageData.data()),
-                (int)jpegImageData.size(), "jpeg");
-
-            auto* view = new QGraphicsView(ui->tabWidget);
-            auto* scene = new QGraphicsScene(view);
-            scene->addPixmap(QPixmap::fromImage(img));
-            scene->setSceneRect(img.rect());
-
-            view->setScene(scene);
-            int tabIndex =
-                ui->tabWidget->addTab(view, QString(image2D->text(0)));
-            ui->tabWidget->setCurrentIndex(tabIndex);
+        if (imageRepresentation)
+        {
+            if (imageRepresentation->blobs().contains("jpegImage"))
+            {
+                openImageBlob(imageRepresentation, "jpegImage",
+                              image2D->text(0).toStdString());
+            }
+            else if (imageRepresentation->blobs().contains("pngImage"))
+            {
+                openImageBlob(imageRepresentation, "pngImage",
+                              image2D->text(0).toStdString());
+            }
         }
     }
+}
+
+void MainWindow::openImageBlob(const E57NodePtr& node,
+                               const std::string& blobName,
+                               const std::string& tabName)
+{
+    if (!node->blobs().contains(blobName))
+        return;
+    auto imageData = m_reader->blobData(node->blobs().at(blobName));
+    QByteArray data = QByteArray::fromRawData(
+        reinterpret_cast<const char*>(imageData.data()), imageData.size());
+
+    QImage img;
+    img.loadFromData(reinterpret_cast<const uchar*>(imageData.data()),
+                     (int)imageData.size(), "jpeg");
+
+    auto* view = new QGraphicsView(ui->tabWidget);
+    auto* scene = new QGraphicsScene(view);
+    scene->addPixmap(QPixmap::fromImage(img));
+    scene->setSceneRect(img.rect());
+
+    view->setScene(scene);
+    int tabIndex = ui->tabWidget->addTab(view, QString::fromStdString(tabName));
+    ui->tabWidget->setCurrentIndex(tabIndex);
 }
