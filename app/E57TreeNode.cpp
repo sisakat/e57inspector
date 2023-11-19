@@ -24,27 +24,6 @@ TNodeImage2D::TNodeImage2D(const E57Image2DPtr& node) : TNode(node)
     setText(0, QString::fromStdString(node->name()));
 }
 
-TNodePinholeRepresentation::TNodePinholeRepresentation(
-    const E57PinholeRepresentationPtr& node)
-    : TNode(node)
-{
-    setText(0, QString("Pinhole"));
-}
-
-TNodeSphericalRepresentation::TNodeSphericalRepresentation(
-    const E57SphericalRepresentationPtr& node)
-    : TNode(node)
-{
-    setText(0, QString("Spherical"));
-}
-
-TNodeCylindricalRepresentation::TNodeCylindricalRepresentation(
-    const E57CylindricalRepresentationPtr& node)
-    : TNode(node)
-{
-    setText(0, QString("Cylindrical"));
-}
-
 TNode* createTNode(const E57NodePtr& e57Node)
 {
     if (std::dynamic_pointer_cast<E57Root>(e57Node) != nullptr)
@@ -58,16 +37,6 @@ TNode* createTNode(const E57NodePtr& e57Node)
     else if (std::dynamic_pointer_cast<E57Image2D>(e57Node))
     {
         return new TNodeImage2D(std::dynamic_pointer_cast<E57Image2D>(e57Node));
-    }
-    else if (std::dynamic_pointer_cast<E57PinholeRepresentation>(e57Node))
-    {
-        return new TNodePinholeRepresentation(
-            std::dynamic_pointer_cast<E57PinholeRepresentation>(e57Node));
-    }
-    else if (std::dynamic_pointer_cast<E57SphericalRepresentation>(e57Node))
-    {
-        return new TNodeSphericalRepresentation(
-            std::dynamic_pointer_cast<E57SphericalRepresentation>(e57Node));
     }
 
     return nullptr;

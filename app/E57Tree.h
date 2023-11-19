@@ -18,6 +18,7 @@ public:
 
 signals:
     void nodeSelected(TNode* node);
+    void nodeDoubleClick(TNode* node);
 
 protected:
     void selectionChanged(const QItemSelection& selected,

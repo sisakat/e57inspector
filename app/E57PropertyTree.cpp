@@ -29,6 +29,7 @@ void E57PropertyTree::init(TNode* node)
     addRow(nullptr, "GUID", e57Node->getString("guid", "n.v."), true);
 
     addData3DData(node);
+    addImage2DData(node);
     addRawData(invisibleRootItem(), e57Node);
 
     expandAll();
@@ -59,6 +60,8 @@ void E57PropertyTree::addData3DData(TNode* node)
 
 void E57PropertyTree::addRawData(QTreeWidgetItem* parent, E57NodePtr node)
 {
+    if (!node)
+        return;
     addFields(parent, node);
     for (const auto& child : node->children())
     {
@@ -156,4 +159,38 @@ void E57PropertyTree::mouseDoubleClickEvent(QMouseEvent* event)
 {
     QTreeView::mouseDoubleClickEvent(event);
     qDebug() << "Double click";
+}
+
+void E57PropertyTree::addImage2DData(TNode* node)
+{
+    auto e57Node = std::dynamic_pointer_cast<E57Image2D>(node->node());
+    if (!e57Node)
+        return;
+
+    if (e57Node->pinholeRepresentation())
+    {
+        auto* node = new QTreeWidgetItem();
+        node->setText(COLUMN_KEY, QString("Pinhole Representation"));
+        node->setFont(0, m_boldFont);
+        addTopLevelItem(node);
+        addRawData(node, e57Node->pinholeRepresentation());
+    }
+
+    if (e57Node->sphericalRepresentation())
+    {
+        auto* node = new QTreeWidgetItem();
+        node->setText(COLUMN_KEY, QString("Spherical Representation"));
+        node->setFont(0, m_boldFont);
+        addTopLevelItem(node);
+        addRawData(node, e57Node->sphericalRepresentation());
+    }
+
+    if (e57Node->cylindricalRepresentation())
+    {
+        auto* node = new QTreeWidgetItem();
+        node->setText(COLUMN_KEY, QString("Cylindrical Representation"));
+        node->setFont(0, m_boldFont);
+        addTopLevelItem(node);
+        addRawData(node, e57Node->cylindricalRepresentation());
+    }
 }

@@ -25,6 +25,7 @@ private:
                 const std::string& value, bool bold = false);
 
     void addData3DData(TNode* node);
+    void addImage2DData(TNode* node);
     void addRawData(QTreeWidgetItem* parent, E57NodePtr node);
     void addFields(QTreeWidgetItem* parent, E57NodePtr node);
 

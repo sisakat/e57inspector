@@ -16,6 +16,12 @@ MainWindow::MainWindow(QWidget* parent)
             &MainWindow::actionOpen_triggered);
     connect(ui->twMain, &E57Tree::nodeSelected, this,
             &MainWindow::twMain_nodeSelected);
+    //    connect(ui->tabWidget->tabBar(), &QTabBar::tabCloseRequested,
+    //            ui->tabWidget->tabBar(), &QTabBar::removeTab);
+    connect(ui->tabWidget, &QTabWidget::tabCloseRequested, this,
+            &MainWindow::tabWidget_tabClosesRequested);
+    connect(ui->twMain, &E57Tree::itemDoubleClicked, this,
+            &MainWindow::twMain_itemDoubleClicked);
 }
 
 MainWindow::~MainWindow() { delete ui; }
@@ -45,12 +51,27 @@ void MainWindow::loadE57(const std::string& filename)
 void MainWindow::twMain_nodeSelected(TNode* node)
 {
     ui->twProperties->init(node);
+}
 
-    if (dynamic_cast<TNodePinholeRepresentation*>(node) != nullptr)
+void MainWindow::tabWidget_tabClosesRequested(int index)
+{
+    if (index == -1)
+        return;
+    QWidget* tabItem = ui->tabWidget->widget(index);
+    ui->tabWidget->removeTab(index);
+    delete tabItem;
+    tabItem = nullptr;
+}
+
+void MainWindow::twMain_itemDoubleClicked(QTreeWidgetItem* item, int column)
+{
+    auto* node = dynamic_cast<TNode*>(item);
+    if (dynamic_cast<TNodeImage2D*>(node) != nullptr)
     {
+        auto* image2D = dynamic_cast<TNodeImage2D*>(node);
         // load image
-        auto pinholeRepr =
-            std::dynamic_pointer_cast<E57PinholeRepresentation>(node->node());
+        auto e57Image2D = std::dynamic_pointer_cast<E57Image2D>(node->node());
+        auto pinholeRepr = e57Image2D->pinholeRepresentation();
         if (pinholeRepr->blobs().contains("jpegImage"))
         {
             auto jpegImageData =
@@ -67,12 +88,15 @@ void MainWindow::twMain_nodeSelected(TNode* node)
                 reinterpret_cast<const uchar*>(jpegImageData.data()),
                 (int)jpegImageData.size(), "jpeg");
 
-            auto* scene = new QGraphicsScene(ui->tabWidget);
+            auto* view = new QGraphicsView(ui->tabWidget);
+            auto* scene = new QGraphicsScene(view);
             scene->addPixmap(QPixmap::fromImage(img));
             scene->setSceneRect(img.rect());
-            auto* view = new QGraphicsView(ui->tabWidget);
+
             view->setScene(scene);
-            ui->tabWidget->addTab(view, QString("Test"));
+            int tabIndex =
+                ui->tabWidget->addTab(view, QString(image2D->text(0)));
+            ui->tabWidget->setCurrentIndex(tabIndex);
         }
     }
 }

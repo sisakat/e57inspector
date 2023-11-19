@@ -30,20 +30,6 @@ void E57Tree::init(const E57RootPtr& root)
     for (const auto& image2D : root->images2D())
     {
         auto* node = createTNode(image2D);
-
-        if (image2D->pinholeRepresentation())
-        {
-            node->addChild(createTNode(image2D->pinholeRepresentation()));
-        }
-        if (image2D->sphericalRepresentation())
-        {
-            node->addChild(createTNode(image2D->sphericalRepresentation()));
-        }
-        if (image2D->cylindricalRepresentation())
-        {
-            node->addChild(createTNode(image2D->cylindricalRepresentation()));
-        }
-
         image2DNode->addChild(node);
     }
 
