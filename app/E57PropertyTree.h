@@ -13,6 +13,9 @@ public:
     explicit E57PropertyTree(QWidget* parent = nullptr);
     void init(TNode* node);
 
+protected:
+    void mouseDoubleClickEvent(QMouseEvent* event) override;
+
 private:
     std::set<std::string> m_fields;
 

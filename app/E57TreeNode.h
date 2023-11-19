@@ -26,6 +26,30 @@ public:
     explicit TNodeData3D(const E57Data3DPtr& node);
 };
 
+class TNodeImage2D : public TNode
+{
+public:
+    explicit TNodeImage2D(const E57Image2DPtr& node);
+};
+
+class TNodePinholeRepresentation : public TNode
+{
+public:
+    explicit TNodePinholeRepresentation(const E57PinholeRepresentationPtr& node);
+};
+
+class TNodeSphericalRepresentation : public TNode
+{
+public:
+    explicit TNodeSphericalRepresentation(const E57SphericalRepresentationPtr& node);
+};
+
+class TNodeCylindricalRepresentation : public TNode
+{
+public:
+    explicit TNodeCylindricalRepresentation(const E57CylindricalRepresentationPtr& node);
+};
+
 TNode* createTNode(const E57NodePtr& e57Node);
 
 #endif // E57INSPECTOR_E57TREENODE_H

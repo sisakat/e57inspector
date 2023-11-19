@@ -4,6 +4,11 @@
 
 #include "utils.h"
 
+const int COLUMN_KEY = 0;
+const int COLUMN_VALUE = 1;
+const char* COLUMN_NAMES[]{"Key", "Value"};
+const int COLUMN_COUNT = sizeof(COLUMN_NAMES) / sizeof(char*);
+
 E57PropertyTree::E57PropertyTree(QWidget* parent) : QTreeWidget(parent)
 {
     prepare();
@@ -27,14 +32,17 @@ void E57PropertyTree::init(TNode* node)
 
     expandAll();
     resizeColumnToContents(0);
+    resizeColumnToContents(1);
 }
 
 void E57PropertyTree::prepare()
 {
-    setColumnCount(2);
+    setColumnCount(COLUMN_COUNT);
     auto* header = headerItem();
-    header->setText(0, "Key");
-    header->setText(1, "Value");
+    for (int i = 0; i < COLUMN_COUNT; ++i)
+    {
+        header->setText(i, COLUMN_NAMES[i]);
+    }
 }
 
 void E57PropertyTree::addData3DData(TNode* node)
@@ -54,7 +62,8 @@ void E57PropertyTree::addRawData(QTreeWidgetItem* parent, E57NodePtr node)
     for (const auto& child : node->children())
     {
         auto* item = new QTreeWidgetItem();
-        item->setText(0, QString::fromStdString(camelCaseToPascalCase(child->name())));
+        item->setText(COLUMN_KEY, QString::fromStdString(
+                                      camelCaseToPascalCase(child->name())));
         parent->addChild(item);
         addRawData(item, child);
     }
@@ -64,8 +73,8 @@ void E57PropertyTree::addRow(QTreeWidgetItem* parent, const std::string& key,
                              const std::string& value, bool bold)
 {
     auto* item = new QTreeWidgetItem();
-    item->setText(0, QString::fromStdString(key));
-    item->setText(1, QString::fromStdString(value));
+    item->setText(COLUMN_KEY, QString::fromStdString(key));
+    item->setText(COLUMN_VALUE, QString::fromStdString(value));
     m_fields.insert(to_lower(key));
 
     if (bold)
@@ -99,8 +108,9 @@ void E57PropertyTree::addFields(QTreeWidgetItem* parent, E57NodePtr node)
         if (m_fields.contains(to_lower(key)))
             continue;
         auto* item = new QTreeWidgetItem();
-        item->setText(0, QString::fromStdString(camelCaseToPascalCase(key)));
-        item->setText(1, QString::fromStdString(value));
+        item->setText(COLUMN_KEY,
+                      QString::fromStdString(camelCaseToPascalCase(key)));
+        item->setText(COLUMN_VALUE, QString::fromStdString(value));
         rawData->addChild(item);
     }
 
@@ -109,8 +119,10 @@ void E57PropertyTree::addFields(QTreeWidgetItem* parent, E57NodePtr node)
         if (m_fields.contains(to_lower(key)))
             continue;
         auto* item = new QTreeWidgetItem();
-        item->setText(0, QString::fromStdString(camelCaseToPascalCase(key)));
-        item->setText(1, QString::fromStdString(std::to_string(value)));
+        item->setText(COLUMN_KEY,
+                      QString::fromStdString(camelCaseToPascalCase(key)));
+        item->setText(COLUMN_VALUE,
+                      QString::fromStdString(std::to_string(value)));
         rawData->addChild(item);
     }
 
@@ -119,8 +131,16 @@ void E57PropertyTree::addFields(QTreeWidgetItem* parent, E57NodePtr node)
         if (m_fields.contains(to_lower(key)))
             continue;
         auto* item = new QTreeWidgetItem();
-        item->setText(0, QString::fromStdString(camelCaseToPascalCase(key)));
-        item->setText(1, QString::fromStdString(std::to_string(value)));
+        item->setText(COLUMN_KEY,
+                      QString::fromStdString(camelCaseToPascalCase(key)));
+        item->setText(COLUMN_VALUE,
+                      QString::fromStdString(std::to_string(value)));
         rawData->addChild(item);
     }
+}
+
+void E57PropertyTree::mouseDoubleClickEvent(QMouseEvent* event)
+{
+    QTreeView::mouseDoubleClickEvent(event);
+    qDebug() << "Double click";
 }

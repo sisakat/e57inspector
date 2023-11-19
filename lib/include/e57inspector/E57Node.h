@@ -74,10 +74,67 @@ public:
 private:
 };
 
-class E57Image2D : public E57Node
+class E57PinholeRepresentation : public E57Node
 {
 public:
 private:
+};
+
+class E57SphericalRepresentation : public E57Node
+{
+public:
+private:
+};
+
+class E57CylindricalRepresentation : public E57Node
+{
+public:
+private:
+};
+
+using E57PinholeRepresentationPtr = std::shared_ptr<E57PinholeRepresentation>;
+using E57SphericalRepresentationPtr =
+    std::shared_ptr<E57SphericalRepresentation>;
+using E57CylindricalRepresentationPtr =
+    std::shared_ptr<E57CylindricalRepresentation>;
+
+class E57Image2D : public E57Node
+{
+public:
+    const E57PinholeRepresentationPtr& pinholeRepresentation() const
+    {
+        return m_pinholeRepresentation;
+    }
+
+    const E57SphericalRepresentationPtr& sphericalRepresentation() const
+    {
+        return m_sphericalRepresentation;
+    }
+
+    const E57CylindricalRepresentationPtr& cylindricalRepresentation() const
+    {
+        return m_cylindricalRepresentation;
+    }
+
+    void setPinholeRepresentation(E57PinholeRepresentationPtr repr)
+    {
+        m_pinholeRepresentation = std::move(repr);
+    }
+
+    void setSphericalRepresentation(E57SphericalRepresentationPtr repr)
+    {
+        m_sphericalRepresentation = std::move(repr);
+    }
+
+    void setCylindricalRepresentation(E57CylindricalRepresentationPtr repr)
+    {
+        m_cylindricalRepresentation = std::move(repr);
+    }
+
+private:
+    E57PinholeRepresentationPtr m_pinholeRepresentation;
+    E57SphericalRepresentationPtr m_sphericalRepresentation;
+    E57CylindricalRepresentationPtr m_cylindricalRepresentation;
 };
 
 using E57NodePtr = std::shared_ptr<E57Node>;

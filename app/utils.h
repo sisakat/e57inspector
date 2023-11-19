@@ -16,9 +16,11 @@ std::string camelCaseToPascalCase(const std::string& str,
 {
     std::string result;
     bool first = true;
+    char previous = ' ';
     for (const auto& ch : str)
     {
-        if (std::tolower(ch) != ch || first)
+        if ((std::tolower(ch) != ch || first) &&
+            (previous < '0' || previous > '9'))
         {
             first = false;
             if (result.size() > 0)
@@ -31,6 +33,7 @@ std::string camelCaseToPascalCase(const std::string& str,
         {
             result += ch;
         }
+        previous = ch;
     }
     return result;
 }

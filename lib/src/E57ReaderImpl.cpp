@@ -1,11 +1,13 @@
 #include "E57ReaderImpl.h"
 
 #include <filesystem>
+#include <set>
 
 template <typename T>
-std::shared_ptr<T> convertE57StructureNode(const e57::StructureNode& node)
+void parseFields(const std::shared_ptr<T>& result,
+                 const e57::StructureNode& node,
+                 const std::set<std::string>& ignoreFields = {})
 {
-    std::shared_ptr<T> result = std::make_shared<T>();
     result->setName(node.elementName());
 
     if (node.isDefined("name"))
@@ -16,6 +18,10 @@ std::shared_ptr<T> convertE57StructureNode(const e57::StructureNode& node)
     for (int64_t i = 0; i < node.childCount(); ++i)
     {
         auto child = node.get(i);
+        if (ignoreFields.contains(child.elementName()))
+        {
+            continue;
+        }
         if (child.type() == e57::TypeString)
         {
             result->strings()[child.elementName()] =
@@ -33,29 +39,58 @@ std::shared_ptr<T> convertE57StructureNode(const e57::StructureNode& node)
         }
         else if (child.type() == e57::TypeStructure)
         {
-            result->addChild(
-                convertE57StructureNode<E57Node>(e57::StructureNode(child)));
+            auto item = std::make_shared<E57Node>();
+            parseFields<E57Node>(item, e57::StructureNode(child));
+            result->addChild(item);
         }
     }
-
-    return result;
 }
 
 E57Data3DPtr parseData3D(const e57::StructureNode& node)
 {
-    auto result = convertE57StructureNode<E57Data3D>(node);
+    auto result = std::make_shared<E57Data3D>();
+    parseFields<E57Data3D>(result, node);
     return result;
 }
 
 E57Image2DPtr parseImage2D(const e57::StructureNode& node)
 {
-    auto result = convertE57StructureNode<E57Image2D>(node);
+    auto result = std::make_shared<E57Image2D>();
+
+    if (node.isDefined("pinholeRepresentation"))
+    {
+        auto pinholeRepr = std::make_shared<E57PinholeRepresentation>();
+        parseFields<E57PinholeRepresentation>(
+            pinholeRepr, e57::StructureNode(node.get("pinholeRepresentation")));
+        result->setPinholeRepresentation(pinholeRepr);
+    }
+
+    if (node.isDefined("sphericalRepresentation"))
+    {
+        auto sphericalRepr = std::make_shared<E57SphericalRepresentation>();
+        parseFields<E57SphericalRepresentation>(
+            sphericalRepr, e57::StructureNode(node.get("sphericalRepr")));
+        result->setSphericalRepresentation(sphericalRepr);
+    }
+
+    if (node.isDefined("cylindricalRepresentation"))
+    {
+        auto cylindricalRepr = std::make_shared<E57CylindricalRepresentation>();
+        parseFields<E57CylindricalRepresentation>(
+            cylindricalRepr, e57::StructureNode(node.get("cylindricalRepr")));
+        result->setCylindricalRepresentation(cylindricalRepr);
+    }
+
+    parseFields<E57Image2D>(result, node,
+                            {"pinholeRepresentation", "sphericalRepresentation",
+                             "cylindricalRepresentation"});
     return result;
 }
 
 E57RootPtr parseRoot(const e57::StructureNode& node)
 {
-    auto result = convertE57StructureNode<E57Root>(node);
+    auto result = std::make_shared<E57Root>();
+    parseFields<E57Root>(result, node);
 
     if (node.isDefined("data3D"))
     {
