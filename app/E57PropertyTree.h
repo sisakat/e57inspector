@@ -29,6 +29,7 @@ private:
     void addFields(QTreeWidgetItem* parent, E57NodePtr node);
 
     QFont m_boldFont;
+    QFont m_italicFont;
 };
 
 #endif // E57INSPECTOR_E57PROPERTYTREE_H

@@ -2,7 +2,10 @@
 #include "./ui_mainwindow.h"
 #include "E57TreeNode.h"
 
+#include <QBuffer>
 #include <QFileDialog>
+#include <QGraphicsScene>
+#include <QGraphicsView>
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
@@ -42,4 +45,34 @@ void MainWindow::loadE57(const std::string& filename)
 void MainWindow::twMain_nodeSelected(TNode* node)
 {
     ui->twProperties->init(node);
+
+    if (dynamic_cast<TNodePinholeRepresentation*>(node) != nullptr)
+    {
+        // load image
+        auto pinholeRepr =
+            std::dynamic_pointer_cast<E57PinholeRepresentation>(node->node());
+        if (pinholeRepr->blobs().contains("jpegImage"))
+        {
+            auto jpegImageData =
+                m_reader->blobData(pinholeRepr->blobs().at("jpegImage"));
+
+            QByteArray data = QByteArray::fromRawData(
+                reinterpret_cast<const char*>(jpegImageData.data()),
+                jpegImageData.size());
+            //            QBuffer buffer(data);
+            //            QImageReader reader(&buffer);
+            //            QImage img = reader.read();
+            QImage img;
+            img.loadFromData(
+                reinterpret_cast<const uchar*>(jpegImageData.data()),
+                (int)jpegImageData.size(), "jpeg");
+
+            auto* scene = new QGraphicsScene(ui->tabWidget);
+            scene->addPixmap(QPixmap::fromImage(img));
+            scene->setSceneRect(img.rect());
+            auto* view = new QGraphicsView(ui->tabWidget);
+            view->setScene(scene);
+            ui->tabWidget->addTab(view, QString("Test"));
+        }
+    }
 }

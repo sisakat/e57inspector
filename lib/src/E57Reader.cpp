@@ -10,3 +10,8 @@ E57Reader::E57Reader(const std::string& filename)
 E57Reader::~E57Reader() { delete m_impl; }
 
 const E57RootPtr& E57Reader::root() const { return m_impl->root(); }
+
+std::vector<uint8_t> E57Reader::blobData(uint32_t blobId) const
+{
+    return m_impl->blobData(blobId);
+}

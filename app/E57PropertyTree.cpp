@@ -13,6 +13,7 @@ E57PropertyTree::E57PropertyTree(QWidget* parent) : QTreeWidget(parent)
 {
     prepare();
     m_boldFont.setBold(true);
+    m_italicFont.setItalic(true);
 }
 
 void E57PropertyTree::init(TNode* node)
@@ -135,6 +136,18 @@ void E57PropertyTree::addFields(QTreeWidgetItem* parent, E57NodePtr node)
                       QString::fromStdString(camelCaseToPascalCase(key)));
         item->setText(COLUMN_VALUE,
                       QString::fromStdString(std::to_string(value)));
+        rawData->addChild(item);
+    }
+
+    for (const auto& [key, value] : node->blobs())
+    {
+        if (m_fields.contains(to_lower(key)))
+            continue;
+        auto* item = new QTreeWidgetItem();
+        item->setText(COLUMN_KEY,
+                      QString::fromStdString(camelCaseToPascalCase(key)));
+        item->setText(COLUMN_VALUE, "(available)");
+        item->setFont(COLUMN_VALUE, m_italicFont);
         rawData->addChild(item);
     }
 }

@@ -12,6 +12,7 @@ public:
     using strings_t = std::unordered_map<std::string, std::string>;
     using integers_t = std::unordered_map<std::string, int64_t>;
     using floats_t = std::unordered_map<std::string, double>;
+    using blobs_t = std::unordered_map<std::string, uint32_t>;
 
     E57Node() = default;
     virtual ~E57Node() = default;
@@ -22,10 +23,12 @@ public:
     [[nodiscard]] const strings_t& strings() const { return m_strings; }
     [[nodiscard]] const integers_t& integers() const { return m_integers; }
     [[nodiscard]] const floats_t& floats() const { return m_floats; }
+    [[nodiscard]] const blobs_t& blobs() const { return m_blobs; }
 
     [[nodiscard]] strings_t& strings() { return m_strings; }
     [[nodiscard]] integers_t& integers() { return m_integers; }
     [[nodiscard]] floats_t& floats() { return m_floats; }
+    [[nodiscard]] blobs_t& blobs() { return m_blobs; }
 
     [[nodiscard]] std::string
     getString(const std::string& name,
@@ -65,10 +68,17 @@ private:
     strings_t m_strings;
     integers_t m_integers;
     floats_t m_floats;
+    blobs_t m_blobs;
     std::vector<std::shared_ptr<E57Node>> m_children;
 };
 
 class E57Data3D : public E57Node
+{
+public:
+private:
+};
+
+class E57Blob : public E57Node
 {
 public:
 private:
