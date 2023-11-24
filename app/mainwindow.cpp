@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include "E57TreeNode.h"
+#include "siimageviewer.h"
 
 #include <QBuffer>
 #include <QFileDialog>
@@ -117,13 +118,8 @@ void MainWindow::openImageBlob(const E57NodePtr& node,
     QImage img;
     img.loadFromData(reinterpret_cast<const uchar*>(imageData.data()),
                      (int)imageData.size(), "jpeg");
-
-    auto* view = new QGraphicsView(ui->tabWidget);
-    auto* scene = new QGraphicsScene(view);
-    scene->addPixmap(QPixmap::fromImage(img));
-    scene->setSceneRect(img.rect());
-
-    view->setScene(scene);
-    int tabIndex = ui->tabWidget->addTab(view, QString::fromStdString(tabName));
+    auto* imageViewer = new SiImageViewer(ui->tabWidget);
+    int tabIndex = ui->tabWidget->addTab(imageViewer, QString::fromStdString(tabName));
     ui->tabWidget->setCurrentIndex(tabIndex);
+    imageViewer->openImage(img);
 }

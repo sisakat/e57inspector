@@ -1,5 +1,5 @@
 
-find_package(Qt6 COMPONENTS Widgets REQUIRED)
+find_package(Qt6 COMPONENTS Widgets OpenGL OpenGLWidgets REQUIRED)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
@@ -16,9 +16,13 @@ add_executable(${PROJECT_NAME}
         E57Tree.h
         E57PropertyTree.cpp
         E57PropertyTree.h
-        utils.h)
+        utils.h
+        siimageviewer.cpp
+        siimageviewer.h)
 target_link_libraries(${PROJECT_NAME} PRIVATE
         E57Format
         Qt6::Widgets
+        Qt6::OpenGL
+        Qt6::OpenGLWidgets
         ${PROJECT_NAME}_lib)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
