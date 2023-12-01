@@ -1,0 +1,71 @@
+#ifndef SIPOINTCLOUDRENDERER_H
+#define SIPOINTCLOUDRENDERER_H
+
+#include <QWidget>
+#include <QOpenGLFunctions>
+#include <QOpenGLFunctions_3_3_Core>
+#include <QOpenGLDebugLogger>
+#include <QOpenGLWidget>
+#include <QMatrix4x4>
+#include <vector>
+#include <memory>
+
+#include "octree.h"
+#include "scene.h"
+#include "camera.h"
+#include "pointcloud.h"
+
+class SiPointCloudRenderer : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core
+{
+    Q_OBJECT
+public:
+    SiPointCloudRenderer(QWidget *parent = nullptr);
+    ~SiPointCloudRenderer();
+
+    void reset();
+    void insert(const std::vector<PointData>& data);
+    void doneInserting();
+
+protected:
+    void initializeGL() override;
+    void paintGL() override;
+    void resizeGL(int width, int height) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void wheelEvent(QWheelEvent *event) override;
+    void keyPressEvent(QKeyEvent *event) override;
+    void keyReleaseEvent(QKeyEvent *event) override;
+
+private slots:
+    void onMessageLogged(const QOpenGLDebugMessage &debugMessage);
+
+private:
+    QOpenGLDebugLogger m_openGLLogger;
+
+    GLuint m_vertexShader;
+    GLuint m_fragmentShader;
+    GLuint m_shaderProgram;
+
+    // Uniform locations
+    GLuint m_modelLocation;
+    GLuint m_viewLocation;
+    GLuint m_projectionLocation;
+
+    QMatrix4x4 m_model;
+    QMatrix4x4 m_view;
+    QMatrix4x4 m_projection;
+
+    Octree m_octree;
+    bool m_render;
+
+    Scene::Ptr m_scene;
+    Camera::Ptr m_camera;
+    PointCloud::Ptr m_pointCloud;
+
+    void setupScene();
+    void setupShaders();
+    void setupBuffers();
+};
+
+#endif // SIPOINTCLOUDRENDERER_H

@@ -60,6 +60,8 @@ void E57ReaderImpl::parseFields(E57NodePtr result,
             elementName[0] = static_cast<char>(std::toupper(elementName[0]));
             result->integers()["Num" + elementName] =
                 compressedVectorNode.childCount();
+            uint32_t dataId = registerData(compressedVectorNode);
+            result->data()[compressedVectorNode.elementName()] = dataId;
         }
     }
 }
@@ -155,6 +157,12 @@ uint32_t E57ReaderImpl::registerBlob(e57::BlobNode& blob)
     return m_blobs.size() - 1;
 }
 
+uint32_t E57ReaderImpl::registerData(e57::CompressedVectorNode& data)
+{
+    m_data.push_back(data);
+    return m_data.size() - 1;
+}
+
 std::vector<uint8_t> E57ReaderImpl::blobData(uint32_t blobId) const
 {
     if (m_blobs.size() <= blobId)
@@ -164,4 +172,91 @@ std::vector<uint8_t> E57ReaderImpl::blobData(uint32_t blobId) const
     std::vector<uint8_t> buffer(blob.byteCount());
     blob.read(buffer.data(), 0, blob.byteCount());
     return buffer;
+}
+
+std::vector<std::array<double, 4>> E57ReaderImpl::data(uint32_t dataId) const
+{
+    if (m_data.size() <= dataId)
+        throw std::runtime_error("Cannot retrieve data. Invalid data id.");
+
+    auto data = m_data.at(dataId);
+
+    std::vector<std::array<double, 4>> result;
+    std::vector<std::array<double, 4>> buffer(10000 * 4);
+    std::vector<e57::SourceDestBuffer> sourceDestBuffers;
+    sourceDestBuffers.emplace_back(data.destImageFile(), "cartesianX",
+                                   reinterpret_cast<double*>(buffer.data()),
+                                   buffer.size() / 4, true, true,
+                                   4 * sizeof(double));
+    sourceDestBuffers.emplace_back(data.destImageFile(), "cartesianY",
+                                   reinterpret_cast<double*>(buffer.data()) + 1,
+                                   buffer.size() / 4, true, true,
+                                   4 * sizeof(double));
+    sourceDestBuffers.emplace_back(data.destImageFile(), "cartesianZ",
+                                   reinterpret_cast<double*>(buffer.data()) + 2,
+                                   buffer.size() / 4, true, true,
+                                   4 * sizeof(double));
+    sourceDestBuffers.emplace_back(data.destImageFile(), "intensity",
+                                   reinterpret_cast<double*>(buffer.data()) + 3,
+                                   buffer.size() / 4, true, true,
+                                   4 * sizeof(double));
+
+    auto reader = data.reader(sourceDestBuffers);
+    while (reader.read(sourceDestBuffers))
+    {
+        std::copy(buffer.begin(), buffer.end(), std::back_inserter(result));
+    }
+    return result;
+}
+std::vector<E57DataInfo> E57ReaderImpl::dataInfo(uint32_t dataId) const
+{
+    if (m_data.size() <= dataId)
+        throw std::runtime_error("Cannot retrieve data. Invalid data id.");
+
+    auto data = m_data.at(dataId);
+    auto prototype = e57::StructureNode(data.prototype());
+
+    std::vector<E57DataInfo> result;
+
+    for (uint64_t i = 0; i < prototype.childCount(); ++i)
+    {
+        auto child = prototype.get(i);
+
+        E57DataInfo dataInfo;
+        dataInfo.identifier = child.elementName();
+
+        switch (child.type())
+        {
+        case e57::TypeInteger:
+        {
+            auto c = e57::IntegerNode(child);
+            dataInfo.dataType = E57DataType::INTEGER;
+            dataInfo.minValue = c.minimum();
+            dataInfo.maxValue = c.maximum();
+            break;
+        }
+        case e57::TypeScaledInteger:
+        {
+            auto c = e57::ScaledIntegerNode(child);
+            dataInfo.dataType = E57DataType::FLOAT;
+            dataInfo.minValue = c.scaledMinimum();
+            dataInfo.maxValue = c.scaledMaximum();
+            break;
+        }
+        case e57::TypeFloat:
+        {
+            auto c = e57::FloatNode(child);
+            dataInfo.dataType = E57DataType::FLOAT;
+            dataInfo.minValue = c.minimum();
+            dataInfo.maxValue = c.maximum();
+            break;
+        }
+        default:
+            continue;
+        }
+
+        result.push_back(dataInfo);
+    }
+
+    return result;
 }

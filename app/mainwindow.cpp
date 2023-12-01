@@ -2,6 +2,7 @@
 #include "./ui_mainwindow.h"
 #include "E57TreeNode.h"
 #include "siimageviewer.h"
+#include "sipointcloudrenderer.h"
 
 #include <QBuffer>
 #include <QFileDialog>
@@ -100,6 +101,15 @@ void MainWindow::twMain_itemDoubleClicked(QTreeWidgetItem* item, int column)
             }
         }
     }
+    else if (dynamic_cast<TNodeData3D*>(node) != nullptr)
+    {
+        auto* data3D = dynamic_cast<TNodeData3D*>(node);
+        auto e57Data3D = std::dynamic_pointer_cast<E57Data3D>(node->node());
+        if (e57Data3D->data().contains("points"))
+        {
+            openPointCloud(e57Data3D, "points", data3D->text(0).toStdString());
+        }
+    }
 }
 
 void MainWindow::openImageBlob(const E57NodePtr& node,
@@ -119,7 +129,42 @@ void MainWindow::openImageBlob(const E57NodePtr& node,
     img.loadFromData(reinterpret_cast<const uchar*>(imageData.data()),
                      (int)imageData.size(), "jpeg");
     auto* imageViewer = new SiImageViewer(ui->tabWidget);
-    int tabIndex = ui->tabWidget->addTab(imageViewer, QString::fromStdString(tabName));
+    int tabIndex =
+        ui->tabWidget->addTab(imageViewer, QString::fromStdString(tabName));
     ui->tabWidget->setCurrentIndex(tabIndex);
-    imageViewer->openImage(img);
+    imageViewer->setImage(img);
+}
+
+void MainWindow::openPointCloud(const E57NodePtr& node,
+                                const std::string& dataName,
+                                const std::string& tabName)
+{
+    if (!node->data().contains(dataName))
+        return;
+
+    auto dataInfo = m_reader->dataInfo(node->data().at(dataName));
+
+    auto* pointCloudViewer = new SiPointCloudRenderer(ui->tabWidget);
+    int tabIndex = ui->tabWidget->addTab(pointCloudViewer,
+                                         QString::fromStdString(tabName));
+    ui->tabWidget->setCurrentIndex(tabIndex);
+
+    auto data = m_reader->data(node->data().at(dataName));
+    std::vector<PointData> pointData;
+    for (const auto& point : data)
+    {
+        PointData pd{};
+        pd.xyz[0] = (float)point[0];
+        pd.xyz[1] = (float)point[1];
+        pd.xyz[2] = (float)point[2];
+                pd.rgb[0] = (float)point[3]/30.0;
+                pd.rgb[1] = (float)point[3]/30.0;
+                pd.rgb[2] = (float)point[3]/30.0;
+        pd.rgb[0] = 1.0;
+        pd.rgb[1] = 1.0;
+        pd.rgb[2] = 1.0;
+        pointData.push_back(pd);
+    }
+    pointCloudViewer->insert(pointData);
+    pointCloudViewer->doneInserting();
 }

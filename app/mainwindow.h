@@ -37,6 +37,8 @@ private:
     void loadE57(const std::string& filename);
     void openImageBlob(const E57NodePtr& node, const std::string& blobName,
                        const std::string& tabName);
+    void openPointCloud(const E57NodePtr& node, const std::string& dataName,
+                        const std::string& tabName);
 };
 
 #endif // E57INSPECTOR_MAINWINDOW_H

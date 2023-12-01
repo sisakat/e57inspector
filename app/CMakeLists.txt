@@ -18,11 +18,26 @@ add_executable(${PROJECT_NAME}
         E57PropertyTree.h
         utils.h
         siimageviewer.cpp
-        siimageviewer.h)
+        siimageviewer.h
+        pointcloudrenderer/sipointcloudrenderer.cpp
+        pointcloudrenderer/sipointcloudrenderer.h
+        pointcloudrenderer/openglarraybuffer.cpp
+        pointcloudrenderer/openglarraybuffer.h
+        pointcloudrenderer/octree.h
+        pointcloudrenderer/octree.cpp
+        pointcloudrenderer/silrucache.h
+        pointcloudrenderer/scene.h
+        pointcloudrenderer/scene.cpp
+        pointcloudrenderer/camera.h
+        pointcloudrenderer/camera.cpp
+        pointcloudrenderer/pointcloud.h
+        pointcloudrenderer/pointcloud.cpp)
 target_link_libraries(${PROJECT_NAME} PRIVATE
         E57Format
         Qt6::Widgets
         Qt6::OpenGL
         Qt6::OpenGLWidgets
         ${PROJECT_NAME}_lib)
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(${PROJECT_NAME} PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/pointcloudrenderer)
