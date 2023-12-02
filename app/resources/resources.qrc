@@ -1,0 +1,29 @@
+<!DOCTYPE RCC><RCC version="1.0">
+    <qresource>
+        <file>icons/Data3D.png</file>
+    </qresource>
+    <qresource>
+        <file>icons/E57.png</file>
+    </qresource>
+    <qresource>
+        <file>icons/Float.png</file>
+    </qresource>
+    <qresource>
+        <file>icons/Image2D.png</file>
+    </qresource>
+    <qresource>
+        <file>icons/Integer.png</file>
+    </qresource>
+    <qresource>
+        <file>icons/Pointcloud.png</file>
+    </qresource>
+    <qresource>
+        <file>icons/Pose.png</file>
+    </qresource>
+    <qresource>
+        <file>icons/Spherical.png</file>
+    </qresource>
+    <qresource>
+        <file>icons/String.png</file>
+    </qresource>
+</RCC>

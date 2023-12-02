@@ -14,6 +14,7 @@ E57PropertyTree::E57PropertyTree(QWidget* parent) : QTreeWidget(parent)
     prepare();
     m_boldFont.setBold(true);
     m_italicFont.setItalic(true);
+    setIconSize(QSize(16, 16));
 }
 
 void E57PropertyTree::init(TE57Node* node)
@@ -32,7 +33,7 @@ void E57PropertyTree::init(TE57Node* node)
     addImage2DData(node);
     addRawData(invisibleRootItem(), e57Node);
 
-    expandAll();
+    //expandAll();
     resizeColumnToContents(0);
     resizeColumnToContents(1);
 }
@@ -68,6 +69,10 @@ void E57PropertyTree::addRawData(QTreeWidgetItem* parent, E57NodePtr node)
         auto* item = new QTreeWidgetItem();
         item->setText(COLUMN_KEY, QString::fromStdString(
                                       camelCaseToPascalCase(child->name())));
+        if (child->name() == "pose")
+        {
+            item->setIcon(0, QIcon(":/icons/Pose.png"));
+        }
         parent->addChild(item);
         addRawData(item, child);
     }
@@ -79,6 +84,7 @@ void E57PropertyTree::addRow(QTreeWidgetItem* parent, const std::string& key,
     auto* item = new QTreeWidgetItem();
     item->setText(COLUMN_KEY, QString::fromStdString(key));
     item->setText(COLUMN_VALUE, QString::fromStdString(value));
+
     m_fields.insert(to_lower(key));
 
     if (bold)
@@ -115,6 +121,7 @@ void E57PropertyTree::addFields(QTreeWidgetItem* parent, E57NodePtr node)
         item->setText(COLUMN_KEY,
                       QString::fromStdString(camelCaseToPascalCase(key)));
         item->setText(COLUMN_VALUE, QString::fromStdString(value));
+        item->setIcon(0, QIcon(":/icons/String.png"));
         rawData->addChild(item);
     }
 
@@ -127,6 +134,7 @@ void E57PropertyTree::addFields(QTreeWidgetItem* parent, E57NodePtr node)
                       QString::fromStdString(camelCaseToPascalCase(key)));
         item->setText(COLUMN_VALUE,
                       QString::fromStdString(std::to_string(value)));
+        item->setIcon(0, QIcon(":/icons/Integer.png"));
         rawData->addChild(item);
     }
 
@@ -139,6 +147,7 @@ void E57PropertyTree::addFields(QTreeWidgetItem* parent, E57NodePtr node)
                       QString::fromStdString(camelCaseToPascalCase(key)));
         item->setText(COLUMN_VALUE,
                       QString::fromStdString(std::to_string(value)));
+        item->setIcon(0, QIcon(":/icons/Float.png"));
         rawData->addChild(item);
     }
 

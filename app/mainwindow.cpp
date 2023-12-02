@@ -51,9 +51,9 @@ void MainWindow::loadE57(const std::string& filename)
 
 void MainWindow::twMain_nodeSelected(TNode* node)
 {
-    if (dynamic_cast<TNodeE57*>(node) != nullptr)
+    if (dynamic_cast<TE57Node*>(node) != nullptr)
     {
-        ui->twProperties->init(dynamic_cast<TNodeE57*>(node));
+        ui->twProperties->init(dynamic_cast<TE57Node*>(node));
     }
 }
 

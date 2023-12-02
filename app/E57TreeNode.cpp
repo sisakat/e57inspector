@@ -12,11 +12,13 @@ E57NodePtr TE57Node::node() { return m_node; }
 TNodeE57::TNodeE57(const E57RootPtr& root) : TE57Node(root)
 {
     setText(0, QString::fromStdString(root->name()));
+    setIcon(0, QIcon(":/icons/E57.png"));
 }
 
 TNodeData3D::TNodeData3D(const E57Data3DPtr& node) : TE57Node(node)
 {
     setText(0, QString::fromStdString(node->name()));
+    setIcon(0, QIcon(":/icons/Pointcloud.png"));
 
     m_images = new TNodeImages();
     addChild(m_images);
@@ -25,11 +27,13 @@ TNodeData3D::TNodeData3D(const E57Data3DPtr& node) : TE57Node(node)
 TNodeImages::TNodeImages() : TNode()
 {
     setText(0, "Images");
+    setIcon(0, QIcon(":/icons/Image2D.png"));
 }
 
 TNodeImage2D::TNodeImage2D(const E57Image2DPtr& node) : TE57Node(node)
 {
     setText(0, QString::fromStdString(node->name()));
+    setIcon(0, QIcon(":/icons/Image2D.png"));
 }
 
 TNode* createTNode(const E57NodePtr& e57Node)

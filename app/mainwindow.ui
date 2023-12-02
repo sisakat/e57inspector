@@ -45,7 +45,7 @@
        <widget class="E57PropertyTree" name="twProperties">
         <property name="styleSheet">
          <string notr="true">QTreeWidget::item{
-	height: 25px;
+	height: 24px;
 }</string>
         </property>
         <column>

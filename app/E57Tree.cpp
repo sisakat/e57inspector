@@ -4,6 +4,7 @@ E57Tree::E57Tree(QWidget* parent) : QTreeWidget(parent)
 {
     setColumnCount(1);
     setHeaderHidden(true);
+    setIconSize(QSize(16, 16));
 }
 
 void E57Tree::init(const E57RootPtr& root)
@@ -15,6 +16,7 @@ void E57Tree::init(const E57RootPtr& root)
 
     auto* data3DNode = new QTreeWidgetItem();
     data3DNode->setText(0, "Data 3D");
+    data3DNode->setIcon(0, QIcon(":/icons/Data3D.png"));
     topLevelNode->addChild(data3DNode);
 
     for (const auto& data3D : root->data3D())
@@ -25,6 +27,7 @@ void E57Tree::init(const E57RootPtr& root)
 
     auto* image2DNode = new QTreeWidgetItem();
     image2DNode->setText(0, "Images 2D");
+    image2DNode->setIcon(0, QIcon(":/icons/Image2D.png"));
     topLevelNode->addChild(image2DNode);
 
     for (const auto& image2D : root->images2D())
