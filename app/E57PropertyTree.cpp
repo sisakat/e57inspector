@@ -33,9 +33,9 @@ void E57PropertyTree::init(TE57Node* node)
     addImage2DData(node);
     addRawData(invisibleRootItem(), e57Node);
 
-    //expandAll();
+    expandAll();
     resizeColumnToContents(0);
-    resizeColumnToContents(1);
+    //resizeColumnToContents(1);
 }
 
 void E57PropertyTree::prepare()

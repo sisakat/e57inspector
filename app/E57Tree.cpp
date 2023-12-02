@@ -46,7 +46,9 @@ void E57Tree::init(const E57RootPtr& root)
         }
     }
 
-    expandAll();
+    topLevelNode->setExpanded(true);
+    data3DNode->setExpanded(true);
+    image2DNode->setExpanded(true);
     resizeColumnToContents(0);
 }
 

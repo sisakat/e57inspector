@@ -9,6 +9,9 @@
         <file>icons/Float.png</file>
     </qresource>
     <qresource>
+        <file>icons/Image.png</file>
+    </qresource>
+    <qresource>
         <file>icons/Image2D.png</file>
     </qresource>
     <qresource>

@@ -33,7 +33,7 @@ TNodeImages::TNodeImages() : TNode()
 TNodeImage2D::TNodeImage2D(const E57Image2DPtr& node) : TE57Node(node)
 {
     setText(0, QString::fromStdString(node->name()));
-    setIcon(0, QIcon(":/icons/Image2D.png"));
+    setIcon(0, QIcon(":/icons/Image.png"));
 }
 
 TNode* createTNode(const E57NodePtr& e57Node)
