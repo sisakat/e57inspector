@@ -22,8 +22,8 @@ void Camera::render()
     m_view.setToIdentity();
     m_view.lookAt(m_position, m_center, m_up);
     m_projection.setToIdentity();
-    m_projection.perspective(45, 1.0f * m_viewportWidth / m_viewportHeight, 0.001f,
-                             1000.0f);
+    m_projection.perspective(45, 1.0f * m_viewportWidth / m_viewportHeight,
+                             0.001f, 1000.0f);
 
     glUniformMatrix4fv(m_viewLocation, 1, GL_FALSE, m_view.data());
     glUniformMatrix4fv(m_projectionLocation, 1, GL_FALSE, m_projection.data());
@@ -55,11 +55,21 @@ void Camera::mouseMoveEvent(QMouseEvent* event)
         auto deltaVec = QVector2D(delta.x(), delta.y());
         auto viewVec = (m_position - m_center).normalized();
         auto up = m_up;
-        if (std::abs(QVector3D::dotProduct(viewVec, m_up) - 1) <
-            std::numeric_limits<float>::epsilon())
+        auto angle = QVector3D::dotProduct(viewVec, m_up);
+
+        // prevent view vector to align with up vector
+        if (std::abs(angle) > 0.95)
         {
-            up = QVector3D(1.0f, 0.0f, 0.0f);
+            if (angle < 0 && deltaVec.y() > 0)
+            {
+                deltaVec.setY(0);
+            }
+            else if (angle > 0 && deltaVec.y() < 0)
+            {
+                deltaVec.setY(0);
+            }
         }
+
         auto rotVec = QVector3D::crossProduct(up, viewVec);
 
         const QVector3D zAxis(0.0f, 0.0f, 1.0f);
