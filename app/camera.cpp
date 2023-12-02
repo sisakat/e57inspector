@@ -44,7 +44,7 @@ void Camera::pitch(float angle)
     auto cosViewUp = QVector3D::dotProduct(viewVec, m_up);
 
     // prevent view vector to align with up vector
-    if (std::abs(cosViewUp) > 0.95)
+    if (std::abs(cosViewUp) > 0.98)
     {
         if (cosViewUp < 0.0f && angle > 0.0f)
         {

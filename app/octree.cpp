@@ -1,13 +1,13 @@
 #include "octree.h"
 
+#include <cassert>
 #include <limits>
 
 const auto doubleMin = std::numeric_limits<double>::min();
 const auto doubleMax = std::numeric_limits<double>::max();
 
 uint32_t calculateChildIndex(const OctreeElement& element,
-                             const double resolution,
-                             const uint32_t depth)
+                             const double resolution, const uint32_t depth)
 {
     UVW uvw = element.getUVW(resolution, depth);
     return 4 * uvw.w + 2 * uvw.v + uvw.u;
@@ -16,15 +16,16 @@ uint32_t calculateChildIndex(const OctreeElement& element,
 OctreeNode::OctreeNode(uint32_t elementLimit, double resolution)
     : m_elementLimit{elementLimit}, m_resolution{resolution}
 {
-
 }
 
-void OctreeNode::insert(const std::vector<OctreeElement> &elements, uint32_t currentDepth)
+void OctreeNode::insert(const std::vector<OctreeElement>& elements,
+                        uint32_t currentDepth)
 {
     if (elements.size() <= m_elementLimit || currentDepth == 31)
     {
         // store the points - making it a leaf
-        m_elements = elements;
+        std::copy(elements.begin(), elements.end(),
+                  std::back_inserter(m_elements));
         return;
     }
 
@@ -32,7 +33,9 @@ void OctreeNode::insert(const std::vector<OctreeElement> &elements, uint32_t cur
 
     for (auto& element : elements)
     {
-        const uint32_t i = calculateChildIndex(element, m_resolution, currentDepth);
+        const uint32_t i =
+            calculateChildIndex(element, m_resolution, currentDepth);
+        assert(i < 8);
         childPointCounts[i]++;
     }
 
@@ -41,7 +44,9 @@ void OctreeNode::insert(const std::vector<OctreeElement> &elements, uint32_t cur
         if (!childPointCounts[i])
             continue;
 
-        m_childNodes[i] = std::make_unique<OctreeNode>(m_elementLimit, m_resolution);
+        if (!m_childNodes[i])
+            m_childNodes[i] =
+                std::make_unique<OctreeNode>(m_elementLimit, m_resolution);
 
         std::vector<OctreeElement> newElements;
         for (const auto& element : elements)
@@ -56,10 +61,7 @@ void OctreeNode::insert(const std::vector<OctreeElement> &elements, uint32_t cur
     }
 }
 
-bool OctreeNode::isLeaf() const
-{
-    return !m_elements.empty();
-}
+bool OctreeNode::isLeaf() const { return !m_elements.empty(); }
 
 void OctreeNode::finalize()
 {
@@ -72,7 +74,8 @@ void OctreeNode::finalize()
     int onlyChildIdx = getOnlyChildIndex();
     if (onlyChildIdx != -1)
     {
-        std::unique_ptr<OctreeNode> child(std::move(m_childNodes[onlyChildIdx]));
+        std::unique_ptr<OctreeNode> child(
+            std::move(m_childNodes[onlyChildIdx]));
         m_childNodes[onlyChildIdx] = nullptr;
         for (size_t i = 0; i < 8; ++i)
         {
@@ -102,29 +105,20 @@ Octree::Octree(uint32_t elementLimit, double resolution)
     : m_elementLimit{elementLimit}, m_resolution{resolution},
       m_root{std::make_unique<OctreeNode>(m_elementLimit, m_resolution)}
 {
-
 }
 
-void Octree::insert(const std::vector<PointData> &elements)
+void Octree::insert(const std::vector<PointData>& elements)
 {
     std::vector<OctreeElement> octreeElements(elements.size());
-    for (size_t i = 0; i < elements.size(); ++i) {
+    for (size_t i = 0; i < elements.size(); ++i)
+    {
         octreeElements[i].data = {elements[i].xyz, elements[i].rgb};
     }
     m_root->insert(octreeElements, 0);
 }
 
-void Octree::finalize()
-{
-    m_root->finalize();
-}
+void Octree::finalize() { m_root->finalize(); }
 
-OctreeNode &Octree::root()
-{
-    return *m_root;
-}
+OctreeNode& Octree::root() { return *m_root; }
 
-const OctreeNode &Octree::root() const
-{
-    return *m_root;
-}
+const OctreeNode& Octree::root() const { return *m_root; }

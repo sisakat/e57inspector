@@ -149,22 +149,28 @@ void MainWindow::openPointCloud(const E57NodePtr& node,
                                          QString::fromStdString(tabName));
     ui->tabWidget->setCurrentIndex(tabIndex);
 
-    auto data = m_reader->data(node->data().at(dataName));
-    std::vector<PointData> pointData;
-    for (const auto& point : data)
+    std::vector<std::array<float, 3>> xyz(10000);
+    auto dataReader = m_reader->dataReader(node->data().at(dataName));
+    dataReader.bindBuffer("cartesianX", (float*)&xyz[0][0], xyz.size(), 3 * sizeof(float));
+    dataReader.bindBuffer("cartesianY", (float*)&xyz[0][1], xyz.size(), 3 * sizeof(float));
+    dataReader.bindBuffer("cartesianZ", (float*)&xyz[0][2], xyz.size(), 3 * sizeof(float));
+    uint64_t count;
+    uint64_t totalCount = 0;
+    while ((count = dataReader.read()) > 0)
     {
-        PointData pd{};
-        pd.xyz[0] = (float)point[0];
-        pd.xyz[1] = (float)point[1];
-        pd.xyz[2] = (float)point[2];
-                pd.rgb[0] = (float)point[3]/30.0;
-                pd.rgb[1] = (float)point[3]/30.0;
-                pd.rgb[2] = (float)point[3]/30.0;
-        pd.rgb[0] = 1.0;
-        pd.rgb[1] = 1.0;
-        pd.rgb[2] = 1.0;
-        pointData.push_back(pd);
+        std::vector<PointData> pointData;
+        for (size_t i = 0; i < count; ++i)
+        {
+            PointData pd{};
+            pd.xyz = xyz[i];
+            pd.rgb[0] = 1.0;
+            pd.rgb[1] = 1.0;
+            pd.rgb[2] = 1.0;
+            pointData.push_back(pd);
+        }
+        pointCloudViewer->insert(pointData);
+        totalCount += count;
     }
-    pointCloudViewer->insert(pointData);
+
     pointCloudViewer->doneInserting();
 }

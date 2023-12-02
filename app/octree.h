@@ -21,7 +21,7 @@ class OctreeElement {
 public:
     PointData data;
 
-    UVW getUVW(const double resolution, const uint32_t depth) const {
+    [[nodiscard]] UVW getUVW(const double resolution, const uint32_t depth) const {
         const uint32_t offset = 1 << 31;
         uint32_t u = static_cast<uint32_t>(data.xyz[0] / resolution + offset) >> (31 - depth) & 1;
         uint32_t v = static_cast<uint32_t>(data.xyz[1] / resolution + offset) >> (31 - depth) & 1;
@@ -43,7 +43,7 @@ public:
         return m_childNodes[index].get();
     }
 
-    const OctreeNode* child(uint32_t index) const
+    [[nodiscard]] const OctreeNode* child(uint32_t index) const
     {
         return m_childNodes[index].get();
     }
@@ -59,7 +59,7 @@ private:
     std::array<std::unique_ptr<OctreeNode>, 8> m_childNodes;
     std::vector<OctreeElement> m_elements;
 
-    int getOnlyChildIndex() const;
+    [[nodiscard]] int getOnlyChildIndex() const;
 };
 
 class Octree

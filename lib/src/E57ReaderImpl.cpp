@@ -3,6 +3,8 @@
 #include <exception>
 #include <filesystem>
 
+#include "E57Utils.h"
+
 void E57ReaderImpl::parseFields(E57NodePtr result,
                                 const e57::StructureNode& node,
                                 const std::set<std::string>& ignoreFields)
@@ -259,4 +261,59 @@ std::vector<E57DataInfo> E57ReaderImpl::dataInfo(uint32_t dataId) const
     }
 
     return result;
+}
+
+std::shared_ptr<E57DataReaderImpl> E57ReaderImpl::dataReader(uint32_t dataId)
+{
+    if (m_data.size() <= dataId)
+        throw std::runtime_error("Cannot retrieve data. Invalid data id.");
+    auto data = m_data.at(dataId);
+    return std::make_shared<E57DataReaderImpl>(
+        e57::StructureNode(data.parent()), data);
+}
+
+E57DataReaderImpl::E57DataReaderImpl(e57::StructureNode parent,
+                                     e57::CompressedVectorNode node)
+    : m_parent{std::move(parent)}, m_node{std::move(node)},
+      m_reader{std::nullopt}
+{
+}
+
+void E57DataReaderImpl::bindBuffer(const std::string& identifier, float* buffer,
+                                   uint32_t bufferSize, uint32_t stride)
+{
+    auto prototype = e57::StructureNode(m_node.prototype());
+
+    if (isDefined(prototype, identifier))
+    {
+        m_sourceDestBuffers.emplace_back(m_node.destImageFile(), identifier,
+                                         buffer, bufferSize, true, true,
+                                         stride);
+    }
+}
+
+uint64_t E57DataReaderImpl::read()
+{
+    if (!m_reader.has_value())
+    {
+        m_reader = m_node.reader(m_sourceDestBuffers);
+    }
+    if (!m_reader->isOpen())
+    {
+        throw std::runtime_error("Reader not open.");
+    }
+    if (!m_node.isAttached())
+    {
+        throw std::runtime_error("Node is not attached.");
+    }
+
+    return m_reader->read(m_sourceDestBuffers);
+}
+
+E57DataReaderImpl::~E57DataReaderImpl()
+{
+    if (m_reader)
+    {
+        m_reader->close();
+    }
 }

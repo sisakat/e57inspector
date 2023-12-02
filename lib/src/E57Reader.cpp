@@ -16,12 +16,20 @@ std::vector<uint8_t> E57Reader::blobData(uint32_t blobId) const
     return m_impl->blobData(blobId);
 }
 
-std::vector<std::array<double, 4>> E57Reader::data(uint32_t dataId) const
-{
-    return m_impl->data(dataId);
-}
-
 std::vector<E57DataInfo> E57Reader::dataInfo(uint32_t dataId) const
 {
     return m_impl->dataInfo(dataId);
 }
+
+E57DataReader E57Reader::dataReader(uint32_t dataId) const
+{
+    return E57DataReader(m_impl->dataReader(dataId));
+}
+
+void E57DataReader::bindBuffer(const std::string& identifier, float* buffer,
+                               uint32_t bufferSize, uint32_t stride)
+{
+    m_impl->bindBuffer(identifier, buffer, bufferSize, stride);
+}
+
+uint64_t E57DataReader::read() { return m_impl->read(); }

@@ -8,7 +8,9 @@ set(SOURCES
         src/E57Reader.cpp
         src/E57ReaderImpl.cpp
         src/E57ReaderImpl.h
-        include/e57inspector/E57Node.h)
+        src/E57Utils.h
+        include/e57inspector/E57Node.h
+        src/E57Utils.h)
 
 add_library(${library_name} ${HEADERS} ${SOURCES})
 target_include_directories(${library_name} PUBLIC include)
