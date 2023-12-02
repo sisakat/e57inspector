@@ -19,6 +19,24 @@ public:
 
     void bindBuffer(const std::string& identifier, float* buffer,
                     uint32_t bufferSize, uint32_t stride = 0);
+    void bindBuffer(const std::string& identifier, double* buffer,
+                    uint32_t bufferSize, uint32_t stride = 0);
+
+    void bindBuffer(const std::string& identifier, int8_t* buffer,
+                    uint32_t bufferSize, uint32_t stride = 0);
+    void bindBuffer(const std::string& identifier, int16_t* buffer,
+                    uint32_t bufferSize, uint32_t stride = 0);
+    void bindBuffer(const std::string& identifier, int32_t* buffer,
+                    uint32_t bufferSize, uint32_t stride = 0);
+    void bindBuffer(const std::string& identifier, int64_t* buffer,
+                    uint32_t bufferSize, uint32_t stride = 0);
+
+    void bindBuffer(const std::string& identifier, uint8_t* buffer,
+                    uint32_t bufferSize, uint32_t stride = 0);
+    void bindBuffer(const std::string& identifier, uint16_t* buffer,
+                    uint32_t bufferSize, uint32_t stride = 0);
+    void bindBuffer(const std::string& identifier, uint32_t* buffer,
+                    uint32_t bufferSize, uint32_t stride = 0);
     uint64_t read();
 
 private:
@@ -34,8 +52,6 @@ public:
     explicit E57ReaderImpl(const std::string& filename);
     [[nodiscard]] const E57RootPtr& root() const;
     [[nodiscard]] std::vector<uint8_t> blobData(uint32_t blobId) const;
-    [[nodiscard]] std::vector<std::array<double, 4>>
-    data(uint32_t dataId) const;
     [[nodiscard]] std::vector<E57DataInfo> dataInfo(uint32_t dataId) const;
     std::shared_ptr<E57DataReaderImpl> dataReader(uint32_t dataId);
 

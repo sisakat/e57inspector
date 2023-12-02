@@ -176,40 +176,6 @@ std::vector<uint8_t> E57ReaderImpl::blobData(uint32_t blobId) const
     return buffer;
 }
 
-std::vector<std::array<double, 4>> E57ReaderImpl::data(uint32_t dataId) const
-{
-    if (m_data.size() <= dataId)
-        throw std::runtime_error("Cannot retrieve data. Invalid data id.");
-
-    auto data = m_data.at(dataId);
-
-    std::vector<std::array<double, 4>> result;
-    std::vector<std::array<double, 4>> buffer(10000 * 4);
-    std::vector<e57::SourceDestBuffer> sourceDestBuffers;
-    sourceDestBuffers.emplace_back(data.destImageFile(), "cartesianX",
-                                   reinterpret_cast<double*>(buffer.data()),
-                                   buffer.size() / 4, true, true,
-                                   4 * sizeof(double));
-    sourceDestBuffers.emplace_back(data.destImageFile(), "cartesianY",
-                                   reinterpret_cast<double*>(buffer.data()) + 1,
-                                   buffer.size() / 4, true, true,
-                                   4 * sizeof(double));
-    sourceDestBuffers.emplace_back(data.destImageFile(), "cartesianZ",
-                                   reinterpret_cast<double*>(buffer.data()) + 2,
-                                   buffer.size() / 4, true, true,
-                                   4 * sizeof(double));
-    sourceDestBuffers.emplace_back(data.destImageFile(), "intensity",
-                                   reinterpret_cast<double*>(buffer.data()) + 3,
-                                   buffer.size() / 4, true, true,
-                                   4 * sizeof(double));
-
-    auto reader = data.reader(sourceDestBuffers);
-    while (reader.read(sourceDestBuffers))
-    {
-        std::copy(buffer.begin(), buffer.end(), std::back_inserter(result));
-    }
-    return result;
-}
 std::vector<E57DataInfo> E57ReaderImpl::dataInfo(uint32_t dataId) const
 {
     if (m_data.size() <= dataId)
@@ -281,6 +247,118 @@ E57DataReaderImpl::E57DataReaderImpl(e57::StructureNode parent,
 
 void E57DataReaderImpl::bindBuffer(const std::string& identifier, float* buffer,
                                    uint32_t bufferSize, uint32_t stride)
+{
+    auto prototype = e57::StructureNode(m_node.prototype());
+
+    if (isDefined(prototype, identifier))
+    {
+        m_sourceDestBuffers.emplace_back(m_node.destImageFile(), identifier,
+                                         buffer, bufferSize, true, true,
+                                         stride);
+    }
+}
+
+void E57DataReaderImpl::bindBuffer(const std::string& identifier,
+                                   double* buffer, uint32_t bufferSize,
+                                   uint32_t stride)
+{
+    auto prototype = e57::StructureNode(m_node.prototype());
+
+    if (isDefined(prototype, identifier))
+    {
+        m_sourceDestBuffers.emplace_back(m_node.destImageFile(), identifier,
+                                         buffer, bufferSize, true, true,
+                                         stride);
+    }
+}
+
+void E57DataReaderImpl::bindBuffer(const std::string& identifier,
+                                   int8_t* buffer, uint32_t bufferSize,
+                                   uint32_t stride)
+{
+    auto prototype = e57::StructureNode(m_node.prototype());
+
+    if (isDefined(prototype, identifier))
+    {
+        m_sourceDestBuffers.emplace_back(m_node.destImageFile(), identifier,
+                                         buffer, bufferSize, true, true,
+                                         stride);
+    }
+}
+
+void E57DataReaderImpl::bindBuffer(const std::string& identifier,
+                                   int16_t* buffer, uint32_t bufferSize,
+                                   uint32_t stride)
+{
+    auto prototype = e57::StructureNode(m_node.prototype());
+
+    if (isDefined(prototype, identifier))
+    {
+        m_sourceDestBuffers.emplace_back(m_node.destImageFile(), identifier,
+                                         buffer, bufferSize, true, true,
+                                         stride);
+    }
+}
+
+void E57DataReaderImpl::bindBuffer(const std::string& identifier,
+                                   int32_t* buffer, uint32_t bufferSize,
+                                   uint32_t stride)
+{
+    auto prototype = e57::StructureNode(m_node.prototype());
+
+    if (isDefined(prototype, identifier))
+    {
+        m_sourceDestBuffers.emplace_back(m_node.destImageFile(), identifier,
+                                         buffer, bufferSize, true, true,
+                                         stride);
+    }
+}
+
+void E57DataReaderImpl::bindBuffer(const std::string& identifier,
+                                   int64_t* buffer, uint32_t bufferSize,
+                                   uint32_t stride)
+{
+    auto prototype = e57::StructureNode(m_node.prototype());
+
+    if (isDefined(prototype, identifier))
+    {
+        m_sourceDestBuffers.emplace_back(m_node.destImageFile(), identifier,
+                                         buffer, bufferSize, true, true,
+                                         stride);
+    }
+}
+
+void E57DataReaderImpl::bindBuffer(const std::string& identifier,
+                                   uint8_t* buffer, uint32_t bufferSize,
+                                   uint32_t stride)
+{
+    auto prototype = e57::StructureNode(m_node.prototype());
+
+    if (isDefined(prototype, identifier))
+    {
+        m_sourceDestBuffers.emplace_back(m_node.destImageFile(), identifier,
+                                         buffer, bufferSize, true, true,
+                                         stride);
+    }
+}
+
+void E57DataReaderImpl::bindBuffer(const std::string& identifier,
+                                   uint16_t* buffer, uint32_t bufferSize,
+                                   uint32_t stride)
+{
+    auto prototype = e57::StructureNode(m_node.prototype());
+
+    if (isDefined(prototype, identifier))
+    {
+        m_sourceDestBuffers.emplace_back(m_node.destImageFile(), identifier,
+                                         buffer, bufferSize, true, true,
+                                         stride);
+    }
+}
+
+void E57DataReaderImpl::bindBuffer(const std::string& identifier,
+                                   uint32_t* buffer, uint32_t bufferSize,
+                                   uint32_t stride)
 {
     auto prototype = e57::StructureNode(m_node.prototype());
 

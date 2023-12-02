@@ -43,6 +43,25 @@ class E57DataReader
 public:
     void bindBuffer(const std::string& identifier, float* buffer,
                     uint32_t bufferSize, uint32_t stride = 0);
+    void bindBuffer(const std::string& identifier, double* buffer,
+                    uint32_t bufferSize, uint32_t stride = 0);
+
+    void bindBuffer(const std::string& identifier, int8_t* buffer,
+                    uint32_t bufferSize, uint32_t stride = 0);
+    void bindBuffer(const std::string& identifier, int16_t* buffer,
+                    uint32_t bufferSize, uint32_t stride = 0);
+    void bindBuffer(const std::string& identifier, int32_t* buffer,
+                    uint32_t bufferSize, uint32_t stride = 0);
+    void bindBuffer(const std::string& identifier, int64_t* buffer,
+                    uint32_t bufferSize, uint32_t stride = 0);
+
+    void bindBuffer(const std::string& identifier, uint8_t* buffer,
+                    uint32_t bufferSize, uint32_t stride = 0);
+    void bindBuffer(const std::string& identifier, uint16_t* buffer,
+                    uint32_t bufferSize, uint32_t stride = 0);
+    void bindBuffer(const std::string& identifier, uint32_t* buffer,
+                    uint32_t bufferSize, uint32_t stride = 0);
+
     uint64_t read();
 
     friend class E57Reader;

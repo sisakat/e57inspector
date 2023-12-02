@@ -32,4 +32,52 @@ void E57DataReader::bindBuffer(const std::string& identifier, float* buffer,
     m_impl->bindBuffer(identifier, buffer, bufferSize, stride);
 }
 
+void E57DataReader::bindBuffer(const std::string& identifier, double* buffer,
+                               uint32_t bufferSize, uint32_t stride)
+{
+    m_impl->bindBuffer(identifier, buffer, bufferSize, stride);
+}
+
+void E57DataReader::bindBuffer(const std::string& identifier, int8_t* buffer,
+                               uint32_t bufferSize, uint32_t stride)
+{
+    m_impl->bindBuffer(identifier, buffer, bufferSize, stride);
+}
+
+void E57DataReader::bindBuffer(const std::string& identifier, int16_t* buffer,
+                               uint32_t bufferSize, uint32_t stride)
+{
+    m_impl->bindBuffer(identifier, buffer, bufferSize, stride);
+}
+
+void E57DataReader::bindBuffer(const std::string& identifier, int32_t* buffer,
+                               uint32_t bufferSize, uint32_t stride)
+{
+    m_impl->bindBuffer(identifier, buffer, bufferSize, stride);
+}
+
+void E57DataReader::bindBuffer(const std::string& identifier, int64_t* buffer,
+                               uint32_t bufferSize, uint32_t stride)
+{
+    m_impl->bindBuffer(identifier, buffer, bufferSize, stride);
+}
+
+void E57DataReader::bindBuffer(const std::string& identifier, uint8_t* buffer,
+                               uint32_t bufferSize, uint32_t stride)
+{
+    m_impl->bindBuffer(identifier, buffer, bufferSize, stride);
+}
+
+void E57DataReader::bindBuffer(const std::string& identifier, uint16_t* buffer,
+                               uint32_t bufferSize, uint32_t stride)
+{
+    m_impl->bindBuffer(identifier, buffer, bufferSize, stride);
+}
+
+void E57DataReader::bindBuffer(const std::string& identifier, uint32_t* buffer,
+                               uint32_t bufferSize, uint32_t stride)
+{
+    m_impl->bindBuffer(identifier, buffer, bufferSize, stride);
+}
+
 uint64_t E57DataReader::read() { return m_impl->read(); }
