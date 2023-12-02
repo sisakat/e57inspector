@@ -19,19 +19,19 @@ add_executable(${PROJECT_NAME}
         utils.h
         siimageviewer.cpp
         siimageviewer.h
-        pointcloudrenderer/sipointcloudrenderer.cpp
-        pointcloudrenderer/sipointcloudrenderer.h
-        pointcloudrenderer/openglarraybuffer.cpp
-        pointcloudrenderer/openglarraybuffer.h
-        pointcloudrenderer/octree.h
-        pointcloudrenderer/octree.cpp
-        pointcloudrenderer/silrucache.h
-        pointcloudrenderer/scene.h
-        pointcloudrenderer/scene.cpp
-        pointcloudrenderer/camera.h
-        pointcloudrenderer/camera.cpp
-        pointcloudrenderer/pointcloud.h
-        pointcloudrenderer/pointcloud.cpp)
+        sipointcloudrenderer.cpp
+        sipointcloudrenderer.h
+        openglarraybuffer.cpp
+        openglarraybuffer.h
+        octree.h
+        octree.cpp
+        silrucache.h
+        scene.h
+        scene.cpp
+        camera.h
+        camera.cpp
+        pointcloud.h
+        pointcloud.cpp)
 target_link_libraries(${PROJECT_NAME} PRIVATE
         E57Format
         Qt6::Widgets
