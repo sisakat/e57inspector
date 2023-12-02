@@ -34,6 +34,9 @@ public:
 
     void render() override;
 
+    void yaw(float angle);
+    void pitch(float angle);
+
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);

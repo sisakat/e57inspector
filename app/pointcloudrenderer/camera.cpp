@@ -29,6 +29,38 @@ void Camera::render()
     glUniformMatrix4fv(m_projectionLocation, 1, GL_FALSE, m_projection.data());
 }
 
+void Camera::yaw(float angle)
+{
+    const QVector3D zAxis(0.0f, 0.0f, 1.0f);
+
+    QMatrix4x4 transformation;
+    transformation.rotate(angle, zAxis);
+    m_position = (transformation * m_position.toVector4D()).toVector3D();
+}
+
+void Camera::pitch(float angle)
+{
+    auto viewVec = (m_position - m_center).normalized();
+    auto cosViewUp = QVector3D::dotProduct(viewVec, m_up);
+
+    // prevent view vector to align with up vector
+    if (std::abs(cosViewUp) > 0.95)
+    {
+        if (cosViewUp < 0.0f && angle > 0.0f)
+        {
+            angle = 0.0f;
+        }
+        else if (cosViewUp > 0.0f && angle < 0.0f)
+        {
+            angle = 0.0f;
+        }
+    }
+
+    QMatrix4x4 transformation;
+    transformation.rotate(angle, QVector3D::crossProduct(m_up, viewVec));
+    m_position = (transformation * m_position.toVector4D()).toVector3D();
+}
+
 void Camera::mousePressEvent(QMouseEvent* event)
 {
     if (event->button() == Qt::MouseButton::LeftButton)
@@ -52,34 +84,8 @@ void Camera::mouseMoveEvent(QMouseEvent* event)
     if (m_mouseDown)
     {
         auto delta = event->pos() - m_originalMousePosition;
-        auto deltaVec = QVector2D(delta.x(), delta.y());
-        auto viewVec = (m_position - m_center).normalized();
-        auto up = m_up;
-        auto angle = QVector3D::dotProduct(viewVec, m_up);
-
-        // prevent view vector to align with up vector
-        if (std::abs(angle) > 0.95)
-        {
-            if (angle < 0 && deltaVec.y() > 0)
-            {
-                deltaVec.setY(0);
-            }
-            else if (angle > 0 && deltaVec.y() < 0)
-            {
-                deltaVec.setY(0);
-            }
-        }
-
-        auto rotVec = QVector3D::crossProduct(up, viewVec);
-
-        const QVector3D zAxis(0.0f, 0.0f, 1.0f);
-
-        QMatrix4x4 transformation;
-        transformation.setToIdentity();
-        transformation.rotate(deltaVec.x(), zAxis);
-        transformation.rotate(deltaVec.y(), rotVec);
-
-        m_position = (transformation * m_position.toVector4D()).toVector3D();
+        pitch(static_cast<float>(delta.y()));
+        yaw(static_cast<float>(delta.x()));
         m_originalMousePosition = event->pos();
     }
 }
