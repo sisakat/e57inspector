@@ -12,9 +12,11 @@ class E57Tree : public QTreeWidget
     Q_OBJECT
 
 public:
-    E57Tree(QWidget* parent = nullptr);
+    explicit E57Tree(QWidget* parent = nullptr);
 
     void init(const E57RootPtr& root);
+
+    TNodeData3D* findData3DNode(QTreeWidgetItem* item, const std::string& guid) const;
 
 signals:
     void nodeSelected(TNode* node);

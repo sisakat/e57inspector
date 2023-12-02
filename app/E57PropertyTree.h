@@ -11,7 +11,7 @@ class E57PropertyTree : public QTreeWidget
     Q_OBJECT
 public:
     explicit E57PropertyTree(QWidget* parent = nullptr);
-    void init(TNode* node);
+    void init(TE57Node* node);
 
 protected:
     void mouseDoubleClickEvent(QMouseEvent* event) override;
@@ -24,8 +24,8 @@ private:
     void addRow(QTreeWidgetItem* parent, const std::string& key,
                 const std::string& value, bool bold = false);
 
-    void addData3DData(TNode* node);
-    void addImage2DData(TNode* node);
+    void addData3DData(TE57Node* node);
+    void addImage2DData(TE57Node* node);
     void addRawData(QTreeWidgetItem* parent, E57NodePtr node);
     void addFields(QTreeWidgetItem* parent, E57NodePtr node);
 

@@ -30,7 +30,17 @@ void E57Tree::init(const E57RootPtr& root)
     for (const auto& image2D : root->images2D())
     {
         auto* node = createTNode(image2D);
-        image2DNode->addChild(node);
+        if (image2D->strings().contains("associatedData3DGuid"))
+        {
+            auto* data3DNode =
+                findData3DNode(this->invisibleRootItem(),
+                               image2D->strings().at("associatedData3DGuid"));
+            data3DNode->images()->addChild(node);
+        }
+        else
+        {
+            image2DNode->addChild(node);
+        }
     }
 
     expandAll();
@@ -54,4 +64,31 @@ void E57Tree::selectionChanged(const QItemSelection& selected,
     {
         emit nodeSelected(nullptr);
     }
+}
+
+TNodeData3D* E57Tree::findData3DNode(QTreeWidgetItem* item,
+                                     const std::string& guid) const
+{
+    if (dynamic_cast<TE57Node*>(item))
+    {
+        auto* node = dynamic_cast<TE57Node*>(item);
+        if (node->node()->strings().contains("guid"))
+        {
+            if (node->node()->strings().at("guid") == guid)
+            {
+                return dynamic_cast<TNodeData3D*>(node);
+            }
+        }
+    }
+
+    for (int i = 0; i < item->childCount(); ++i)
+    {
+        auto* result = findData3DNode(item->child(i), guid);
+        if (result)
+        {
+            return result;
+        }
+    }
+
+    return nullptr;
 }

@@ -16,7 +16,7 @@ E57PropertyTree::E57PropertyTree(QWidget* parent) : QTreeWidget(parent)
     m_italicFont.setItalic(true);
 }
 
-void E57PropertyTree::init(TNode* node)
+void E57PropertyTree::init(TE57Node* node)
 {
     clear();
     prepare();
@@ -47,7 +47,7 @@ void E57PropertyTree::prepare()
     }
 }
 
-void E57PropertyTree::addData3DData(TNode* node)
+void E57PropertyTree::addData3DData(TE57Node* node)
 {
     auto e57Node = std::dynamic_pointer_cast<E57Data3D>(node->node());
     if (!e57Node)
@@ -161,7 +161,7 @@ void E57PropertyTree::mouseDoubleClickEvent(QMouseEvent* event)
     qDebug() << "Double click";
 }
 
-void E57PropertyTree::addImage2DData(TNode* node)
+void E57PropertyTree::addImage2DData(TE57Node* node)
 {
     auto e57Node = std::dynamic_pointer_cast<E57Image2D>(node->node());
     if (!e57Node)

@@ -51,7 +51,10 @@ void MainWindow::loadE57(const std::string& filename)
 
 void MainWindow::twMain_nodeSelected(TNode* node)
 {
-    ui->twProperties->init(node);
+    if (dynamic_cast<TNodeE57*>(node) != nullptr)
+    {
+        ui->twProperties->init(dynamic_cast<TNodeE57*>(node));
+    }
 }
 
 void MainWindow::tabWidget_tabClosesRequested(int index)
@@ -66,7 +69,8 @@ void MainWindow::tabWidget_tabClosesRequested(int index)
 
 void MainWindow::twMain_itemDoubleClicked(QTreeWidgetItem* item, int column)
 {
-    auto* node = dynamic_cast<TNode*>(item);
+    if (dynamic_cast<TE57Node*>(item) == nullptr) return;
+    auto* node = dynamic_cast<TE57Node*>(item);
     if (dynamic_cast<TNodeImage2D*>(node) != nullptr)
     {
         auto* image2D = dynamic_cast<TNodeImage2D*>(node);

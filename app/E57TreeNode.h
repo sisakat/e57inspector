@@ -6,27 +6,41 @@
 
 class TNode : public QTreeWidgetItem
 {
+
+};
+
+class TE57Node : public TNode
+{
 public:
-    explicit TNode(E57NodePtr node);
+    explicit TE57Node(E57NodePtr node);
     E57NodePtr node();
 
 private:
     E57NodePtr m_node;
 };
 
-class TNodeE57 : public TNode
+class TNodeE57 : public TE57Node
 {
 public:
     explicit TNodeE57(const E57RootPtr& root);
 };
 
-class TNodeData3D : public TNode
+class TNodeImages : public TNode {
+public:
+    TNodeImages();
+};
+
+class TNodeData3D : public TE57Node
 {
 public:
     explicit TNodeData3D(const E57Data3DPtr& node);
+
+    TNodeImages* images() { return m_images; }
+private:
+    TNodeImages* m_images;
 };
 
-class TNodeImage2D : public TNode
+class TNodeImage2D : public TE57Node
 {
 public:
     explicit TNodeImage2D(const E57Image2DPtr& node);
