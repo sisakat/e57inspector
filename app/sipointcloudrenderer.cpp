@@ -71,6 +71,8 @@ void SiPointCloudRenderer::initializeGL()
     initializeOpenGLFunctions();
     glClear(GL_COLOR_BUFFER_BIT);
 
+    glEnable(GL_DEPTH_TEST);
+
     m_openGLLogger.initialize();
 
     connect(&m_openGLLogger, &QOpenGLDebugLogger::messageLogged, this, &SiPointCloudRenderer::onMessageLogged);
@@ -87,7 +89,7 @@ void SiPointCloudRenderer::initializeGL()
 void SiPointCloudRenderer::paintGL()
 {
     if (!m_render) return;
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glUseProgram(m_shaderProgram);
     m_scene->render();
 }
