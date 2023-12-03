@@ -72,6 +72,7 @@ void SiPointCloudRenderer::initializeGL()
     glClear(GL_COLOR_BUFFER_BIT);
 
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_PROGRAM_POINT_SIZE);
 
     m_openGLLogger.initialize();
 
