@@ -103,6 +103,7 @@ void SiPointCloudRenderer::resizeGL(int width, int height)
 
 void SiPointCloudRenderer::mousePressEvent(QMouseEvent *event)
 {
+    makeCurrent();
     m_camera->mousePressEvent(event);
     update();
 }

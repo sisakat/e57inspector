@@ -36,6 +36,11 @@ public:
 
     void yaw(float angle);
     void pitch(float angle);
+    void translateRight(float value);
+    void translateUp(float value);
+
+    [[nodiscard]] QVector4D unproject(const QVector3D& window) const;
+    [[nodiscard]] QVector3D project(const QVector4D& object) const;
 
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
@@ -56,6 +61,8 @@ private:
     QMatrix4x4 m_projection;
     QMatrix4x4 m_rotation;
 
+    uint32_t m_viewportX{0};
+    uint32_t m_viewportY{0};
     uint32_t m_viewportWidth{0};
     uint32_t m_viewportHeight{0};
 
@@ -63,6 +70,7 @@ private:
     std::string m_projectionNameInShader;
 
     bool m_mouseDown;
+    bool m_panning;
     QPoint m_originalMousePosition;
 };
 

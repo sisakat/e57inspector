@@ -61,12 +61,76 @@ void Camera::pitch(float angle)
     m_position = (transformation * m_position.toVector4D()).toVector3D();
 }
 
+void Camera::translateRight(float value)
+{
+    auto viewVec = (m_position - m_center).normalized();
+    auto right = QVector3D::crossProduct(viewVec, m_up);
+    m_center += right * value;
+    m_position += right * value;
+}
+
+void Camera::translateUp(float value)
+{
+    m_center += m_up * value;
+    m_position += m_up * value;
+}
+
+QVector4D Camera::unproject(const QVector3D& window) const
+{
+    QVector4D result;
+    result.setX((window.x() - static_cast<float>(m_viewportX)) /
+                    static_cast<float>(m_viewportWidth) * 2.0f -
+                1.0f);
+    result.setY((window.y() - static_cast<float>(m_viewportY)) /
+                    static_cast<float>(m_viewportHeight) * 2.0f -
+                1.0f);
+    result.setZ(window.z() * 2.0f - 1.0f);
+    result.setW(1.0f);
+
+    result = m_projection.inverted() * result;
+    result /= result.w();
+    result = m_view.inverted() * result;
+    return result;
+}
+
+QVector3D Camera::project(const QVector4D& object) const
+{
+    QVector4D result(object);
+    result.setW(1.0f);
+    result = m_view * object;
+    result = m_projection * result;
+    result /= result.w();
+
+    result.setX(((result.x() + 1.0f) / 2.0f + static_cast<float>(m_viewportX)) *
+                static_cast<float>(m_viewportWidth));
+    result.setY(((result.y() + 1.0f) / 2.0f + static_cast<float>(m_viewportY)) *
+                static_cast<float>(m_viewportHeight));
+    result.setZ((result.z() + 1.0f) / 2.0f);
+    return result.toVector3D();
+}
+
 void Camera::mousePressEvent(QMouseEvent* event)
 {
     if (event->button() == Qt::MouseButton::LeftButton)
     {
         m_mouseDown = true;
         m_originalMousePosition = event->pos();
+    }
+    else if (event->button() == Qt::MouseButton::MiddleButton)
+    {
+        m_panning = true;
+        m_originalMousePosition = event->pos();
+    }
+
+    int u = event->pos().x();
+    int v = static_cast<int>(m_viewportHeight) - 1 - event->pos().y();
+    auto depth = scene()->findDepth(u, v);
+    if (depth)
+    {
+        auto objectSpace = unproject(*depth);
+        auto windowSpace = project(objectSpace);
+        int x = 3;
+        qDebug() << "";
     }
 }
 
@@ -75,6 +139,11 @@ void Camera::mouseReleaseEvent(QMouseEvent* event)
     if (event->button() == Qt::MouseButton::LeftButton)
     {
         m_mouseDown = false;
+        m_originalMousePosition = event->pos();
+    }
+    else if (event->button() == Qt::MouseButton::MiddleButton)
+    {
+        m_panning = false;
         m_originalMousePosition = event->pos();
     }
 }
@@ -86,6 +155,13 @@ void Camera::mouseMoveEvent(QMouseEvent* event)
         auto delta = event->pos() - m_originalMousePosition;
         pitch(static_cast<float>(delta.y()));
         yaw(static_cast<float>(delta.x()));
+        m_originalMousePosition = event->pos();
+    }
+    else if (m_panning)
+    {
+        auto delta = event->pos() - m_originalMousePosition;
+        translateRight(0.5f * delta.x());
+        translateUp(0.2f * delta.y());
         m_originalMousePosition = event->pos();
     }
 }

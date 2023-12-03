@@ -22,38 +22,21 @@
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QSplitter" name="splitter_2">
+     <widget class="QSplitter" name="splitter">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
-      <widget class="QSplitter" name="splitter">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <widget class="E57Tree" name="twMain">
-        <property name="styleSheet">
-         <string notr="true">QTreeWidget::item{
+      <widget class="E57Tree" name="twMain">
+       <property name="styleSheet">
+        <string notr="true">QTreeWidget::item{
 	height: 25px;
 }</string>
+       </property>
+       <column>
+        <property name="text">
+         <string notr="true">1</string>
         </property>
-        <column>
-         <property name="text">
-          <string notr="true">1</string>
-         </property>
-        </column>
-       </widget>
-       <widget class="E57PropertyTree" name="twProperties">
-        <property name="styleSheet">
-         <string notr="true">QTreeWidget::item{
-	height: 24px;
-}</string>
-        </property>
-        <column>
-         <property name="text">
-          <string notr="true">1</string>
-         </property>
-        </column>
-       </widget>
+       </column>
       </widget>
       <widget class="QTabWidget" name="tabWidget">
        <property name="sizePolicy">
@@ -68,6 +51,18 @@
        <property name="tabsClosable">
         <bool>true</bool>
        </property>
+      </widget>
+      <widget class="E57PropertyTree" name="twProperties">
+       <property name="styleSheet">
+        <string notr="true">QTreeWidget::item{
+	height: 24px;
+}</string>
+       </property>
+       <column>
+        <property name="text">
+         <string notr="true">1</string>
+        </property>
+       </column>
       </widget>
      </widget>
     </item>
