@@ -1,6 +1,7 @@
 #include "octree.h"
 
 #include <cassert>
+#include <iterator>
 #include <limits>
 
 const auto doubleMin = std::numeric_limits<double>::min();
