@@ -32,7 +32,9 @@ add_executable(${PROJECT_NAME}
         camera.cpp
         pointcloud.h
         pointcloud.cpp
-        resources/resources.qrc)
+        resources/resources.qrc
+        shader.cpp
+        shader.h)
 target_link_libraries(${PROJECT_NAME} PRIVATE
         E57Format
         Qt6::Widgets

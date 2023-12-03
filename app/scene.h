@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "openglarraybuffer.h"
+#include "shader.h"
 #include "silrucache.h"
 
 class Scene; // forward declaration
@@ -88,9 +89,13 @@ public:
                                        int viewportY, int viewportWidth,
                                        int viewportHeight);
 
+    const Shader::Ptr& shader() { return m_shader; }
+    void setShader(const Shader::Ptr& shader) { m_shader = shader; }
+
 private:
     BufferCache m_bufferCache;
     std::vector<SceneNode::Ptr> m_nodes;
+    Shader::Ptr m_shader;
 };
 
 #endif // SCENE_H

@@ -29,4 +29,11 @@
     <qresource>
         <file>icons/String.png</file>
     </qresource>
+
+    <qresource>
+        <file>shaders/default_vertex.glsl</file>
+    </qresource>
+    <qresource>
+        <file>shaders/default_fragment.glsl</file>
+    </qresource>
 </RCC>

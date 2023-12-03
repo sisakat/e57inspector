@@ -26,10 +26,7 @@ SceneNode::SceneNode()
 
 void SceneNode::render()
 {
-    GLint shaderProgram = 0;
-    glGetIntegerv(GL_CURRENT_PROGRAM, &shaderProgram);
-    GLint modelLocation = glGetUniformLocation(shaderProgram, "model");
-    glUniformMatrix4fv(modelLocation, 1, GL_FALSE, m_pose.data());
+    scene()->shader()->setUniformMat4("model", m_pose.data());
 }
 
 float Scene::getDepth(int u, int v)

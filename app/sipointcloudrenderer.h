@@ -14,6 +14,7 @@
 #include "scene.h"
 #include "camera.h"
 #include "pointcloud.h"
+#include "shader.h"
 
 class SiPointCloudRenderer : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core
 {
@@ -43,15 +44,6 @@ private slots:
 private:
     QOpenGLDebugLogger m_openGLLogger;
 
-    GLuint m_vertexShader;
-    GLuint m_fragmentShader;
-    GLuint m_shaderProgram;
-
-    // Uniform locations
-    GLuint m_modelLocation;
-    GLuint m_viewLocation;
-    GLuint m_projectionLocation;
-
     QMatrix4x4 m_model;
     QMatrix4x4 m_view;
     QMatrix4x4 m_projection;
@@ -60,6 +52,7 @@ private:
     bool m_render;
 
     Scene::Ptr m_scene;
+    Shader::Ptr m_shader;
     Camera::Ptr m_camera;
     PointCloud::Ptr m_pointCloud;
 

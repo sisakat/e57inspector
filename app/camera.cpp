@@ -26,8 +26,8 @@ void Camera::render()
     m_projection.perspective(45, 1.0f * m_viewportWidth / m_viewportHeight,
                              0.001f, 1000.0f);
 
-    glUniformMatrix4fv(m_viewLocation, 1, GL_FALSE, m_view.data());
-    glUniformMatrix4fv(m_projectionLocation, 1, GL_FALSE, m_projection.data());
+    scene()->shader()->setUniformMat4("view", m_view.data());
+    scene()->shader()->setUniformMat4("projection", m_projection.data());
 }
 
 void Camera::yaw(float angle)

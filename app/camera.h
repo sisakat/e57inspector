@@ -14,23 +14,9 @@ public:
 
     Camera();
 
-    void setViewNameInShader(const std::string& name, GLuint location) {
-        m_viewNameInShader = name;
-        m_viewLocation = location;
-    }
+    void setViewportWidth(uint32_t width) { m_viewportWidth = width; }
 
-    void setProjectionNameInShader(const std::string& name, GLuint location) {
-        m_projectionNameInShader = name;
-        m_projectionLocation = location;
-    }
-
-    void setViewportWidth(uint32_t width) {
-        m_viewportWidth = width;
-    }
-
-    void setViewportHeight(uint32_t height) {
-        m_viewportHeight = height;
-    }
+    void setViewportHeight(uint32_t height) { m_viewportHeight = height; }
 
     void render() override;
 
@@ -44,12 +30,12 @@ public:
     [[nodiscard]] QVector4D unproject(const QVector3D& window) const;
     [[nodiscard]] QVector3D project(const QVector4D& object) const;
 
-    void mousePressEvent(QMouseEvent *event);
-    void mouseReleaseEvent(QMouseEvent *event);
-    void mouseMoveEvent(QMouseEvent *event);
-    void wheelEvent(QWheelEvent *event);
-    void keyPressEvent(QKeyEvent *event);
-    void keyReleaseEvent(QKeyEvent *event);
+    void mousePressEvent(QMouseEvent* event);
+    void mouseReleaseEvent(QMouseEvent* event);
+    void mouseMoveEvent(QMouseEvent* event);
+    void wheelEvent(QWheelEvent* event);
+    void keyPressEvent(QKeyEvent* event);
+    void keyReleaseEvent(QKeyEvent* event);
 
 private:
     GLuint m_viewLocation;
@@ -68,9 +54,6 @@ private:
     uint32_t m_viewportY{0};
     uint32_t m_viewportWidth{0};
     uint32_t m_viewportHeight{0};
-
-    std::string m_viewNameInShader;
-    std::string m_projectionNameInShader;
 
     bool m_mouseDown{false};
     bool m_panning{false};
