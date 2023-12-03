@@ -64,6 +64,12 @@ void E57ReaderImpl::parseFields(E57NodePtr result,
                 compressedVectorNode.childCount();
             uint32_t dataId = registerData(compressedVectorNode);
             result->data()[compressedVectorNode.elementName()] = dataId;
+
+            auto item = std::make_shared<E57Node>();
+            parseFields(item,
+                        e57::StructureNode(compressedVectorNode.prototype()));
+            item->setName(compressedVectorNode.elementName());
+            result->addChild(item);
         }
     }
 }
