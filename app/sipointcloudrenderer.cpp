@@ -110,30 +110,35 @@ void SiPointCloudRenderer::mousePressEvent(QMouseEvent *event)
 
 void SiPointCloudRenderer::mouseReleaseEvent(QMouseEvent *event)
 {
+    makeCurrent();
     m_camera->mouseReleaseEvent(event);
     update();
 }
 
 void SiPointCloudRenderer::mouseMoveEvent(QMouseEvent *event)
 {
+    makeCurrent();
     m_camera->mouseMoveEvent(event);
     update();
 }
 
 void SiPointCloudRenderer::wheelEvent(QWheelEvent *event)
 {
+    makeCurrent();
     m_camera->wheelEvent(event);
     update();
 }
 
 void SiPointCloudRenderer::keyPressEvent(QKeyEvent *event)
 {
+    makeCurrent();
     m_camera->keyPressEvent(event);
     update();
 }
 
 void SiPointCloudRenderer::keyReleaseEvent(QKeyEvent *event)
 {
+    makeCurrent();
     m_camera->keyReleaseEvent(event);
     update();
 }

@@ -5,8 +5,8 @@
 #include <QOpenGLFunctions>
 #include <QOpenGLFunctions_3_3_Core>
 #include <memory>
-#include <vector>
 #include <optional>
+#include <vector>
 
 #include "openglarraybuffer.h"
 #include "silrucache.h"
@@ -84,9 +84,9 @@ public:
 
     float getDepth(int u, int v);
 
-    std::optional<QVector3D> findDepth(int u, int v);
-
-
+    std::optional<QVector3D> findDepth(int u, int v, int viewportX,
+                                       int viewportY, int viewportWidth,
+                                       int viewportHeight);
 
 private:
     BufferCache m_bufferCache;

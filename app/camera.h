@@ -39,6 +39,8 @@ public:
     void translateRight(float value);
     void translateUp(float value);
 
+    void updatePickpoint(const QPoint& window);
+
     [[nodiscard]] QVector4D unproject(const QVector3D& window) const;
     [[nodiscard]] QVector3D project(const QVector4D& object) const;
 
@@ -56,6 +58,7 @@ private:
     QVector3D m_position;
     QVector3D m_center;
     QVector3D m_up;
+    QVector4D m_pickpoint;
 
     QMatrix4x4 m_view;
     QMatrix4x4 m_projection;
@@ -69,8 +72,9 @@ private:
     std::string m_viewNameInShader;
     std::string m_projectionNameInShader;
 
-    bool m_mouseDown;
-    bool m_panning;
+    bool m_mouseDown{false};
+    bool m_panning{false};
+    bool m_zooming{false};
     QPoint m_originalMousePosition;
 };
 

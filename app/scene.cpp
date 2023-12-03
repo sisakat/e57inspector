@@ -43,21 +43,33 @@ float Scene::getDepth(int u, int v)
     return -1;
 }
 
-std::optional<QVector3D> Scene::findDepth(int u, int v)
+std::optional<QVector3D> Scene::findDepth(int u, int v, int viewportX,
+                                          int viewportY, int viewportWidth,
+                                          int viewportHeight)
 {
 
     std::set<std::tuple<int, int>> visited;
     std::queue<std::tuple<int, int>> pixels;
     pixels.emplace(u, v);
 
+    float depth = getDepth(u, v);
+    if (depth > 0.0)
+    {
+        return QVector3D{static_cast<float>(u), static_cast<float>(v), depth};
+    }
+
+    std::vector<float> depthBuffer(viewportWidth * viewportHeight);
+    glReadPixels(viewportX, viewportY, viewportWidth, viewportHeight,
+                 GL_DEPTH_COMPONENT, GL_FLOAT, depthBuffer.data());
+
     while (!pixels.empty())
     {
         auto pixel = pixels.front();
         pixels.pop();
-        visited.insert(pixel);
 
-        float depth = getDepth(std::get<0>(pixel), std::get<1>(pixel));
-        if (depth > 0.0)
+        depth = depthBuffer.at(std::get<1>(pixel) * viewportWidth +
+                               std::get<0>(pixel));
+        if (depth > 0.0f && depth < 1.0f)
         {
             return QVector3D{static_cast<float>(std::get<0>(pixel)),
                              static_cast<float>(std::get<1>(pixel)), depth};
@@ -69,10 +81,15 @@ std::optional<QVector3D> Scene::findDepth(int u, int v)
             {
                 if (i == 0 && j == 0)
                     continue;
-                std::tuple<int, int> newPixel(std::get<0>(pixel) + i,
-                                              std::get<1>(pixel) + j);
-                if (!visited.contains(newPixel))
+                int newU = std::get<0>(pixel) + i;
+                int newV = std::get<1>(pixel) + j;
+                std::tuple<int, int> newPixel(newU, newV);
+                if (!visited.contains(newPixel) && newU >= 0 &&
+                    newU < viewportWidth && newV >= 0 && newV < viewportHeight)
+                {
+                    visited.insert(newPixel);
                     pixels.push(std::move(newPixel));
+                }
             }
         }
     }
