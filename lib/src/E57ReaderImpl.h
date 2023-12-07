@@ -18,25 +18,25 @@ public:
     ~E57DataReaderImpl();
 
     void bindBuffer(const std::string& identifier, float* buffer,
-                    uint32_t bufferSize, uint32_t stride = 0);
+                    uint32_t bufferSize, uint32_t stride = sizeof(float));
     void bindBuffer(const std::string& identifier, double* buffer,
-                    uint32_t bufferSize, uint32_t stride = 0);
+                    uint32_t bufferSize, uint32_t stride = sizeof(double));
 
     void bindBuffer(const std::string& identifier, int8_t* buffer,
-                    uint32_t bufferSize, uint32_t stride = 0);
+                    uint32_t bufferSize, uint32_t stride = sizeof(int8_t));
     void bindBuffer(const std::string& identifier, int16_t* buffer,
-                    uint32_t bufferSize, uint32_t stride = 0);
+                    uint32_t bufferSize, uint32_t stride = sizeof(int16_t));
     void bindBuffer(const std::string& identifier, int32_t* buffer,
-                    uint32_t bufferSize, uint32_t stride = 0);
+                    uint32_t bufferSize, uint32_t stride = sizeof(int32_t));
     void bindBuffer(const std::string& identifier, int64_t* buffer,
-                    uint32_t bufferSize, uint32_t stride = 0);
+                    uint32_t bufferSize, uint32_t stride = sizeof(int64_t));
 
     void bindBuffer(const std::string& identifier, uint8_t* buffer,
-                    uint32_t bufferSize, uint32_t stride = 0);
+                    uint32_t bufferSize, uint32_t stride = sizeof(uint8_t));
     void bindBuffer(const std::string& identifier, uint16_t* buffer,
-                    uint32_t bufferSize, uint32_t stride = 0);
+                    uint32_t bufferSize, uint32_t stride = sizeof(uint16_t));
     void bindBuffer(const std::string& identifier, uint32_t* buffer,
-                    uint32_t bufferSize, uint32_t stride = 0);
+                    uint32_t bufferSize, uint32_t stride = sizeof(uint32_t));
     uint64_t read();
 
 private:

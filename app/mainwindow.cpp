@@ -15,6 +15,7 @@
 #include "CPropertyHeader.h"
 #include "QColorComboBox.h"
 
+static const int BUFFER_SIZE = 10000;
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
 {
@@ -189,7 +190,7 @@ void MainWindow::openPointCloud(const E57NodePtr& node,
                                   QString("Combined View"));
     }
 
-    std::vector<std::array<float, 3>> xyz(10000);
+    std::vector<std::array<float, 3>> xyz(BUFFER_SIZE);
     auto dataReader = m_reader->dataReader(node->data().at(dataName));
     dataReader.bindBuffer("cartesianX", (float*)&xyz[0][0], xyz.size(),
                           3 * sizeof(float));
@@ -198,13 +199,15 @@ void MainWindow::openPointCloud(const E57NodePtr& node,
     dataReader.bindBuffer("cartesianZ", (float*)&xyz[0][2], xyz.size(),
                           3 * sizeof(float));
 
-    std::vector<std::array<float, 3>> rgb(10000);
     bool hasColor = false;
     bool hasIntensity = false;
+
+    std::vector<std::array<float, 3>> rgb(0);
     if (std::any_of(dataInfo.begin(), dataInfo.end(),
                     [](const auto& info)
-                    { return info.identifier == "colorRed1"; }))
+                    { return info.identifier == "colorRed"; }))
     {
+        rgb.resize(BUFFER_SIZE);
         hasColor = true;
         dataReader.bindBuffer("colorRed", (float*)&rgb[0][0], rgb.size(),
                               3 * sizeof(float));
@@ -213,13 +216,16 @@ void MainWindow::openPointCloud(const E57NodePtr& node,
         dataReader.bindBuffer("colorBlue", (float*)&rgb[0][2], rgb.size(),
                               3 * sizeof(float));
     }
-    else if (std::any_of(dataInfo.begin(), dataInfo.end(),
-                         [](const auto& info)
-                         { return info.identifier == "intensity"; }))
+
+    std::vector<float> intensity(0);
+    if (std::any_of(dataInfo.begin(), dataInfo.end(),
+                    [](const auto& info)
+                    { return info.identifier == "intensity"; }))
     {
+        intensity.resize(BUFFER_SIZE);
         hasIntensity = true;
-        dataReader.bindBuffer("intensity", (float*)&rgb[0][0], rgb.size(),
-                              3 * sizeof(float));
+        dataReader.bindBuffer("intensity", (float*)&intensity[0],
+                              intensity.size());
     }
 
     auto pointCloud = std::make_shared<PointCloud>(nullptr, e57Data3D);
@@ -240,18 +246,22 @@ void MainWindow::openPointCloud(const E57NodePtr& node,
                 pd.rgb[1] /= 255.0;
                 pd.rgb[2] /= 255.0;
             }
-            else if (hasIntensity)
-            {
-                pd.rgb = rgb[i];
-                pd.rgb[1] = pd.rgb[0];
-                pd.rgb[2] = pd.rgb[0];
-            }
             else
             {
                 pd.rgb[0] = 1.0;
                 pd.rgb[1] = 1.0;
                 pd.rgb[2] = 1.0;
             }
+
+            if (hasIntensity)
+            {
+                pd.intensity = intensity[i];
+            }
+            else
+            {
+                pd.intensity = 1.0f;
+            }
+
             pointData.push_back(pd);
         }
         pointCloud->insertPoints(pointData);

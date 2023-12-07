@@ -1,6 +1,7 @@
 #include "ScenePropertyEditor.h"
 
 #include "CBaseProperty.h"
+#include "CColorProperty.h"
 #include "CDoubleProperty.h"
 #include "CIntegerProperty.h"
 #include "CListProperty.h"
@@ -41,6 +42,25 @@ void ScenePropertyEditor::init(SceneNode* sceneNode)
                                  pointcloud->pointSize());
         pointSize->setRange(1, 100);
         add(pointSize);
+
+        auto* viewProperties =
+            new CPropertyHeader("ViewProperties", "View Settings");
+        add(viewProperties);
+
+        CListData viewTypes;
+        viewTypes.append(CListDataItem(QString("Color"), QIcon(), QVariant(0)));
+        viewTypes.append(
+            CListDataItem(QString("Intensity"), QIcon(), QVariant(1)));
+        viewTypes.append(
+            CListDataItem(QString("Single Color"), QIcon(), QVariant(2)));
+        auto* viewType = new CListProperty(viewProperties, "viewType",
+                                           "View Type", viewTypes, 0, 0);
+        add(viewType);
+
+        auto* singleColor =
+            new CColorProperty(viewProperties, "singleColor", "Color",
+                               QColor::fromRgb(255, 255, 255));
+        add(singleColor);
     }
 
     adjustToContents();
@@ -83,6 +103,19 @@ std::optional<int> getListIndex(QTreeWidgetItem* item, const std::string& id)
     return std::nullopt;
 }
 
+std::optional<QColor> getColorValue(QTreeWidgetItem* item,
+                                    const std::string& id)
+{
+    if (auto* property = dynamic_cast<CColorProperty*>(item))
+    {
+        if (property->getId().toStdString() == id)
+        {
+            return property->getColor();
+        }
+    }
+    return std::nullopt;
+}
+
 void ScenePropertyEditor::onItemChanged(QTreeWidgetItem* item, int column)
 {
     auto* property = dynamic_cast<CBaseProperty*>(item);
@@ -99,6 +132,18 @@ void ScenePropertyEditor::onItemChanged(QTreeWidgetItem* item, int column)
         if (pointSize)
         {
             pointcloud->setPointSize(*pointSize);
+        }
+
+        auto viewType = getListIndex(item, "viewType");
+        if (viewType)
+        {
+            pointcloud->setViewType(static_cast<PointCloudViewType>(*viewType));
+        }
+
+        auto singleColor = getColorValue(item, "singleColor");
+        if (singleColor)
+        {
+            pointcloud->setSingleColor(*singleColor);
         }
     }
 }

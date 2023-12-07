@@ -14,6 +14,10 @@ void PointCloud::render()
 {
     SceneNode::render();
     scene()->shader()->setUniformInt("pointSize", m_pointSize);
+    scene()->shader()->setUniformInt("viewType", static_cast<int>(m_viewType));
+    float rgb[]{m_singleColor.redF(), m_singleColor.greenF(),
+                m_singleColor.blueF()};
+    scene()->shader()->setUniformVec3("singleColor", rgb);
     for (auto& child : m_childNodes)
     {
         child->render();
@@ -74,7 +78,7 @@ void PointCloudOctreeNode::render()
     if (!scene()->bufferCache().contains(id()))
     {
         buffer = std::make_shared<OpenGLArrayBuffer>(
-            m_node->elements().data(), GL_FLOAT, 6,
+            m_node->elements().data(), GL_FLOAT, 7,
             (int)m_node->elements().size(), GL_STATIC_DRAW);
         scene()->bufferCache().addItem(id(), buffer);
     }
@@ -83,16 +87,22 @@ void PointCloudOctreeNode::render()
         buffer = scene()->bufferCache().getItem(id()).value();
     }
 
+    GLsizei stride = 7 * sizeof(GLfloat);
+
     glBindVertexArray(m_vao);
     glBindBuffer(GL_ARRAY_BUFFER, buffer->buffer());
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat),
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride,
                           (char*)0 + 0 * sizeof(GLfloat));
     glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat),
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride,
                           (char*)0 + 3 * sizeof(GLfloat));
     glEnableVertexAttribArray(1);
+
+    glVertexAttribPointer(2, 1, GL_FLOAT, GL_TRUE, stride,
+                          (char*)0 + 6 * sizeof(GLfloat));
+    glEnableVertexAttribArray(2);
 
     glDrawArrays(GL_POINTS, 0, buffer->elementCount());
     glBindVertexArray(0);

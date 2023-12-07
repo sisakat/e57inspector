@@ -4,7 +4,15 @@
 #include "e57inspector/E57Node.h"
 #include "octree.h"
 #include "scene.h"
+#include <QColor>
 #include <QMatrix4x4>
+
+enum class PointCloudViewType
+{
+    COLOR = 0,
+    INTENSITY = 1,
+    SINGLECOLOR = 2
+};
 
 class PointCloud : public SceneNode
 {
@@ -16,6 +24,12 @@ public:
 
     [[nodiscard]] int pointSize() const { return m_pointSize; }
     void setPointSize(int value) { m_pointSize = value; }
+
+    [[nodiscard]] PointCloudViewType viewType() const { return m_viewType; }
+    void setViewType(PointCloudViewType viewType) { m_viewType = viewType; }
+
+    [[nodiscard]] QColor singleColor() const { return m_singleColor; }
+    void setSingleColor(QColor singleColor) { m_singleColor = singleColor; }
 
     [[nodiscard]] QMatrix4x4 sop() const { return m_sop; }
     void setSOP(const QMatrix4x4& sop) { m_sop = sop; }
@@ -30,6 +44,8 @@ private:
     Octree m_octree;
     std::vector<OctreeNode*> m_octreeNodes;
     int m_pointSize{1};
+    PointCloudViewType m_viewType{PointCloudViewType::COLOR};
+    QColor m_singleColor;
     QMatrix4x4 m_sop;
 };
 
