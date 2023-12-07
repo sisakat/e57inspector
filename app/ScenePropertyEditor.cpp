@@ -30,6 +30,11 @@ void ScenePropertyEditor::init(SceneNode* sceneNode)
     if (dynamic_cast<Camera*>(sceneNode))
     {
         auto* camera = dynamic_cast<Camera*>(sceneNode);
+
+        auto* fieldOfView =
+            new CDoubleProperty("fieldOfView", "Field of View",
+                                camera->fieldOfView(), 90.0f, 1.0f, 179.0f);
+        add(fieldOfView);
     }
     else if (dynamic_cast<PointCloud*>(sceneNode))
     {
@@ -141,6 +146,12 @@ void ScenePropertyEditor::onItemChanged(QTreeWidgetItem* item, int column)
 
     if (dynamic_cast<Camera*>(m_sceneNode))
     {
+        auto* camera = dynamic_cast<Camera*>(m_sceneNode);
+        auto fieldOfView = getDoubleValue(item, "fieldOfView");
+        if (fieldOfView)
+        {
+            camera->setFieldOfView(*fieldOfView);
+        }
     }
     else if (dynamic_cast<PointCloud*>(m_sceneNode))
     {

@@ -18,6 +18,8 @@ public:
     void setViewportHeight(uint32_t height) { m_viewportHeight = height; }
     [[nodiscard]] uint32_t viewportWidth() { return m_viewportWidth; }
     [[nodiscard]] uint32_t viewportHeight() { return m_viewportHeight; }
+    [[nodiscard]] float fieldOfView() const { return m_fieldOfView; }
+    void setFieldOfView(float fieldOfView) { m_fieldOfView = fieldOfView; }
 
     void render() override;
 
@@ -58,6 +60,8 @@ private:
     bool m_panning{false};
     bool m_zooming{false};
     QPoint m_originalMousePosition;
+
+    float m_fieldOfView{90.0};
 };
 
 #endif // CAMERA_H

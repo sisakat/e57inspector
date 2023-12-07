@@ -23,8 +23,9 @@ void Camera::render()
     m_view.lookAt(m_position, m_center, m_up);
 
     m_projection.setToIdentity();
-    m_projection.perspective(45, 1.0f * m_viewportWidth / m_viewportHeight,
-                             0.001f, 1000.0f);
+    m_projection.perspective(m_fieldOfView / 2.0f,
+                             1.0f * m_viewportWidth / m_viewportHeight, 0.001f,
+                             1000.0f);
 
     scene()->shader()->setUniformMat4("view", m_view.data());
     scene()->shader()->setUniformMat4("projection", m_projection.data());
