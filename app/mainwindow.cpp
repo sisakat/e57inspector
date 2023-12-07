@@ -31,6 +31,8 @@ MainWindow::MainWindow(QWidget* parent)
             &MainWindow::twMain_itemDoubleClicked);
     connect(ui->tabWidget, &QTabWidget::currentChanged, this,
             &MainWindow::tabWidget_currentChanged);
+    connect(ui->twViewProperties, &ScenePropertyEditor::itemChanged, this,
+            &MainWindow::twViewProperties_itemChanged);
 
     ui->twScene->setScenePropertyEditor(ui->twViewProperties);
 }
@@ -139,6 +141,15 @@ void MainWindow::twMain_itemDoubleClicked(QTreeWidgetItem* item, int column)
         {
             openPointCloud(e57Data3D, "points", data3D->text(0).toStdString());
         }
+    }
+}
+
+void MainWindow::twViewProperties_itemChanged(QTreeWidgetItem* item, int column)
+{
+    auto* widget = ui->tabWidget->currentWidget();
+    if (dynamic_cast<SceneView*>(widget))
+    {
+        dynamic_cast<SceneView*>(widget)->update();
     }
 }
 
