@@ -31,6 +31,9 @@ public:
     [[nodiscard]] QColor singleColor() const { return m_singleColor; }
     void setSingleColor(QColor singleColor) { m_singleColor = singleColor; }
 
+    [[nodiscard]] bool visible() const { return m_visible; }
+    void setVisible(bool visible) { m_visible = visible; }
+
     [[nodiscard]] QMatrix4x4 sop() const { return m_sop; }
     void setSOP(const QMatrix4x4& sop) { m_sop = sop; }
 
@@ -47,6 +50,7 @@ private:
     PointCloudViewType m_viewType{PointCloudViewType::COLOR};
     QColor m_singleColor;
     QMatrix4x4 m_sop;
+    bool m_visible{true};
 };
 
 class PointCloudOctreeNode : public SceneNode

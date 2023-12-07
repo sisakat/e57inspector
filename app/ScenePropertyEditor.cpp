@@ -1,6 +1,7 @@
 #include "ScenePropertyEditor.h"
 
 #include "CBaseProperty.h"
+#include "CBoolProperty.h"
 #include "CColorProperty.h"
 #include "CDoubleProperty.h"
 #include "CIntegerProperty.h"
@@ -47,19 +48,22 @@ void ScenePropertyEditor::init(SceneNode* sceneNode)
             new CPropertyHeader("ViewProperties", "View Settings");
         add(viewProperties);
 
+        auto* visible = new CBoolProperty(viewProperties, "visible", "Visible",
+                                          pointcloud->visible(), true);
+
         CListData viewTypes;
         viewTypes.append(CListDataItem(QString("Color"), QIcon(), QVariant(0)));
         viewTypes.append(
             CListDataItem(QString("Intensity"), QIcon(), QVariant(1)));
         viewTypes.append(
             CListDataItem(QString("Single Color"), QIcon(), QVariant(2)));
-        auto* viewType = new CListProperty(viewProperties, "viewType",
-                                           "View Type", viewTypes, 0, 0);
+        auto* viewType = new CListProperty(
+            viewProperties, "viewType", "View Type", viewTypes,
+            static_cast<int>(pointcloud->viewType()), 0);
         add(viewType);
 
-        auto* singleColor =
-            new CColorProperty(viewProperties, "singleColor", "Color",
-                               QColor::fromRgb(255, 255, 255));
+        auto* singleColor = new CColorProperty(
+            viewProperties, "singleColor", "Color", pointcloud->singleColor());
         add(singleColor);
     }
 
@@ -116,6 +120,19 @@ std::optional<QColor> getColorValue(QTreeWidgetItem* item,
     return std::nullopt;
 }
 
+std::optional<bool> getBooleanValue(QTreeWidgetItem* item,
+                                    const std::string& id)
+{
+    if (auto* property = dynamic_cast<CBoolProperty*>(item))
+    {
+        if (property->getId().toStdString() == id)
+        {
+            return property->getValue();
+        }
+    }
+    return std::nullopt;
+}
+
 void ScenePropertyEditor::onItemChanged(QTreeWidgetItem* item, int column)
 {
     auto* property = dynamic_cast<CBaseProperty*>(item);
@@ -132,6 +149,12 @@ void ScenePropertyEditor::onItemChanged(QTreeWidgetItem* item, int column)
         if (pointSize)
         {
             pointcloud->setPointSize(*pointSize);
+        }
+
+        auto visible = getBooleanValue(item, "visible");
+        if (visible)
+        {
+            pointcloud->setVisible(*visible);
         }
 
         auto viewType = getListIndex(item, "viewType");

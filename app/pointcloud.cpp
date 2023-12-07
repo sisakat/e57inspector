@@ -13,11 +13,15 @@ PointCloud::~PointCloud() = default;
 void PointCloud::render()
 {
     SceneNode::render();
+    if (!visible())
+        return;
+
     scene()->shader()->setUniformInt("pointSize", m_pointSize);
     scene()->shader()->setUniformInt("viewType", static_cast<int>(m_viewType));
     float rgb[]{m_singleColor.redF(), m_singleColor.greenF(),
                 m_singleColor.blueF()};
     scene()->shader()->setUniformVec3("singleColor", rgb);
+
     for (auto& child : m_childNodes)
     {
         child->render();
