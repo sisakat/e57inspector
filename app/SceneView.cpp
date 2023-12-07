@@ -1,9 +1,9 @@
-#include "sipointcloudrenderer.h"
+#include "SceneView.h"
 
 #include <QFile>
 #include <queue>
 
-SiPointCloudRenderer::SiPointCloudRenderer(QWidget* parent)
+SceneView::SceneView(QWidget* parent)
     : QOpenGLWidget(parent)
 {
     // to receive necessary events
@@ -18,20 +18,20 @@ SiPointCloudRenderer::SiPointCloudRenderer(QWidget* parent)
     setFormat(format);
 }
 
-SiPointCloudRenderer::~SiPointCloudRenderer() {}
+SceneView::~SceneView() {}
 
-void SiPointCloudRenderer::reset()
+void SceneView::reset()
 {
     m_octree = Octree();
     m_render = false;
 }
 
-void SiPointCloudRenderer::insert(const std::vector<PointData>& data)
+void SceneView::insert(const std::vector<PointData>& data)
 {
     m_octree.insert(data);
 }
 
-void SiPointCloudRenderer::doneInserting()
+void SceneView::doneInserting()
 {
     makeCurrent();
     m_octree.finalize();
@@ -40,7 +40,9 @@ void SiPointCloudRenderer::doneInserting()
     m_render = true;
 }
 
-void SiPointCloudRenderer::initializeGL()
+Scene& SceneView::scene() { return *m_scene; }
+
+void SceneView::initializeGL()
 {
     initializeOpenGLFunctions();
     glClear(GL_COLOR_BUFFER_BIT);
@@ -51,7 +53,7 @@ void SiPointCloudRenderer::initializeGL()
     m_openGLLogger.initialize();
 
     connect(&m_openGLLogger, &QOpenGLDebugLogger::messageLogged, this,
-            &SiPointCloudRenderer::onMessageLogged);
+            &SceneView::onMessageLogged);
 
     m_openGLLogger.enableMessages();
     m_openGLLogger.startLogging();
@@ -59,10 +61,9 @@ void SiPointCloudRenderer::initializeGL()
     makeCurrent();
     setupScene();
     setupShaders();
-    setupBuffers();
 }
 
-void SiPointCloudRenderer::paintGL()
+void SceneView::paintGL()
 {
     if (!m_render)
         return;
@@ -71,74 +72,72 @@ void SiPointCloudRenderer::paintGL()
     m_scene->render();
 }
 
-void SiPointCloudRenderer::resizeGL(int width, int height)
+void SceneView::resizeGL(int width, int height)
 {
     m_camera->setViewportWidth(width);
     m_camera->setViewportHeight(height);
     update();
 }
 
-void SiPointCloudRenderer::mousePressEvent(QMouseEvent* event)
+void SceneView::mousePressEvent(QMouseEvent* event)
 {
     makeCurrent();
     m_camera->mousePressEvent(event);
     update();
 }
 
-void SiPointCloudRenderer::mouseReleaseEvent(QMouseEvent* event)
+void SceneView::mouseReleaseEvent(QMouseEvent* event)
 {
     makeCurrent();
     m_camera->mouseReleaseEvent(event);
     update();
 }
 
-void SiPointCloudRenderer::mouseMoveEvent(QMouseEvent* event)
+void SceneView::mouseMoveEvent(QMouseEvent* event)
 {
     makeCurrent();
     m_camera->mouseMoveEvent(event);
     update();
 }
 
-void SiPointCloudRenderer::wheelEvent(QWheelEvent* event)
+void SceneView::wheelEvent(QWheelEvent* event)
 {
     makeCurrent();
     m_camera->wheelEvent(event);
     update();
 }
 
-void SiPointCloudRenderer::keyPressEvent(QKeyEvent* event)
+void SceneView::keyPressEvent(QKeyEvent* event)
 {
     makeCurrent();
     m_camera->keyPressEvent(event);
     update();
 }
 
-void SiPointCloudRenderer::keyReleaseEvent(QKeyEvent* event)
+void SceneView::keyReleaseEvent(QKeyEvent* event)
 {
     makeCurrent();
     m_camera->keyReleaseEvent(event);
     update();
 }
 
-void SiPointCloudRenderer::onMessageLogged(
+void SceneView::onMessageLogged(
     const QOpenGLDebugMessage& debugMessage)
 {
     qDebug() << debugMessage.message();
 }
 
-void SiPointCloudRenderer::setupScene()
+void SceneView::setupScene()
 {
     m_scene = std::make_shared<Scene>();
     m_camera = std::make_shared<Camera>();
     m_scene->addNode(m_camera);
 }
 
-void SiPointCloudRenderer::setupShaders()
+void SceneView::setupShaders()
 {
     m_shader = std::make_shared<Shader>(":/shaders/default_vertex.glsl",
                                         ":/shaders/default_fragment.glsl");
     m_shader->use();
     m_scene->setShader(m_shader);
 }
-
-void SiPointCloudRenderer::setupBuffers() {}

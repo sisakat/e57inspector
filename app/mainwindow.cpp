@@ -1,14 +1,19 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include "E57TreeNode.h"
+#include "SceneView.h"
 #include "siimageviewer.h"
-#include "sipointcloudrenderer.h"
 
 #include <QBuffer>
 #include <QFileDialog>
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QImageReader>
+
+#include "CColorProperty.h"
+#include "CDoubleProperty.h"
+#include "CPropertyHeader.h"
+#include "QColorComboBox.h"
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
@@ -23,6 +28,10 @@ MainWindow::MainWindow(QWidget* parent)
             &MainWindow::tabWidget_tabClosesRequested);
     connect(ui->twMain, &E57Tree::itemDoubleClicked, this,
             &MainWindow::twMain_itemDoubleClicked);
+    connect(ui->tabWidget, &QTabWidget::currentChanged, this,
+            &MainWindow::tabWidget_currentChanged);
+
+    ui->twScene->setScenePropertyEditor(ui->twViewProperties);
 }
 
 MainWindow::~MainWindow() { delete ui; }
@@ -68,9 +77,24 @@ void MainWindow::tabWidget_tabClosesRequested(int index)
     tabItem = nullptr;
 }
 
+void MainWindow::tabWidget_currentChanged(int index)
+{
+    auto* widget = ui->tabWidget->currentWidget();
+    if (dynamic_cast<SceneView*>(widget))
+    {
+        auto* renderer = dynamic_cast<SceneView*>(widget);
+        ui->twScene->init(renderer->scene());
+    }
+    else
+    {
+        ui->twScene->clear();
+    }
+}
+
 void MainWindow::twMain_itemDoubleClicked(QTreeWidgetItem* item, int column)
 {
-    if (dynamic_cast<TE57Node*>(item) == nullptr) return;
+    if (dynamic_cast<TE57Node*>(item) == nullptr)
+        return;
     auto* node = dynamic_cast<TE57Node*>(item);
     if (dynamic_cast<TNodeImage2D*>(node) != nullptr)
     {
@@ -149,7 +173,7 @@ void MainWindow::openPointCloud(const E57NodePtr& node,
 
     auto dataInfo = m_reader->dataInfo(node->data().at(dataName));
 
-    auto* pointCloudViewer = new SiPointCloudRenderer(ui->tabWidget);
+    auto* pointCloudViewer = new SceneView(ui->tabWidget);
     int tabIndex = ui->tabWidget->addTab(pointCloudViewer,
                                          QString::fromStdString(tabName));
     ui->tabWidget->setCurrentIndex(tabIndex);
@@ -207,4 +231,5 @@ void MainWindow::openPointCloud(const E57NodePtr& node,
     }
 
     pointCloudViewer->doneInserting();
+    ui->twScene->init(pointCloudViewer->scene());
 }

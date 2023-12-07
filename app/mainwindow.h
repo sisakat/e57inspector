@@ -27,6 +27,7 @@ private slots:
     void actionOpen_triggered();
     void twMain_nodeSelected(TNode* node);
     void tabWidget_tabClosesRequested(int index);
+    void tabWidget_currentChanged(int index);
     void twMain_itemDoubleClicked(QTreeWidgetItem* item, int column);
 
 private:

@@ -1,8 +1,8 @@
 #ifndef POINTCLOUD_H
 #define POINTCLOUD_H
 
-#include "scene.h"
 #include "octree.h"
+#include "scene.h"
 
 class PointCloud : public SceneNode
 {
@@ -12,9 +12,13 @@ public:
 
     void render() override;
 
+    [[nodiscard]] int pointSize() const { return m_pointSize; }
+    void setPointSize(int value) { m_pointSize = value; }
+
 private:
     Octree& m_octree;
     std::vector<OctreeNode*> m_octreeNodes;
+    int m_pointSize{1};
 };
 
 class PointCloudOctreeNode : public SceneNode

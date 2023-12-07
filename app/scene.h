@@ -92,6 +92,9 @@ public:
     const Shader::Ptr& shader() { return m_shader; }
     void setShader(const Shader::Ptr& shader) { m_shader = shader; }
 
+    std::vector<SceneNode::Ptr>& nodes() { return m_nodes; }
+    const std::vector<SceneNode::Ptr>& nodes() const { return m_nodes; }
+
 private:
     BufferCache m_bufferCache;
     std::vector<SceneNode::Ptr> m_nodes;

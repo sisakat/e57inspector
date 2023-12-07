@@ -15,10 +15,12 @@ E57PropertyTree::E57PropertyTree(QWidget* parent) : QTreeWidget(parent)
     m_boldFont.setBold(true);
     m_italicFont.setItalic(true);
     setIconSize(QSize(16, 16));
+    setHeaderHidden(true);
 }
 
 void E57PropertyTree::init(TE57Node* node)
 {
+    setHeaderHidden(false);
     clear();
     prepare();
 
@@ -35,7 +37,7 @@ void E57PropertyTree::init(TE57Node* node)
 
     expandAll();
     resizeColumnToContents(0);
-    //resizeColumnToContents(1);
+    // resizeColumnToContents(1);
 }
 
 void E57PropertyTree::prepare()

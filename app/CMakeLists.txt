@@ -19,8 +19,8 @@ add_executable(${PROJECT_NAME}
         utils.h
         siimageviewer.cpp
         siimageviewer.h
-        sipointcloudrenderer.cpp
-        sipointcloudrenderer.h
+        SceneView.cpp
+        SceneView.h
         openglarraybuffer.cpp
         openglarraybuffer.h
         octree.h
@@ -34,7 +34,45 @@ add_executable(${PROJECT_NAME}
         pointcloud.cpp
         resources/resources.qrc
         shader.cpp
-        shader.h)
+        shader.h
+        SceneTree.cpp
+        SceneTree.h
+        SceneTreeNode.cpp
+        SceneTreeNode.h
+        propertyeditor/CBaseProperty.cpp
+        propertyeditor/CBaseProperty.h
+        propertyeditor/CBoolProperty.cpp
+        propertyeditor/CBoolProperty.h
+        propertyeditor/CButtonBasedEditor.cpp
+        propertyeditor/CButtonBasedEditor.h
+        propertyeditor/CColorProperty.cpp
+        propertyeditor/CColorProperty.h
+        propertyeditor/CDateProperty.cpp
+        propertyeditor/CDateProperty.h
+        propertyeditor/CDateTimeProperty.cpp
+        propertyeditor/CDateTimeProperty.h
+        propertyeditor/CDoubleProperty.cpp
+        propertyeditor/CDoubleProperty.h
+        propertyeditor/CFontProperty.cpp
+        propertyeditor/CFontProperty.h
+        propertyeditor/CIntegerProperty.cpp
+        propertyeditor/CIntegerProperty.h
+        propertyeditor/CListProperty.cpp
+        propertyeditor/CListProperty.h
+        propertyeditor/CPropertyEditor.cpp
+        propertyeditor/CPropertyEditor.h
+        propertyeditor/CPropertyHeader.cpp
+        propertyeditor/CPropertyHeader.h
+        propertyeditor/CStringProperty.cpp
+        propertyeditor/CStringProperty.h
+        propertyeditor/CTimeProperty.cpp
+        propertyeditor/CTimeProperty.h
+        propertyeditor/QColorComboBox.cpp
+        propertyeditor/QColorComboBox.h
+        SceneTreeNodeFactory.cpp
+        SceneTreeNodeFactory.h
+        ScenePropertyEditor.cpp
+        ScenePropertyEditor.h)
 target_link_libraries(${PROJECT_NAME} PRIVATE
         E57Format
         Qt6::Widgets
@@ -43,7 +81,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         ${PROJECT_NAME}_lib)
 target_include_directories(${PROJECT_NAME} PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
-        ${CMAKE_CURRENT_SOURCE_DIR}/pointcloudrenderer)
+        ${CMAKE_CURRENT_SOURCE_DIR}/propertyeditor)
 
 if(WIN32)
     set_property(TARGET ${PROJECT_NAME} PROPERTY WIN32_EXECUTABLE true)

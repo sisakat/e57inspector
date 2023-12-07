@@ -15,8 +15,9 @@ public:
     Camera();
 
     void setViewportWidth(uint32_t width) { m_viewportWidth = width; }
-
     void setViewportHeight(uint32_t height) { m_viewportHeight = height; }
+    [[nodiscard]] uint32_t viewportWidth() { return m_viewportWidth; }
+    [[nodiscard]] uint32_t viewportHeight() { return m_viewportHeight; }
 
     void render() override;
 

@@ -20,23 +20,67 @@
      <verstretch>0</verstretch>
     </sizepolicy>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout">
+   <layout class="QVBoxLayout" name="verticalLayout_3">
     <item>
      <widget class="QSplitter" name="splitter">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
-      <widget class="E57Tree" name="twMain">
-       <property name="styleSheet">
-        <string notr="true">QTreeWidget::item{
+      <widget class="QTabWidget" name="tabWidget_3">
+       <property name="tabPosition">
+        <enum>QTabWidget::North</enum>
+       </property>
+       <property name="tabShape">
+        <enum>QTabWidget::Rounded</enum>
+       </property>
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <property name="elideMode">
+        <enum>Qt::ElideNone</enum>
+       </property>
+       <property name="usesScrollButtons">
+        <bool>false</bool>
+       </property>
+       <property name="documentMode">
+        <bool>false</bool>
+       </property>
+       <property name="tabsClosable">
+        <bool>false</bool>
+       </property>
+       <property name="movable">
+        <bool>false</bool>
+       </property>
+       <property name="tabBarAutoHide">
+        <bool>true</bool>
+       </property>
+       <widget class="QWidget" name="tab_3">
+        <attribute name="title">
+         <string>File</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item>
+          <widget class="E57Tree" name="twMain">
+           <property name="styleSheet">
+            <string notr="true">QTreeWidget::item{
 	height: 25px;
 }</string>
-       </property>
-       <column>
-        <property name="text">
-         <string notr="true">1</string>
-        </property>
-       </column>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Sunken</enum>
+           </property>
+           <property name="alternatingRowColors">
+            <bool>false</bool>
+           </property>
+           <column>
+            <property name="text">
+             <string notr="true">1</string>
+            </property>
+           </column>
+          </widget>
+         </item>
+        </layout>
+       </widget>
       </widget>
       <widget class="QTabWidget" name="tabWidget">
        <property name="sizePolicy">
@@ -52,17 +96,65 @@
         <bool>true</bool>
        </property>
       </widget>
-      <widget class="E57PropertyTree" name="twProperties">
-       <property name="styleSheet">
-        <string notr="true">QTreeWidget::item{
+      <widget class="QTabWidget" name="tabWidget_2">
+       <property name="currentIndex">
+        <number>1</number>
+       </property>
+       <widget class="QWidget" name="tab">
+        <attribute name="title">
+         <string>Properties</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <item>
+          <widget class="E57PropertyTree" name="twProperties">
+           <property name="styleSheet">
+            <string notr="true">QTreeWidget::item{
 	height: 24px;
 }</string>
-       </property>
-       <column>
-        <property name="text">
-         <string notr="true">1</string>
-        </property>
-       </column>
+           </property>
+           <property name="alternatingRowColors">
+            <bool>true</bool>
+           </property>
+           <column>
+            <property name="text">
+             <string notr="true">1</string>
+            </property>
+           </column>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tab_2">
+        <attribute name="title">
+         <string>View</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <item>
+          <widget class="QSplitter" name="splitter_2">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <widget class="SceneTree" name="twScene">
+            <property name="alternatingRowColors">
+             <bool>true</bool>
+            </property>
+            <column>
+             <property name="text">
+              <string notr="true">1</string>
+             </property>
+            </column>
+           </widget>
+           <widget class="ScenePropertyEditor" name="twViewProperties">
+            <column>
+             <property name="text">
+              <string notr="true">1</string>
+             </property>
+            </column>
+           </widget>
+          </widget>
+         </item>
+        </layout>
+       </widget>
       </widget>
      </widget>
     </item>
@@ -138,6 +230,16 @@
    <class>E57PropertyTree</class>
    <extends>QTreeWidget</extends>
    <header>E57PropertyTree.h</header>
+  </customwidget>
+  <customwidget>
+   <class>SceneTree</class>
+   <extends>QTreeWidget</extends>
+   <header>SceneTree.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ScenePropertyEditor</class>
+   <extends>QTreeWidget</extends>
+   <header>ScenePropertyEditor.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

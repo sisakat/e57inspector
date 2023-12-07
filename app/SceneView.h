@@ -16,16 +16,18 @@
 #include "pointcloud.h"
 #include "shader.h"
 
-class SiPointCloudRenderer : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core
+class SceneView : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core
 {
     Q_OBJECT
 public:
-    SiPointCloudRenderer(QWidget *parent = nullptr);
-    ~SiPointCloudRenderer();
+    SceneView(QWidget *parent = nullptr);
+    ~SceneView() override;
 
     void reset();
     void insert(const std::vector<PointData>& data);
     void doneInserting();
+
+    Scene& scene();
 
 protected:
     void initializeGL() override;
@@ -58,7 +60,6 @@ private:
 
     void setupScene();
     void setupShaders();
-    void setupBuffers();
 };
 
 #endif // SIPOINTCLOUDRENDERER_H
