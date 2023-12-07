@@ -24,8 +24,6 @@ public:
     ~SceneView() override;
 
     void reset();
-    void insert(const std::vector<PointData>& data);
-    void doneInserting();
 
     Scene& scene();
 
@@ -50,13 +48,9 @@ private:
     QMatrix4x4 m_view;
     QMatrix4x4 m_projection;
 
-    Octree m_octree;
-    bool m_render;
-
     Scene::Ptr m_scene;
     Shader::Ptr m_shader;
     Camera::Ptr m_camera;
-    PointCloud::Ptr m_pointCloud;
 
     void setupScene();
     void setupShaders();

@@ -7,6 +7,7 @@
 #include <e57inspector/E57Reader.h>
 
 #include "E57TreeNode.h"
+#include "SceneView.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui
@@ -40,6 +41,8 @@ private:
                        const std::string& tabName);
     void openPointCloud(const E57NodePtr& node, const std::string& dataName,
                         const std::string& tabName);
+
+    SceneView* findSceneView();
 };
 
 #endif // E57INSPECTOR_MAINWINDOW_H

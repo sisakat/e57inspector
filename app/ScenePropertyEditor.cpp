@@ -28,14 +28,6 @@ void ScenePropertyEditor::init(SceneNode* sceneNode)
     if (dynamic_cast<Camera*>(sceneNode))
     {
         auto* camera = dynamic_cast<Camera*>(sceneNode);
-
-        auto* viewportHeader = new CPropertyHeader("Viewport", "Viewport");
-        add(viewportHeader);
-
-        auto* viewportWidth = new CIntegerProperty(
-            viewportHeader, "viewportWidth", "Width", camera->viewportWidth());
-        viewportWidth->setRange(0, 10000);
-        add(viewportWidth);
     }
     else if (dynamic_cast<PointCloud*>(sceneNode))
     {

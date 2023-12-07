@@ -19,7 +19,7 @@ class SceneNode : protected QOpenGLFunctions_3_3_Core
 public:
     using Ptr = std::shared_ptr<SceneNode>;
 
-    SceneNode();
+    explicit SceneNode(SceneNode* parent = nullptr);
     virtual ~SceneNode() = default;
 
     virtual void render();
@@ -36,13 +36,26 @@ public:
 
     const std::vector<Ptr>& children() const { return m_childNodes; }
 
-    QMatrix4x4 pose() const { return m_pose; }
+    [[nodiscard]] QMatrix4x4 pose() const
+    {
+        QMatrix4x4 result(m_pose);
+        SceneNode* parent = m_parent;
+        while (parent != nullptr)
+        {
+            result = parent->m_pose * result;
+            parent = parent->parent();
+        }
+        return result;
+    }
 
     void setPose(const QMatrix4x4& newPose) { m_pose = newPose; }
 
     Scene* scene() { return m_scene; }
 
     const Scene* scene() const { return m_scene; }
+
+    const SceneNode* parent() const { return m_parent; }
+    SceneNode* parent() { return m_parent; }
 
     friend class Scene;
 
@@ -60,6 +73,8 @@ protected:
             child->setScene(scene);
         }
     }
+
+    SceneNode* m_parent{nullptr};
 };
 
 class Scene
@@ -74,6 +89,7 @@ public:
     void addNode(SceneNode::Ptr node)
     {
         node->setScene(this);
+        node->m_parent = nullptr;
         m_nodes.push_back(std::move(node));
     }
 

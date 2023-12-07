@@ -6,6 +6,20 @@
 #include <unordered_map>
 #include <vector>
 
+struct E57Quaternion
+{
+    double x;
+    double y;
+    double z;
+    double w;
+};
+
+struct E57Pose
+{
+    std::array<double, 3> translation;
+    E57Quaternion rotation;
+};
+
 class E57Node
 {
 public:
@@ -78,7 +92,11 @@ private:
 class E57Data3D : public E57Node
 {
 public:
+    E57Pose& pose() { return m_pose; }
+    const E57Pose& pose() const { return m_pose; }
+
 private:
+    E57Pose m_pose;
 };
 
 class E57Blob : public E57Node

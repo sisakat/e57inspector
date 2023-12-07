@@ -1,9 +1,33 @@
 #include "pointcloud.h"
 
 #include <queue>
+#include <utility>
 
-PointCloud::PointCloud(Octree& octree) : SceneNode(), m_octree{octree}
+PointCloud::PointCloud(SceneNode* parent, E57Data3DPtr data3D)
+    : SceneNode(parent), m_data3D(std::move(data3D)), m_octree()
 {
+}
+
+PointCloud::~PointCloud() = default;
+
+void PointCloud::render()
+{
+    SceneNode::render();
+    scene()->shader()->setUniformInt("pointSize", m_pointSize);
+    for (auto& child : m_childNodes)
+    {
+        child->render();
+    }
+}
+
+void PointCloud::insertPoints(const std::vector<PointData>& data)
+{
+    m_octree.insert(data);
+}
+
+void PointCloud::doneInserting()
+{
+    m_octree.finalize();
     std::queue<OctreeNode*> visit;
     visit.push(&m_octree.root());
     while (!visit.empty())
@@ -26,26 +50,12 @@ PointCloud::PointCloud(Octree& octree) : SceneNode(), m_octree{octree}
 
     for (auto* node : m_octreeNodes)
     {
-        addChild(std::make_shared<PointCloudOctreeNode>(node));
-    }
-
-    m_pose.setToIdentity();
-}
-
-PointCloud::~PointCloud() {}
-
-void PointCloud::render()
-{
-    SceneNode::render();
-    scene()->shader()->setUniformInt("pointSize", m_pointSize);
-    for (auto& child : m_childNodes)
-    {
-        child->render();
+        addChild(std::make_shared<PointCloudOctreeNode>(this, node));
     }
 }
 
-PointCloudOctreeNode::PointCloudOctreeNode(OctreeNode* node)
-    : SceneNode(), m_node{node}
+PointCloudOctreeNode::PointCloudOctreeNode(SceneNode* parent, OctreeNode* node)
+    : SceneNode(parent), m_node{node}
 {
     glGenVertexArrays(1, &m_vao);
 }

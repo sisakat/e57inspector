@@ -171,12 +171,23 @@ void MainWindow::openPointCloud(const E57NodePtr& node,
     if (!node->data().contains(dataName))
         return;
 
+    auto e57Data3D = std::dynamic_pointer_cast<E57Data3D>(node);
     auto dataInfo = m_reader->dataInfo(node->data().at(dataName));
 
-    auto* pointCloudViewer = new SceneView(ui->tabWidget);
-    int tabIndex = ui->tabWidget->addTab(pointCloudViewer,
-                                         QString::fromStdString(tabName));
-    ui->tabWidget->setCurrentIndex(tabIndex);
+    auto* sceneView = findSceneView();
+    if (!sceneView)
+    {
+        sceneView = new SceneView(ui->tabWidget);
+        int tabIndex =
+            ui->tabWidget->addTab(sceneView, QString::fromStdString(tabName));
+        ui->tabWidget->setCurrentIndex(tabIndex);
+    }
+    else
+    {
+        ui->tabWidget->setCurrentWidget(sceneView);
+        ui->tabWidget->setTabText(ui->tabWidget->currentIndex(),
+                                  QString("Combined View"));
+    }
 
     std::vector<std::array<float, 3>> xyz(10000);
     auto dataReader = m_reader->dataReader(node->data().at(dataName));
@@ -189,9 +200,10 @@ void MainWindow::openPointCloud(const E57NodePtr& node,
 
     std::vector<std::array<float, 3>> rgb(10000);
     bool hasColor = false;
+    bool hasIntensity = false;
     if (std::any_of(dataInfo.begin(), dataInfo.end(),
                     [](const auto& info)
-                    { return info.identifier == "colorRed"; }))
+                    { return info.identifier == "colorRed1"; }))
     {
         hasColor = true;
         dataReader.bindBuffer("colorRed", (float*)&rgb[0][0], rgb.size(),
@@ -201,6 +213,16 @@ void MainWindow::openPointCloud(const E57NodePtr& node,
         dataReader.bindBuffer("colorBlue", (float*)&rgb[0][2], rgb.size(),
                               3 * sizeof(float));
     }
+    else if (std::any_of(dataInfo.begin(), dataInfo.end(),
+                         [](const auto& info)
+                         { return info.identifier == "intensity"; }))
+    {
+        hasIntensity = true;
+        dataReader.bindBuffer("intensity", (float*)&rgb[0][0], rgb.size(),
+                              3 * sizeof(float));
+    }
+
+    auto pointCloud = std::make_shared<PointCloud>(nullptr, e57Data3D);
 
     uint64_t count;
     uint64_t totalCount = 0;
@@ -218,6 +240,12 @@ void MainWindow::openPointCloud(const E57NodePtr& node,
                 pd.rgb[1] /= 255.0;
                 pd.rgb[2] /= 255.0;
             }
+            else if (hasIntensity)
+            {
+                pd.rgb = rgb[i];
+                pd.rgb[1] = pd.rgb[0];
+                pd.rgb[2] = pd.rgb[0];
+            }
             else
             {
                 pd.rgb[0] = 1.0;
@@ -226,10 +254,48 @@ void MainWindow::openPointCloud(const E57NodePtr& node,
             }
             pointData.push_back(pd);
         }
-        pointCloudViewer->insert(pointData);
+        pointCloud->insertPoints(pointData);
         totalCount += count;
     }
 
-    pointCloudViewer->doneInserting();
-    ui->twScene->init(pointCloudViewer->scene());
+    const auto& pose = e57Data3D->pose();
+    QQuaternion quaternion(static_cast<float>(pose.rotation.w),
+                           static_cast<float>(pose.rotation.x),
+                           static_cast<float>(pose.rotation.y),
+                           static_cast<float>(pose.rotation.z));
+    QMatrix4x4 sop(quaternion.toRotationMatrix());
+    sop.setColumn(3, QVector4D(static_cast<float>(pose.translation[0]),
+                               static_cast<float>(pose.translation[1]),
+                               static_cast<float>(pose.translation[2]), 1.0f));
+    pointCloud->setSOP(sop);
+
+    for (auto& node : sceneView->scene().nodes())
+    {
+        if (std::dynamic_pointer_cast<PointCloud>(node))
+        {
+            auto firstPointCloud = std::dynamic_pointer_cast<PointCloud>(node);
+            pointCloud->setPose(firstPointCloud->sop().inverted() *
+                                pointCloud->sop());
+            break;
+        }
+    }
+
+    pointCloud->doneInserting();
+    sceneView->scene().addNode(pointCloud);
+
+    ui->twScene->init(sceneView->scene());
+}
+
+SceneView* MainWindow::findSceneView()
+{
+    for (int i = 0; i < ui->tabWidget->count(); ++i)
+    {
+        auto* widget = ui->tabWidget->widget(i);
+        if (dynamic_cast<SceneView*>(widget))
+        {
+            return dynamic_cast<SceneView*>(widget);
+        }
+    }
+
+    return nullptr;
 }

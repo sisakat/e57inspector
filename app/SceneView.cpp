@@ -3,8 +3,7 @@
 #include <QFile>
 #include <queue>
 
-SceneView::SceneView(QWidget* parent)
-    : QOpenGLWidget(parent)
+SceneView::SceneView(QWidget* parent) : QOpenGLWidget(parent)
 {
     // to receive necessary events
     setFocusPolicy(Qt::StrongFocus);
@@ -18,27 +17,7 @@ SceneView::SceneView(QWidget* parent)
     setFormat(format);
 }
 
-SceneView::~SceneView() {}
-
-void SceneView::reset()
-{
-    m_octree = Octree();
-    m_render = false;
-}
-
-void SceneView::insert(const std::vector<PointData>& data)
-{
-    m_octree.insert(data);
-}
-
-void SceneView::doneInserting()
-{
-    makeCurrent();
-    m_octree.finalize();
-    m_pointCloud = std::make_shared<PointCloud>(m_octree);
-    m_scene->addNode(m_pointCloud);
-    m_render = true;
-}
+SceneView::~SceneView() = default;
 
 Scene& SceneView::scene() { return *m_scene; }
 
@@ -65,8 +44,6 @@ void SceneView::initializeGL()
 
 void SceneView::paintGL()
 {
-    if (!m_render)
-        return;
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     m_scene->shader()->use();
     m_scene->render();
@@ -121,8 +98,7 @@ void SceneView::keyReleaseEvent(QKeyEvent* event)
     update();
 }
 
-void SceneView::onMessageLogged(
-    const QOpenGLDebugMessage& debugMessage)
+void SceneView::onMessageLogged(const QOpenGLDebugMessage& debugMessage)
 {
     qDebug() << debugMessage.message();
 }

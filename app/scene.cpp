@@ -14,7 +14,7 @@ void Scene::render()
     }
 }
 
-SceneNode::SceneNode()
+SceneNode::SceneNode(SceneNode* parent) : m_parent{parent}
 {
     static uint32_t globalId = 0;
     m_id = globalId++;
@@ -22,11 +22,12 @@ SceneNode::SceneNode()
     {
         throw std::runtime_error("Could not initialize OpenGL functions!");
     }
+    m_pose.setToIdentity();
 }
 
 void SceneNode::render()
 {
-    scene()->shader()->setUniformMat4("model", m_pose.data());
+    scene()->shader()->setUniformMat4("model", pose().data());
 }
 
 float Scene::getDepth(int u, int v)
