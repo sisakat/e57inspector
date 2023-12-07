@@ -63,6 +63,7 @@ void MainWindow::loadE57(const std::string& filename)
 {
     m_reader = std::make_unique<E57Reader>(filename);
     ui->twMain->init(m_reader->root());
+    ui->twViewProperties->init(nullptr);
     ui->tabWidget->clear();
 }
 

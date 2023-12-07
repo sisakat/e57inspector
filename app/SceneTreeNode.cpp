@@ -11,6 +11,7 @@ ScenePointcloudTreeNode::ScenePointcloudTreeNode(PointCloud* pointcloud)
     : m_pointcloud(pointcloud)
 {
     setText(0, QString::fromStdString(m_pointcloud->data3D().name()));
+    setIcon(0, QIcon(":/icons/Pointcloud.png"));
 }
 
 SceneNode* ScenePointcloudTreeNode::sceneNode() { return m_pointcloud; }

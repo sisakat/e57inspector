@@ -135,6 +135,11 @@
             <enum>Qt::Vertical</enum>
            </property>
            <widget class="SceneTree" name="twScene">
+            <property name="styleSheet">
+             <string notr="true">QTreeWidget::item{
+	height: 24px;
+}</string>
+            </property>
             <property name="alternatingRowColors">
              <bool>true</bool>
             </property>
