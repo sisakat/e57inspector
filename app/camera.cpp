@@ -86,20 +86,6 @@ void Camera::pitch(float angle)
     m_center = center.toVector3D();
 }
 
-void Camera::translateRight(float value)
-{
-    auto viewVec = (m_position - m_center).normalized();
-    auto right = QVector3D::crossProduct(viewVec, m_up);
-    m_center += right * value;
-    m_position += right * value;
-}
-
-void Camera::translateUp(float value)
-{
-    m_center += m_up * value;
-    m_position += m_up * value;
-}
-
 void Camera::updatePickpoint(const QPoint& window)
 {
     auto u = window.x();

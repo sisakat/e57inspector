@@ -23,8 +23,6 @@ public:
 
     void yaw(float angle);
     void pitch(float angle);
-    void translateRight(float value);
-    void translateUp(float value);
 
     void updatePickpoint(const QPoint& window);
 
