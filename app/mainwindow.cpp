@@ -23,6 +23,8 @@ MainWindow::MainWindow(QWidget* parent)
 
     connect(ui->actionOpen, &QAction::triggered, this,
             &MainWindow::actionOpen_triggered);
+    connect(ui->actionClose, &QAction::triggered, this,
+            &MainWindow::actionClose_triggered);
     connect(ui->twMain, &E57Tree::nodeSelected, this,
             &MainWindow::twMain_nodeSelected);
     connect(ui->tabWidget, &QTabWidget::tabCloseRequested, this,
@@ -40,6 +42,8 @@ MainWindow::MainWindow(QWidget* parent)
 MainWindow::~MainWindow() { delete ui; }
 
 void MainWindow::actionOpen_triggered() { openFile(); }
+
+void MainWindow::actionClose_triggered() { close(); }
 
 void MainWindow::openFile()
 {

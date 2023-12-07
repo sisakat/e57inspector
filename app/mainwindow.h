@@ -26,6 +26,7 @@ public:
 
 private slots:
     void actionOpen_triggered();
+    void actionClose_triggered();
     void twMain_nodeSelected(TNode* node);
     void tabWidget_tabClosesRequested(int index);
     void tabWidget_currentChanged(int index);
