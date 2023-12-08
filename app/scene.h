@@ -20,42 +20,24 @@ public:
     using Ptr = std::shared_ptr<SceneNode>;
 
     explicit SceneNode(SceneNode* parent = nullptr);
-    virtual ~SceneNode() = default;
+    ~SceneNode() override = default;
 
     virtual void render();
+    void addChild(Ptr node);
 
-    uint32_t id() { return m_id; }
+    [[nodiscard]] uint32_t id() const;
+    [[nodiscard]] std::vector<Ptr>& children();
 
-    void addChild(Ptr node)
-    {
-        node->setScene(m_scene);
-        m_childNodes.emplace_back(std::move(node));
-    }
+    [[nodiscard]] const std::vector<Ptr>& children() const;
+    [[nodiscard]] QMatrix4x4 pose() const;
 
-    std::vector<Ptr>& children() { return m_childNodes; }
+    void setPose(const QMatrix4x4& newPose);
 
-    const std::vector<Ptr>& children() const { return m_childNodes; }
+    [[nodiscard]] Scene* scene();
+    [[nodiscard]] const Scene* scene() const;
 
-    [[nodiscard]] QMatrix4x4 pose() const
-    {
-        QMatrix4x4 result(m_pose);
-        SceneNode* parent = m_parent;
-        while (parent != nullptr)
-        {
-            result = parent->m_pose * result;
-            parent = parent->parent();
-        }
-        return result;
-    }
-
-    void setPose(const QMatrix4x4& newPose) { m_pose = newPose; }
-
-    Scene* scene() { return m_scene; }
-
-    const Scene* scene() const { return m_scene; }
-
-    const SceneNode* parent() const { return m_parent; }
-    SceneNode* parent() { return m_parent; }
+    [[nodiscard]] SceneNode* parent();
+    [[nodiscard]] const SceneNode* parent() const;
 
     friend class Scene;
 
@@ -64,17 +46,9 @@ protected:
     std::vector<Ptr> m_childNodes;
     QMatrix4x4 m_pose;
     Scene* m_scene;
-
-    void setScene(Scene* scene)
-    {
-        m_scene = scene;
-        for (auto& child : m_childNodes)
-        {
-            child->setScene(scene);
-        }
-    }
-
     SceneNode* m_parent{nullptr};
+
+    void setScene(Scene* scene);
 };
 
 class Scene
@@ -85,31 +59,22 @@ public:
         SiLRUCache<uint32_t, std::shared_ptr<OpenGLArrayBuffer>, size_t>;
 
     Scene();
-
-    void addNode(SceneNode::Ptr node)
-    {
-        node->setScene(this);
-        node->m_parent = nullptr;
-        m_nodes.push_back(std::move(node));
-    }
-
     void render();
+    void addNode(SceneNode::Ptr node);
 
-    BufferCache& bufferCache() { return m_bufferCache; }
-
-    const BufferCache& bufferCache() const { return m_bufferCache; }
+    [[nodiscard]] BufferCache& bufferCache();
+    [[nodiscard]] const BufferCache& bufferCache() const;
 
     float getDepth(int u, int v);
+    [[nodiscard]] std::optional<QVector3D>
+    findDepth(int u, int v, int viewportX, int viewportY, int viewportWidth,
+              int viewportHeight);
 
-    std::optional<QVector3D> findDepth(int u, int v, int viewportX,
-                                       int viewportY, int viewportWidth,
-                                       int viewportHeight);
+    [[nodiscard]] const Shader::Ptr& shader();
+    void setShader(const Shader::Ptr& shader);
 
-    const Shader::Ptr& shader() { return m_shader; }
-    void setShader(const Shader::Ptr& shader) { m_shader = shader; }
-
-    std::vector<SceneNode::Ptr>& nodes() { return m_nodes; }
-    const std::vector<SceneNode::Ptr>& nodes() const { return m_nodes; }
+    [[nodiscard]] std::vector<SceneNode::Ptr>& nodes();
+    [[nodiscard]] const std::vector<SceneNode::Ptr>& nodes() const;
 
 private:
     BufferCache m_bufferCache;

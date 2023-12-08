@@ -30,6 +30,73 @@ void SceneNode::render()
     scene()->shader()->setUniformMat4("model", pose().data());
 }
 
+void SceneNode::addChild(SceneNode::Ptr node)
+{
+    node->setScene(m_scene);
+    m_childNodes.emplace_back(std::move(node));
+}
+
+QMatrix4x4 SceneNode::pose() const
+{
+    QMatrix4x4 result(m_pose);
+    SceneNode* parent = m_parent;
+    while (parent != nullptr)
+    {
+        result = parent->m_pose * result;
+        parent = parent->parent();
+    }
+    return result;
+}
+
+void SceneNode::setScene(Scene* scene)
+{
+    m_scene = scene;
+    for (auto& child : m_childNodes)
+    {
+        child->setScene(scene);
+    }
+}
+
+std::vector<SceneNode::Ptr>& SceneNode::children()
+{
+    return m_childNodes;
+}
+
+const std::vector<SceneNode::Ptr>& SceneNode::children() const
+{
+    return m_childNodes;
+}
+
+void SceneNode::setPose(const QMatrix4x4& newPose)
+{
+    m_pose = newPose;
+}
+
+Scene* SceneNode::scene()
+{
+    return m_scene;
+}
+
+const Scene* SceneNode::scene() const
+{
+    return m_scene;
+}
+
+SceneNode* SceneNode::parent()
+{
+    return m_parent;
+}
+
+const SceneNode* SceneNode::parent() const
+{
+    return m_parent;
+}
+
+uint32_t SceneNode::id() const
+{
+    return m_id;
+}
+
 float Scene::getDepth(int u, int v)
 {
     GLfloat depth = 0.0;
@@ -93,4 +160,41 @@ std::optional<QVector3D> Scene::findDepth(int u, int v, int viewportX,
     }
 
     return std::nullopt;
+}
+
+void Scene::addNode(SceneNode::Ptr node)
+{
+    node->setScene(this);
+    node->m_parent = nullptr;
+    m_nodes.push_back(std::move(node));
+}
+
+Scene::BufferCache& Scene::bufferCache()
+{
+    return m_bufferCache;
+}
+
+const Scene::BufferCache& Scene::bufferCache() const
+{
+    return m_bufferCache;
+}
+
+const Shader::Ptr& Scene::shader()
+{
+    return m_shader;
+}
+
+void Scene::setShader(const Shader::Ptr& shader)
+{
+    m_shader = shader;
+}
+
+std::vector<SceneNode::Ptr>& Scene::nodes()
+{
+    return m_nodes;
+}
+
+const std::vector<SceneNode::Ptr>& Scene::nodes() const
+{
+    return m_nodes;
 }
