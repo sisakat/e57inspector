@@ -10,6 +10,12 @@ add_executable(${PROJECT_NAME}
         mainwindow.cpp
         mainwindow.h
         mainwindow.ui
+        welcome.cpp
+        welcome.h
+        welcome.ui
+        about.cpp
+        about.h
+        about.ui
         E57TreeNode.cpp
         E57TreeNode.h
         E57Tree.cpp
@@ -84,6 +90,6 @@ target_include_directories(${PROJECT_NAME} PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/propertyeditor)
 
-if(WIN32)
+if (WIN32)
     set_property(TARGET ${PROJECT_NAME} PROPERTY WIN32_EXECUTABLE true)
-endif()
+endif ()

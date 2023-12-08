@@ -29,6 +29,12 @@
     <qresource>
         <file>icons/String.png</file>
     </qresource>
+    <qresource>
+        <file>icons/logo128.png</file>
+    </qresource>
+    <qresource>
+        <file>icons/logo256.png</file>
+    </qresource>
 
     <qresource>
         <file>shaders/default_vertex.glsl</file>

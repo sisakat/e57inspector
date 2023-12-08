@@ -2,7 +2,9 @@
 #include "./ui_mainwindow.h"
 #include "E57TreeNode.h"
 #include "SceneView.h"
+#include "about.h"
 #include "siimageviewer.h"
+#include "welcome.h"
 
 #include <QBuffer>
 #include <QFileDialog>
@@ -10,12 +12,8 @@
 #include <QGraphicsView>
 #include <QImageReader>
 
-#include "CColorProperty.h"
-#include "CDoubleProperty.h"
-#include "CPropertyHeader.h"
-#include "QColorComboBox.h"
-
 static const int BUFFER_SIZE = 10000;
+
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
 {
@@ -25,6 +23,8 @@ MainWindow::MainWindow(QWidget* parent)
             &MainWindow::actionOpen_triggered);
     connect(ui->actionClose, &QAction::triggered, this,
             &MainWindow::actionClose_triggered);
+    connect(ui->actionAbout, &QAction::triggered, this,
+            &MainWindow::actionAbout_triggered);
     connect(ui->twMain, &E57Tree::nodeSelected, this,
             &MainWindow::twMain_nodeSelected);
     connect(ui->tabWidget, &QTabWidget::tabCloseRequested, this,
@@ -37,13 +37,30 @@ MainWindow::MainWindow(QWidget* parent)
             &MainWindow::twViewProperties_itemChanged);
 
     ui->twScene->setScenePropertyEditor(ui->twViewProperties);
+    ui->tabWidget->addTab(new Welcome(ui->tabWidget), tr("Welcome"));
 }
 
-MainWindow::~MainWindow() { delete ui; }
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
 
-void MainWindow::actionOpen_triggered() { openFile(); }
+void MainWindow::actionOpen_triggered()
+{
+    openFile();
+}
 
-void MainWindow::actionClose_triggered() { close(); }
+void MainWindow::actionClose_triggered()
+{
+    close();
+}
+
+void MainWindow::actionAbout_triggered()
+{
+    auto* about = new About(this);
+    about->setModal(true);
+    about->show();
+}
 
 void MainWindow::openFile()
 {

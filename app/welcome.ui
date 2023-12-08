@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Welcome</class>
+ <widget class="QWidget" name="Welcome">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>889</width>
+    <height>629</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <widget class="QScrollArea" name="scrollArea">
+     <property name="autoFillBackground">
+      <bool>false</bool>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <property name="widgetResizable">
+      <bool>true</bool>
+     </property>
+     <widget class="QWidget" name="scrollAreaWidgetContents">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>871</width>
+        <height>611</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <item>
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:26pt; font-weight:700;&quot;&gt;E57 Inspector&lt;/span&gt;&lt;/p&gt;&lt;p&gt;This application may be used to analyze and view ASTM E57 files. It is still under active development. Please submit bug reports and feature requests to the projects' &lt;a href=&quot;https://github.com/sisakat/e57inspector&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#308cc6;&quot;&gt;GitHub&lt;/span&gt;&lt;/a&gt; page.&lt;/p&gt;&lt;p&gt;Refer to the &lt;a href=&quot;https://www.astm.org/e2807-11r19.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#308cc6;&quot;&gt;ASTM E57 Standard Specification&lt;/span&gt;&lt;/a&gt; for more details about E57 files.&lt;br/&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Symbols&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;img src=&quot;:/icons/E57.png&quot;/&gt; E57 Root Object &lt;/p&gt;&lt;p&gt;&lt;img src=&quot;:/icons/Data3D.png&quot;/&gt; Data 3D (Scans)&lt;/p&gt;&lt;p&gt;&lt;img src=&quot;:/icons/Pointcloud.png&quot;/&gt; Point Cloud&lt;/p&gt;&lt;p&gt;&lt;img src=&quot;:/icons/Image2D.png&quot;/&gt; Image 2D (Images)&lt;/p&gt;&lt;p&gt;&lt;img src=&quot;:/icons/Image.png&quot;/&gt; Image&lt;/p&gt;&lt;p&gt;&lt;img src=&quot;:/icons/Integer.png&quot;/&gt; Integer Type&lt;/p&gt;&lt;p&gt;&lt;img src=&quot;:/icons/Float.png&quot;/&gt; Floating Point Type&lt;/p&gt;&lt;p&gt;&lt;img src=&quot;:/icons/String.png&quot;/&gt; String Type&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::RichText</enum>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+           </property>
+           <property name="wordWrap">
+            <bool>true</bool>
+           </property>
+           <property name="margin">
+            <number>20</number>
+           </property>
+           <property name="openExternalLinks">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="resources/resources.qrc"/>
+ </resources>
+ <connections/>
+</ui>
