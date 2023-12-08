@@ -223,6 +223,8 @@ void MainWindow::openPointCloud(const E57NodePtr& node,
                                   QString("Combined View"));
     }
 
+    sceneView->makeCurrent();
+
     std::vector<std::array<float, 3>> xyz(BUFFER_SIZE);
     auto dataReader = m_reader->dataReader(node->data().at(dataName));
     dataReader.bindBuffer("cartesianX", (float*)&xyz[0][0], xyz.size(),
