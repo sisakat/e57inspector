@@ -16,8 +16,8 @@ public:
 
     void setViewportWidth(uint32_t width) { m_viewportWidth = width; }
     void setViewportHeight(uint32_t height) { m_viewportHeight = height; }
-    [[nodiscard]] uint32_t viewportWidth() { return m_viewportWidth; }
-    [[nodiscard]] uint32_t viewportHeight() { return m_viewportHeight; }
+    [[nodiscard]] uint32_t viewportWidth() const { return m_viewportWidth; }
+    [[nodiscard]] uint32_t viewportHeight() const { return m_viewportHeight; }
     [[nodiscard]] float fieldOfView() const { return m_fieldOfView; }
     void setFieldOfView(float fieldOfView) { m_fieldOfView = fieldOfView; }
 
@@ -39,9 +39,6 @@ public:
     void keyReleaseEvent(QKeyEvent* event);
 
 private:
-    GLuint m_viewLocation;
-    GLuint m_projectionLocation;
-
     QVector3D m_position;
     QVector3D m_center;
     QVector3D m_up;
@@ -49,7 +46,6 @@ private:
 
     QMatrix4x4 m_view;
     QMatrix4x4 m_projection;
-    QMatrix4x4 m_rotation;
 
     uint32_t m_viewportX{0};
     uint32_t m_viewportY{0};
