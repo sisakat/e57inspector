@@ -30,6 +30,9 @@
         <file>icons/String.png</file>
     </qresource>
     <qresource>
+        <file>icons/logo64.png</file>
+    </qresource>
+    <qresource>
         <file>icons/logo128.png</file>
     </qresource>
     <qresource>
