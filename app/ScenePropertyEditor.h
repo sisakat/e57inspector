@@ -14,8 +14,14 @@ public:
 protected:
     void onItemChanged(QTreeWidgetItem* item, int column);
 
+    void initFromCamera();
+    void initFromPointcloud();
+
+    void changeFromCamera(QTreeWidgetItem* item);
+    void changeFromPointcloud(QTreeWidgetItem* item);
+
 private:
-    SceneNode* m_sceneNode;
+    SceneNode* m_sceneNode{};
 };
 
 #endif // E57INSPECTOR_SCENEPROPERTYEDITOR_H

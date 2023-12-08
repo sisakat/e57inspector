@@ -72,7 +72,8 @@ add_executable(${PROJECT_NAME}
         SceneTreeNodeFactory.cpp
         SceneTreeNodeFactory.h
         ScenePropertyEditor.cpp
-        ScenePropertyEditor.h)
+        ScenePropertyEditor.h
+        ScenePropertyEditorUtils.h)
 target_link_libraries(${PROJECT_NAME} PRIVATE
         E57Format
         Qt6::Widgets
