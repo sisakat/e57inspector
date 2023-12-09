@@ -221,3 +221,10 @@ BoundingBox Scene::boundingBox() const
     }
     return result;
 }
+
+void Scene::removeNode(SceneNode* node)
+{
+    std::queue<SceneNode*> nodes;
+
+    std::erase_if(m_nodes, [node](auto& ptr) { return ptr.get() == node; });
+}

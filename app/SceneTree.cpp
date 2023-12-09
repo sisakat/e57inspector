@@ -1,9 +1,14 @@
 #include "SceneTree.h"
+#include <QMenu>
 
 SceneTree::SceneTree(QWidget* parent) : QTreeWidget(parent)
 {
-    connect(this, &QTreeWidget::itemClicked, this, &SceneTree::onItemClicked);
     setHeaderHidden(true);
+    setContextMenuPolicy(Qt::CustomContextMenu);
+
+    connect(this, &QTreeWidget::itemClicked, this, &SceneTree::onItemClicked);
+    connect(this, &QTreeWidget::customContextMenuRequested, this,
+            &SceneTree::onCustomContextMenuRequested);
 }
 
 void SceneTree::init(Scene& scene)
@@ -32,4 +37,18 @@ void SceneTree::onItemClicked(QTreeWidgetItem* item, int column)
                 dynamic_cast<SceneTreeNode*>(item)->sceneNode());
         }
     }
+}
+
+void SceneTree::onCustomContextMenuRequested(const QPoint& pos)
+{
+    QTreeWidgetItem* item = itemAt(pos);
+    if (!item)
+        return;
+
+    if (!dynamic_cast<SceneTreeNode*>(item))
+        return;
+
+    auto* sceneTreeNode = dynamic_cast<SceneTreeNode*>(item);
+    auto& menu = sceneTreeNode->contextMenu();
+    menu.exec(viewport()->mapToGlobal(pos));
 }

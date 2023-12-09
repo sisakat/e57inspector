@@ -1,6 +1,7 @@
 #ifndef E57INSPECTOR_SCENETREENODE_H
 #define E57INSPECTOR_SCENETREENODE_H
 
+#include <QMenu>
 #include <QTreeWidgetItem>
 
 #include "camera.h"
@@ -11,6 +12,11 @@ class SceneTreeNode : public QTreeWidgetItem
 {
 public:
     virtual SceneNode* sceneNode() = 0;
+
+    [[nodiscard]] QMenu& contextMenu() { return m_contextMenu; }
+
+protected:
+    QMenu m_contextMenu;
 };
 
 class SceneCameraTreeNode : public SceneTreeNode

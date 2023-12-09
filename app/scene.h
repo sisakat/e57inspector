@@ -65,6 +65,7 @@ public:
     Scene();
     void render();
     void addNode(SceneNode::Ptr node);
+    void removeNode(SceneNode* node);
 
     [[nodiscard]] BufferCache& bufferCache();
     [[nodiscard]] const BufferCache& bufferCache() const;

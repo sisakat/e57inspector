@@ -19,6 +19,7 @@ public:
 
 protected:
     void onItemClicked(QTreeWidgetItem* item, int column);
+    void onCustomContextMenuRequested(const QPoint &pos);
 
 private:
     ScenePropertyEditor* m_scenePropertyEditor{nullptr};
