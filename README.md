@@ -1,6 +1,6 @@
 # E57 Inspector
 
-E57 Inspector is a computer program to view E57 point cloud files. 
+E57 Inspector is cross-platform E57 file viewer. 
 It can visualize the attributes and fields defined in the file, as well as view the contained point clouds and images. 
 The program is open-source under the GPLv3 license.
 It is in an early development stage but already usable.
@@ -30,7 +30,14 @@ Point size and color can be adjusted in the "View" tab on the right hand side.
 
 *2D image view:* Ctrl + R to rotate, Shift + R for fine rotation about the mouse cursor position, Mouse-middle click to pan, Mouse-wheel to zoom, Shift + Mouse-wheel for fine zoom.
 
-## License and Copyright
+## Build Instructions
+
+To build the project from source you will need the following dependencies installed:
+
+* Qt6
+* Xerces-C for XML parsing
+
+## License and copyright
 
 The project is licensed under the GNU GPLv3. 
 It uses the Qt Framework for the user interface and libE57 for reading and parsing E57 files.
