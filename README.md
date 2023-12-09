@@ -1,7 +1,10 @@
 # E57 Inspector
 
-E57 Inspector is cross-platform E57 file viewer. 
-It can visualize the attributes and fields defined in the file, as well as view the contained point clouds and images. 
+E57 Inspector is cross-platform E57 file viewer.
+An E57 file is a vendor-neutral format for storing point clouds, images and metadata.
+It is documented in the [ASTM E2807](https://www.astm.org/e2807-11r19e01.html) standard.
+
+The application can visualize the attributes and fields defined in the file, as well as view the contained point clouds and images.
 The program is open-source under the GPLv3 license.
 It is in an early development stage but already usable.
 For bug reports or feature requests please open an issue.
