@@ -8,6 +8,7 @@
 #include <optional>
 #include <vector>
 
+#include "boundingbox.h"
 #include "openglarraybuffer.h"
 #include "shader.h"
 #include "silrucache.h"
@@ -39,6 +40,8 @@ public:
     [[nodiscard]] SceneNode* parent();
     [[nodiscard]] const SceneNode* parent() const;
 
+    [[nodiscard]] BoundingBox boundingBox() const;
+
     friend class Scene;
 
 protected:
@@ -47,6 +50,7 @@ protected:
     QMatrix4x4 m_pose;
     Scene* m_scene;
     SceneNode* m_parent{nullptr};
+    BoundingBox m_boundingBox{};
 
     void setScene(Scene* scene);
 };
@@ -75,6 +79,8 @@ public:
 
     [[nodiscard]] std::vector<SceneNode::Ptr>& nodes();
     [[nodiscard]] const std::vector<SceneNode::Ptr>& nodes() const;
+
+    BoundingBox boundingBox() const;
 
 private:
     BufferCache m_bufferCache;

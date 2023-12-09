@@ -97,6 +97,18 @@ uint32_t SceneNode::id() const
     return m_id;
 }
 
+BoundingBox SceneNode::boundingBox() const
+{
+    BoundingBox result{m_boundingBox};
+    for (const auto& child : m_childNodes)
+    {
+        auto bb = child->boundingBox();
+        bb.transform(m_pose);
+        result = result.combine(bb);
+    }
+    return result;
+}
+
 float Scene::getDepth(int u, int v)
 {
     GLfloat depth = 0.0;
@@ -197,4 +209,15 @@ std::vector<SceneNode::Ptr>& Scene::nodes()
 const std::vector<SceneNode::Ptr>& Scene::nodes() const
 {
     return m_nodes;
+}
+
+BoundingBox Scene::boundingBox() const
+{
+    BoundingBox result;
+    result.setToInfinite();
+    for (const auto& node : m_nodes)
+    {
+        result = result.combine(node->boundingBox());
+    }
+    return result;
 }

@@ -17,6 +17,7 @@ uint32_t calculateChildIndex(const OctreeElement& element,
 OctreeNode::OctreeNode(uint32_t elementLimit, double resolution)
     : m_elementLimit{elementLimit}, m_resolution{resolution}
 {
+    m_boundingBox.setToInfinite();
 }
 
 void OctreeNode::insert(const std::vector<OctreeElement>& elements,
@@ -62,7 +63,10 @@ void OctreeNode::insert(const std::vector<OctreeElement>& elements,
     }
 }
 
-bool OctreeNode::isLeaf() const { return !m_elements.empty(); }
+bool OctreeNode::isLeaf() const
+{
+    return !m_elements.empty();
+}
 
 void OctreeNode::finalize()
 {
@@ -83,6 +87,9 @@ void OctreeNode::finalize()
             this->m_childNodes[i] = std::move(child->m_childNodes[i]);
         }
     }
+
+    if (isLeaf())
+        updateBoundingBox();
 }
 
 int OctreeNode::getOnlyChildIndex() const
@@ -102,6 +109,25 @@ int OctreeNode::getOnlyChildIndex() const
     return result;
 }
 
+void OctreeNode::updateBoundingBox()
+{
+    for (const auto& element : m_elements)
+    {
+        m_boundingBox.min.setX(
+            std::min(m_boundingBox.min.x(), element.data.xyz[0]));
+        m_boundingBox.min.setY(
+            std::min(m_boundingBox.min.y(), element.data.xyz[1]));
+        m_boundingBox.min.setZ(
+            std::min(m_boundingBox.min.z(), element.data.xyz[2]));
+        m_boundingBox.max.setX(
+            std::max(m_boundingBox.max.x(), element.data.xyz[0]));
+        m_boundingBox.max.setY(
+            std::max(m_boundingBox.max.y(), element.data.xyz[1]));
+        m_boundingBox.max.setZ(
+            std::max(m_boundingBox.max.z(), element.data.xyz[2]));
+    }
+}
+
 Octree::Octree(uint32_t elementLimit, double resolution)
     : m_elementLimit{elementLimit}, m_resolution{resolution},
       m_root{std::make_unique<OctreeNode>(m_elementLimit, m_resolution)}
@@ -118,8 +144,17 @@ void Octree::insert(const std::vector<PointData>& elements)
     m_root->insert(octreeElements, 0);
 }
 
-void Octree::finalize() { m_root->finalize(); }
+void Octree::finalize()
+{
+    m_root->finalize();
+}
 
-OctreeNode& Octree::root() { return *m_root; }
+OctreeNode& Octree::root()
+{
+    return *m_root;
+}
 
-const OctreeNode& Octree::root() const { return *m_root; }
+const OctreeNode& Octree::root() const
+{
+    return *m_root;
+}

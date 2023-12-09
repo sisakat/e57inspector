@@ -79,7 +79,9 @@ add_executable(${PROJECT_NAME}
         SceneTreeNodeFactory.h
         ScenePropertyEditor.cpp
         ScenePropertyEditor.h
-        ScenePropertyEditorUtils.h)
+        ScenePropertyEditorUtils.h
+        boundingbox.cpp
+        boundingbox.h)
 target_link_libraries(${PROJECT_NAME} PRIVATE
         E57Format
         Qt6::Widgets

@@ -5,6 +5,8 @@
 #include <memory>
 #include <vector>
 
+#include "boundingbox.h"
+
 struct UVW
 {
     uint32_t u;
@@ -14,6 +16,8 @@ struct UVW
 
 struct PointData
 {
+    using data_t = float;
+    static const uint32_t COMPONENTS = 7;
     std::array<float, 3> xyz;
     std::array<float, 3> rgb;
     float intensity;
@@ -60,14 +64,23 @@ public:
 
     std::vector<OctreeElement>& elements() { return m_elements; }
 
+    [[nodiscard]] BoundingBox& boundingBox() { return m_boundingBox; }
+    [[nodiscard]] const BoundingBox& boundingBox() const
+    {
+        return m_boundingBox;
+    }
+
 private:
     uint32_t m_elementLimit;
     double m_resolution;
+    BoundingBox m_boundingBox{};
 
     std::array<std::unique_ptr<OctreeNode>, 8> m_childNodes;
     std::vector<OctreeElement> m_elements;
 
     [[nodiscard]] int getOnlyChildIndex() const;
+
+    void updateBoundingBox();
 };
 
 class Octree
@@ -81,6 +94,7 @@ public:
     OctreeNode& root();
     const OctreeNode& root() const;
 
+protected:
 private:
     uint32_t m_elementLimit;
     double m_resolution;

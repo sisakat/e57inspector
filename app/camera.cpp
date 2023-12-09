@@ -1,5 +1,7 @@
 #include "camera.h"
 
+#include <array>
+
 const float ZOOM_FRAC = 0.25;
 
 Camera::Camera()
@@ -22,10 +24,11 @@ void Camera::render()
     m_view.setToIdentity();
     m_view.lookAt(m_position, m_center, m_up);
 
+    updateNearFar();
     m_projection.setToIdentity();
     m_projection.perspective(m_fieldOfView / 2.0f,
-                             1.0f * m_viewportWidth / m_viewportHeight, 0.001f,
-                             1000.0f);
+                             1.0f * m_viewportWidth / m_viewportHeight, m_near,
+                             m_far);
 
     scene()->shader()->setUniformMat4("view", m_view.data());
     scene()->shader()->setUniformMat4("projection", m_projection.data());
@@ -243,3 +246,28 @@ void Camera::wheelEvent(QWheelEvent* event)
 void Camera::keyPressEvent(QKeyEvent* event) {}
 
 void Camera::keyReleaseEvent(QKeyEvent* event) {}
+
+void Camera::updateNearFar()
+{
+    auto bb = scene()->boundingBox();
+    auto bbPoints = bb.points();
+    float maxLength = std::numeric_limits<float>::min();
+    float minLength = std::numeric_limits<float>::max();
+    for (const auto& point : bbPoints)
+    {
+        auto dot = QVector3D::dotProduct(point - m_position,
+                                         (m_center - m_position).normalized());
+        float length = std::abs(dot);
+        if (length > maxLength)
+        {
+            maxLength = length;
+        }
+        if (dot < minLength)
+        {
+            minLength = dot;
+        }
+    }
+
+    m_near = minLength < 0.001f ? 0.001f : minLength;
+    m_far = maxLength < 0.0f ? 100.0f : maxLength;
+}

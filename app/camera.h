@@ -38,6 +38,9 @@ public:
     void keyPressEvent(QKeyEvent* event);
     void keyReleaseEvent(QKeyEvent* event);
 
+protected:
+    void updateNearFar();
+
 private:
     QVector3D m_position;
     QVector3D m_center;
@@ -58,6 +61,8 @@ private:
     QPoint m_originalMousePosition;
 
     float m_fieldOfView{90.0};
+    float m_near{0.001f};
+    float m_far{1000.0f};
 };
 
 #endif // CAMERA_H

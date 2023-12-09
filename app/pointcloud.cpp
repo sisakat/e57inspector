@@ -66,6 +66,7 @@ PointCloudOctreeNode::PointCloudOctreeNode(SceneNode* parent, OctreeNode* node)
     : SceneNode(parent), m_node{node}
 {
     glGenVertexArrays(1, &m_vao);
+    m_boundingBox = m_node->boundingBox();
 }
 
 PointCloudOctreeNode::~PointCloudOctreeNode()
