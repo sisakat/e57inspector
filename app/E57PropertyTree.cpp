@@ -77,6 +77,7 @@ void E57PropertyTree::addRawData(QTreeWidgetItem* parent, E57NodePtr node)
         }
         parent->addChild(item);
         addRawData(item, child);
+        item->sortChildren(0, Qt::SortOrder::AscendingOrder);
     }
 }
 
