@@ -8,6 +8,7 @@ For bug reports or feature requests please open an issue.
 Feedback of all sort is appreciated.
 
 ![Screenshot](docs/e57inspector_screenshot.png)
+*(the visualized point cloud is part of the sample data provided by [libE57.org](http://libe57.org/data.html))*
 
 ## Overview
 To open an E57 file click the "Open" button or choose "Open" from the drop-down menu.
