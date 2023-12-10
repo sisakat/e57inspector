@@ -1,5 +1,6 @@
 
 find_package(Qt6 COMPONENTS Widgets OpenGL OpenGLWidgets REQUIRED)
+find_package(OpenGL REQUIRED)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
@@ -87,7 +88,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         Qt6::Widgets
         Qt6::OpenGL
         Qt6::OpenGLWidgets
-        ${PROJECT_NAME}_lib)
+        ${PROJECT_NAME}_lib
+        ${OPENGL_LIBRARIES})
 target_include_directories(${PROJECT_NAME} PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/propertyeditor)
