@@ -13,7 +13,9 @@ SceneView::SceneView(QWidget* parent) : QOpenGLWidget(parent)
     QSurfaceFormat format;
     format.setVersion(3, 3);
     format.setProfile(QSurfaceFormat::CoreProfile);
+#ifdef DEBUG
     format.setOption(QSurfaceFormat::DebugContext);
+#endif
     setFormat(format);
 }
 
@@ -29,13 +31,13 @@ void SceneView::initializeGL()
     initializeOpenGLFunctions();
     glClear(GL_COLOR_BUFFER_BIT);
 
+#ifdef DEBUG
     m_openGLLogger.initialize();
-
     connect(&m_openGLLogger, &QOpenGLDebugLogger::messageLogged, this,
             &SceneView::onMessageLogged);
-
     m_openGLLogger.enableMessages();
     m_openGLLogger.startLogging();
+#endif
 
     makeCurrent();
     setupScene();
