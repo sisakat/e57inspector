@@ -43,5 +43,7 @@ To build the project from source you will need the following dependencies instal
 
 ## License and copyright
 
-The project is licensed under the GNU GPLv3. 
+The project is licensed under the GNU GPLv3.
 It uses the Qt Framework for the user interface and libE57 for reading and parsing E57 files.
+
+*Copyright (C) 2023 Stefan Isak*
