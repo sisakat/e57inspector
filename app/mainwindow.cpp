@@ -11,6 +11,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QImageReader>
+#include <QMimeData>
 
 static const int BUFFER_SIZE = 10000;
 
@@ -18,6 +19,7 @@ MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    setAcceptDrops(true);
 
     connect(ui->actionOpen, &QAction::triggered, this,
             &MainWindow::actionOpen_triggered);
@@ -343,4 +345,20 @@ SceneView* MainWindow::findSceneView()
     }
 
     return nullptr;
+}
+
+void MainWindow::dragEnterEvent(QDragEnterEvent* event)
+{
+    if (event->mimeData()->hasUrls() && event->mimeData()->urls().size() == 1 &&
+        event->mimeData()->urls().first().toLocalFile().endsWith(".e57"))
+    {
+        event->acceptProposedAction();
+    }
+}
+
+void MainWindow::dropEvent(QDropEvent* event)
+{
+    const auto url = event->mimeData()->urls().first();
+    auto filename = url.toLocalFile();
+    loadE57(filename.toStdString());
 }
