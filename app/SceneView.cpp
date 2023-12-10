@@ -55,14 +55,14 @@ void SceneView::paintGL()
     m_scene->shader()->release();
     painter.endNativePainting();
 
-    // painter.fillRect(10, 10, 50, 50, Qt::red);
-
     glDisable(GL_DEPTH_TEST);
     m_scene->render2D(painter);
 }
 
 void SceneView::resizeGL(int width, int height)
 {
+    width = static_cast<int>(width * devicePixelRatio());
+    height = static_cast<int>(height * devicePixelRatio());
     m_scene->shader()->use();
     m_camera->setViewportWidth(width);
     m_camera->setViewportHeight(height);
@@ -126,6 +126,7 @@ void SceneView::setupScene()
 {
     m_scene = std::make_shared<Scene>();
     m_camera = std::make_shared<Camera>();
+    m_scene->setDevicePixelRatio(static_cast<float>(devicePixelRatio()));
     m_scene->addNode(m_camera);
 }
 

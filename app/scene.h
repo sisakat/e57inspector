@@ -98,10 +98,15 @@ public:
         return nullptr;
     }
 
+    void setDevicePixelRatio(float value) { m_devicePixelRatio = value; }
+    [[nodiscard]] float devicePixelRatio() const { return m_devicePixelRatio; }
+
 private:
     BufferCache m_bufferCache;
     std::vector<SceneNode::Ptr> m_nodes;
     Shader::Ptr m_shader;
+
+    float m_devicePixelRatio{1.0};
 };
 
 #endif // SCENE_H

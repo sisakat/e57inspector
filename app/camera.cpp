@@ -37,7 +37,10 @@ void Camera::render()
 void Camera::render2D(QPainter& painter)
 {
     auto pp = pickpoint();
-    painter.fillRect(pp.x() - 2, pp.y() - 2, 4, 4, Qt::red);
+    const int x = static_cast<int>(pp.x() - 2.0 * scene()->devicePixelRatio());
+    const int y = static_cast<int>(pp.y() - 2.0 * scene()->devicePixelRatio());
+    const int d = static_cast<int>(4 * scene()->devicePixelRatio());
+    painter.fillRect(x, y, d, d, Qt::red);
 }
 
 void Camera::yaw(float angle)
@@ -184,6 +187,7 @@ void Camera::mouseMoveEvent(QMouseEvent* event)
     if (m_mouseDown)
     {
         auto delta = event->pos() - m_originalMousePosition;
+        delta *= scene()->devicePixelRatio();
         pitch(static_cast<float>(-delta.y()));
         yaw(static_cast<float>(-delta.x()));
     }
