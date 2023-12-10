@@ -39,18 +39,22 @@ void PointCloud::render2D(QPainter& painter)
     origin = m_pose * origin;
     auto positionScreen = camera->project(origin);
 
-    painter.setPen(Qt::black);
-    painter.setBrush(Qt::white);
-    painter.drawEllipse(
-        static_cast<int>(positionScreen.x()) - 5,
-        static_cast<int>(camera->viewportHeight() - 1 - positionScreen.y()) - 5,
-        10, 10);
+    if (positionScreen.z() < 1.0f)
+    {
+        painter.setPen(Qt::black);
+        painter.setBrush(Qt::white);
+        painter.drawEllipse(static_cast<int>(positionScreen.x()) - 5,
+                            static_cast<int>(camera->viewportHeight() - 1 -
+                                             positionScreen.y()) -
+                                5,
+                            10, 10);
 
-    painter.setPen(Qt::white);
-    painter.drawText(
-        static_cast<int>(positionScreen.x()) + 10,
-        static_cast<int>(camera->viewportHeight() - 1 - positionScreen.y()),
-        QString::fromStdString(m_data3D->name()));
+        painter.setPen(Qt::white);
+        painter.drawText(
+            static_cast<int>(positionScreen.x()) + 10,
+            static_cast<int>(camera->viewportHeight() - 1 - positionScreen.y()),
+            QString::fromStdString(m_data3D->name()));
+    }
 }
 
 void PointCloud::insertPoints(const std::vector<PointData>& data)
