@@ -224,8 +224,6 @@ void Camera::mouseMoveEvent(QMouseEvent* event)
         QVector3D delta =
             (currentMousePosObject - originalMousePosObject).toVector3D();
 
-
-
         m_position -= delta;
         m_center -= delta;
     }
