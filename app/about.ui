@@ -135,7 +135,7 @@
              <item>
               <widget class="QLabel" name="label_2">
                <property name="text">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open-source ASTM E57 file viewer. Licenses under GNU GPLv3.&lt;/p&gt;&lt;p&gt;Project page: &lt;a href=&quot;https://github.com/sisakat/e57inspector&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#308cc6;&quot;&gt;https://github.com/sisakat/e57inspector&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;You have received copies of the GNU GPLv3 license with this product.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open-source ASTM E57 file viewer. Licensed under GNU GPLv3.&lt;/p&gt;&lt;p&gt;Project page: &lt;a href=&quot;https://github.com/sisakat/e57inspector&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#308cc6;&quot;&gt;https://github.com/sisakat/e57inspector&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;You have received copies of the GNU GPLv3 license with this product.&lt;/p&gt;&lt;hr /&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Copyright (C) 2023 Stefan Isak&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="scaledContents">
                 <bool>false</bool>
@@ -172,8 +172,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>98</width>
-              <height>222</height>
+              <width>585</width>
+              <height>251</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_5">
