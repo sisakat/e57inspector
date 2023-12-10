@@ -211,11 +211,11 @@ void Camera::mouseMoveEvent(QMouseEvent* event)
 
     if (m_panning)
     {
-        uint32_t u = event->pos().x();
-        uint32_t v = m_viewportHeight - 1 - event->pos().y();
+        int u = event->pos().x();
+        int v = m_viewportHeight - 1 - event->pos().y();
 
-        uint32_t uOriginal = m_originalMousePosition.x();
-        uint32_t vOriginal = m_viewportHeight - 1 - m_originalMousePosition.y();
+        int uOriginal = m_originalMousePosition.x();
+        int vOriginal = m_viewportHeight - 1 - m_originalMousePosition.y();
 
         auto projectedPickpoint = project(m_pickpoint);
         QVector3D currentMousePos(static_cast<float>(u), static_cast<float>(v),
@@ -286,5 +286,5 @@ QPoint Camera::pickpoint() const
     auto projectedPickpoint = project(m_pickpoint);
     return {static_cast<int>(projectedPickpoint.x()),
             static_cast<int>(m_viewportHeight - 1 -
-                             static_cast<uint32_t>(projectedPickpoint.y()))};
+                             static_cast<int>(projectedPickpoint.y()))};
 }

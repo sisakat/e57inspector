@@ -53,10 +53,10 @@ private:
     QMatrix4x4 m_view;
     QMatrix4x4 m_projection;
 
-    uint32_t m_viewportX{0};
-    uint32_t m_viewportY{0};
-    uint32_t m_viewportWidth{0};
-    uint32_t m_viewportHeight{0};
+    int m_viewportX{0};
+    int m_viewportY{0};
+    int m_viewportWidth{0};
+    int m_viewportHeight{0};
 
     bool m_mouseDown{false};
     bool m_panning{false};
