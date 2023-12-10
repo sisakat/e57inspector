@@ -134,7 +134,7 @@ void PointCloudOctreeNode::render()
                           (char*)0 + 3 * sizeof(GLfloat));
     glEnableVertexAttribArray(1);
 
-    glVertexAttribPointer(2, 1, GL_FLOAT, GL_TRUE, stride,
+    glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, stride,
                           (char*)0 + 6 * sizeof(GLfloat));
     glEnableVertexAttribArray(2);
 

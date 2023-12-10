@@ -139,7 +139,7 @@ void Octree::insert(const std::vector<PointData>& elements)
     std::vector<OctreeElement> octreeElements(elements.size());
     for (size_t i = 0; i < elements.size(); ++i)
     {
-        octreeElements[i].data = {elements[i].xyz, elements[i].rgb};
+        octreeElements[i].data = elements[i];
     }
     m_root->insert(octreeElements, 0);
 }
