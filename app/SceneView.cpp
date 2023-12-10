@@ -1,6 +1,7 @@
 #include "SceneView.h"
 
 #include <QFile>
+#include <QPainter>
 #include <queue>
 
 SceneView::SceneView(QWidget* parent) : QOpenGLWidget(parent)
@@ -28,9 +29,6 @@ void SceneView::initializeGL()
     initializeOpenGLFunctions();
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_PROGRAM_POINT_SIZE);
-
     m_openGLLogger.initialize();
 
     connect(&m_openGLLogger, &QOpenGLDebugLogger::messageLogged, this,
@@ -46,13 +44,26 @@ void SceneView::initializeGL()
 
 void SceneView::paintGL()
 {
+    QPainter painter(this);
+
+    painter.beginNativePainting();
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_PROGRAM_POINT_SIZE);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     m_scene->shader()->use();
     m_scene->render();
+    m_scene->shader()->release();
+    painter.endNativePainting();
+
+    // painter.fillRect(10, 10, 50, 50, Qt::red);
+
+    glDisable(GL_DEPTH_TEST);
+    m_scene->render2D(painter);
 }
 
 void SceneView::resizeGL(int width, int height)
 {
+    m_scene->shader()->use();
     m_camera->setViewportWidth(width);
     m_camera->setViewportHeight(height);
     update();
@@ -61,6 +72,7 @@ void SceneView::resizeGL(int width, int height)
 void SceneView::mousePressEvent(QMouseEvent* event)
 {
     makeCurrent();
+    m_scene->shader()->use();
     m_camera->mousePressEvent(event);
     update();
 }
@@ -68,6 +80,7 @@ void SceneView::mousePressEvent(QMouseEvent* event)
 void SceneView::mouseReleaseEvent(QMouseEvent* event)
 {
     makeCurrent();
+    m_scene->shader()->use();
     m_camera->mouseReleaseEvent(event);
     update();
 }
@@ -75,6 +88,7 @@ void SceneView::mouseReleaseEvent(QMouseEvent* event)
 void SceneView::mouseMoveEvent(QMouseEvent* event)
 {
     makeCurrent();
+    m_scene->shader()->use();
     m_camera->mouseMoveEvent(event);
     update();
 }
@@ -82,6 +96,7 @@ void SceneView::mouseMoveEvent(QMouseEvent* event)
 void SceneView::wheelEvent(QWheelEvent* event)
 {
     makeCurrent();
+    m_scene->shader()->use();
     m_camera->wheelEvent(event);
     update();
 }
@@ -89,6 +104,7 @@ void SceneView::wheelEvent(QWheelEvent* event)
 void SceneView::keyPressEvent(QKeyEvent* event)
 {
     makeCurrent();
+    m_scene->shader()->use();
     m_camera->keyPressEvent(event);
     update();
 }
@@ -96,6 +112,7 @@ void SceneView::keyPressEvent(QKeyEvent* event)
 void SceneView::keyReleaseEvent(QKeyEvent* event)
 {
     makeCurrent();
+    m_scene->shader()->use();
     m_camera->keyReleaseEvent(event);
     update();
 }

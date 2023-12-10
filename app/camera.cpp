@@ -34,6 +34,12 @@ void Camera::render()
     scene()->shader()->setUniformMat4("projection", m_projection.data());
 }
 
+void Camera::render2D(QPainter& painter)
+{
+    auto pp = pickpoint();
+    painter.fillRect(pp.x() - 2, pp.y() - 2, 4, 4, Qt::red);
+}
+
 void Camera::yaw(float angle)
 {
     const QVector3D zAxis(0.0f, 0.0f, 1.0f);
@@ -220,7 +226,6 @@ void Camera::mouseMoveEvent(QMouseEvent* event)
 
         m_position -= delta;
         m_center -= delta;
-        m_pickpoint -= delta.toVector4D();
     }
 
     m_originalMousePosition = event->pos();
@@ -270,4 +275,12 @@ void Camera::updateNearFar()
 
     m_near = minLength < 0.001f ? 0.001f : minLength;
     m_far = maxLength < 0.0f ? 100.0f : maxLength;
+}
+
+QPoint Camera::pickpoint() const
+{
+    auto projectedPickpoint = project(m_pickpoint);
+    return {static_cast<int>(projectedPickpoint.x()),
+            static_cast<int>(m_viewportHeight - 1 -
+                             static_cast<uint32_t>(projectedPickpoint.y()))};
 }

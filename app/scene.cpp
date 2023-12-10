@@ -14,6 +14,14 @@ void Scene::render()
     }
 }
 
+void Scene::render2D(QPainter& painter)
+{
+    for (auto& child : m_nodes)
+    {
+        child->render2D(painter);
+    }
+}
+
 SceneNode::SceneNode(SceneNode* parent) : m_parent{parent}
 {
     static uint32_t globalId = 0;
@@ -29,6 +37,8 @@ void SceneNode::render()
 {
     scene()->shader()->setUniformMat4("model", pose().data());
 }
+
+void SceneNode::render2D(QPainter& painter) {}
 
 void SceneNode::addChild(SceneNode::Ptr node)
 {

@@ -6,6 +6,7 @@
 #include <QKeyEvent>
 #include <QMatrix4x4>
 #include <QOpenGLFunctions>
+#include <QPainter>
 
 class Camera : public SceneNode
 {
@@ -22,10 +23,12 @@ public:
     void setFieldOfView(float fieldOfView) { m_fieldOfView = fieldOfView; }
 
     void render() override;
+    void render2D(QPainter& painter) override;
 
     void yaw(float angle);
     void pitch(float angle);
 
+    [[nodiscard]] QPoint pickpoint() const;
     void updatePickpoint(const QPoint& window);
 
     [[nodiscard]] QVector4D unproject(const QVector3D& window) const;

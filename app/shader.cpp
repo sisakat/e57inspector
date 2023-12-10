@@ -88,6 +88,8 @@ Shader::~Shader()
 
 void Shader::use() { glUseProgram(m_shaderProgram); }
 
+void Shader::release() { glUseProgram(0); }
+
 GLint Shader::location(const std::string& name)
 {
     auto location = glGetUniformLocation(m_shaderProgram, name.c_str());

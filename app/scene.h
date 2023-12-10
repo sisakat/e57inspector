@@ -4,6 +4,7 @@
 #include <QMatrix4x4>
 #include <QOpenGLFunctions>
 #include <QOpenGLFunctions_3_3_Core>
+#include <QPainter>
 #include <memory>
 #include <optional>
 #include <vector>
@@ -24,6 +25,7 @@ public:
     ~SceneNode() override = default;
 
     virtual void render();
+    virtual void render2D(QPainter& painter);
     void addChild(Ptr node);
 
     [[nodiscard]] uint32_t id() const;
@@ -64,6 +66,7 @@ public:
 
     Scene();
     void render();
+    void render2D(QPainter& painter);
     void addNode(SceneNode::Ptr node);
     void removeNode(SceneNode* node);
 

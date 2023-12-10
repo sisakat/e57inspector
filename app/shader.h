@@ -16,6 +16,7 @@ public:
     ~Shader();
 
     void use();
+    void release();
 
     GLint location(const std::string& name);
 
