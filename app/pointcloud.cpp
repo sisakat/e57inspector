@@ -1,4 +1,5 @@
 #include "pointcloud.h"
+#include "camera.h"
 
 #include <queue>
 #include <utility>
@@ -26,6 +27,30 @@ void PointCloud::render()
     {
         child->render();
     }
+}
+
+void PointCloud::render2D(QPainter& painter)
+{
+    auto* camera = scene()->findNode<Camera>();
+    if (!camera)
+        return;
+
+    auto origin = QVector4D(0.0f, 0.0f, 0.0f, 1.0f);
+    origin = m_pose * origin;
+    auto positionScreen = camera->project(origin);
+
+    painter.setPen(Qt::black);
+    painter.setBrush(Qt::white);
+    painter.drawEllipse(
+        static_cast<int>(positionScreen.x()) - 5,
+        static_cast<int>(camera->viewportHeight() - 1 - positionScreen.y()) - 5,
+        10, 10);
+
+    painter.setPen(Qt::white);
+    painter.drawText(
+        static_cast<int>(positionScreen.x()) + 10,
+        static_cast<int>(camera->viewportHeight() - 1 - positionScreen.y()),
+        QString::fromStdString(m_data3D->name()));
 }
 
 void PointCloud::insertPoints(const std::vector<PointData>& data)

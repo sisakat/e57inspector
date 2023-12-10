@@ -21,6 +21,7 @@ public:
     ~PointCloud() override;
 
     void render() override;
+    void render2D(QPainter& painter) override;
 
     [[nodiscard]] int pointSize() const { return m_pointSize; }
     void setPointSize(int value) { m_pointSize = value; }

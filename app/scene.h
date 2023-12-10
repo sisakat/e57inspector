@@ -86,6 +86,18 @@ public:
 
     BoundingBox boundingBox() const;
 
+    template <typename T> T* findNode()
+    {
+        for (const auto& node : m_nodes)
+        {
+            if (dynamic_cast<T*>(node.get()))
+            {
+                return dynamic_cast<T*>(node.get());
+            }
+        }
+        return nullptr;
+    }
+
 private:
     BufferCache m_bufferCache;
     std::vector<SceneNode::Ptr> m_nodes;
