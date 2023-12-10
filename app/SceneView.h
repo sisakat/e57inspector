@@ -20,7 +20,7 @@ class SceneView : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core
 {
     Q_OBJECT
 public:
-    SceneView(QWidget *parent = nullptr);
+    explicit SceneView(QWidget *parent = nullptr);
     ~SceneView() override;
 
     void reset();

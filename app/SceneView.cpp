@@ -6,7 +6,6 @@
 SceneView::SceneView(QWidget* parent) : QOpenGLWidget(parent)
 {
     // to receive necessary events
-    setFocusPolicy(Qt::StrongFocus);
     setFocusPolicy(Qt::WheelFocus);
 
     // set the OpenGL profile
@@ -19,7 +18,10 @@ SceneView::SceneView(QWidget* parent) : QOpenGLWidget(parent)
 
 SceneView::~SceneView() = default;
 
-Scene& SceneView::scene() { return *m_scene; }
+Scene& SceneView::scene()
+{
+    return *m_scene;
+}
 
 void SceneView::initializeGL()
 {
