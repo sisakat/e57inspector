@@ -23,8 +23,6 @@ public:
     explicit SceneView(QWidget *parent = nullptr);
     ~SceneView() override;
 
-    void reset();
-
     Scene& scene();
 
 protected:
