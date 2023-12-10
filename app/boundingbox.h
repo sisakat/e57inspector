@@ -5,6 +5,7 @@
 #include <QVector3D>
 #include <algorithm>
 #include <numeric>
+#include <array>
 
 struct BoundingBox
 {
