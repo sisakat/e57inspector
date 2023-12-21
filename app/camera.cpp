@@ -62,25 +62,16 @@ void Camera::yaw(float angle)
     center.setW(1.0f);
     center = transformation * center;
     m_center = center.toVector3D();
+
+    QVector4D up(m_up);
+    up.setW(0.0f);
+    up = transformation * up;
+    m_up = up.toVector3D();
 }
 
 void Camera::pitch(float angle)
 {
     auto viewVec = (m_position - m_center).normalized();
-    auto cosViewUp = QVector3D::dotProduct(viewVec, m_up);
-
-    // prevent view vector to align with up vector
-    if (std::abs(cosViewUp) > 0.98)
-    {
-        if (cosViewUp < 0.0f && angle > 0.0f)
-        {
-            angle = 0.0f;
-        }
-        else if (cosViewUp > 0.0f && angle < 0.0f)
-        {
-            angle = 0.0f;
-        }
-    }
 
     QMatrix4x4 transformation;
     transformation.setToIdentity();
@@ -91,12 +82,21 @@ void Camera::pitch(float angle)
     QVector4D position(m_position);
     position.setW(1.0f);
     position = transformation * position;
-    m_position = position.toVector3D();
 
     QVector4D center(m_center);
     center.setW(1.0f);
     center = transformation * center;
-    m_center = center.toVector3D();
+
+    QVector4D up(m_up);
+    up.setW(0.0f);
+    up = transformation * up;
+
+    if (QVector3D::dotProduct({0.0f, 0.0f, 1.0f}, up.toVector3D()) >= 0.0f)
+    {
+        m_position = position.toVector3D();
+        m_center = center.toVector3D();
+        m_up = up.toVector3D();
+    }
 }
 
 void Camera::updatePickpoint(const QPoint& window)
