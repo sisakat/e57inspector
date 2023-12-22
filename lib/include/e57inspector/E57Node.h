@@ -162,10 +162,14 @@ public:
         m_cylindricalRepresentation = std::move(repr);
     }
 
+    E57Pose& pose() { return m_pose; }
+    const E57Pose& pose() const { return m_pose; }
+
 private:
     E57PinholeRepresentationPtr m_pinholeRepresentation;
     E57SphericalRepresentationPtr m_sphericalRepresentation;
     E57CylindricalRepresentationPtr m_cylindricalRepresentation;
+    E57Pose m_pose;
 };
 
 using E57NodePtr = std::shared_ptr<E57Node>;

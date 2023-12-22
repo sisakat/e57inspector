@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include "E57TreeNode.h"
+#include "Image2d.h"
 #include "SceneView.h"
 #include "about.h"
 #include "siimageviewer.h"
@@ -133,6 +134,8 @@ void MainWindow::twMain_itemDoubleClicked(QTreeWidgetItem* item, int column)
         if (e57Image2D->pinholeRepresentation())
         {
             imageRepresentation = e57Image2D->pinholeRepresentation();
+            openPinholeRepresentation3d(e57Image2D,
+                                        e57Image2D->pinholeRepresentation());
         }
         else if (e57Image2D->sphericalRepresentation())
         {
@@ -330,6 +333,72 @@ void MainWindow::openPointCloud(const E57NodePtr& node,
     pointCloud->doneInserting();
     sceneView->scene().addNode(pointCloud);
 
+    ui->twScene->init(sceneView->scene());
+}
+
+void MainWindow::openPinholeRepresentation3d(
+    const E57Image2DPtr& image2D,
+    const E57PinholeRepresentationPtr& pinholeRepresentation)
+{
+    const auto tabName = image2D->name();
+
+    auto* sceneView = findSceneView();
+    if (!sceneView)
+    {
+        sceneView = new SceneView(ui->tabWidget);
+        int tabIndex =
+            ui->tabWidget->addTab(sceneView, QString::fromStdString(tabName));
+        ui->tabWidget->setCurrentIndex(tabIndex);
+    }
+    else
+    {
+        ui->tabWidget->setCurrentWidget(sceneView);
+        ui->tabWidget->setTabText(ui->tabWidget->currentIndex(),
+                                  QString("Combined View"));
+    }
+
+    sceneView->makeCurrent();
+    Image2d::Ptr image2d = std::make_shared<Image2d>();
+
+    const auto& pose = image2D->pose();
+    glm::quat quaternion(static_cast<float>(pose.rotation.w),
+                         static_cast<float>(pose.rotation.x),
+                         static_cast<float>(pose.rotation.y),
+                         static_cast<float>(pose.rotation.z));
+    Matrix4d sop(quaternion);
+    sop[3] = Vector4d(static_cast<float>(pose.translation[0]),
+                      static_cast<float>(pose.translation[1]),
+                      static_cast<float>(pose.translation[2]), 1.0f);
+
+    for (auto& node : sceneView->scene().nodes())
+    {
+        if (std::dynamic_pointer_cast<PointCloud>(node))
+        {
+            auto firstPointCloud = std::dynamic_pointer_cast<PointCloud>(node);
+            image2d->setPose(InverseMatrix(firstPointCloud->sop()) * sop);
+            break;
+        }
+    }
+
+    image2d->setImage2D(image2D);
+    image2d->setPinholeRepresentation(pinholeRepresentation);
+
+    if (pinholeRepresentation->blobs().contains("jpegImage"))
+    {
+        auto imageData = m_reader->blobData(pinholeRepresentation->blobs().at("jpegImage"));
+        QByteArray data = QByteArray::fromRawData(
+            reinterpret_cast<const char*>(imageData.data()), imageData.size());
+
+        // Disable image allocation limit (else 128MB)
+        QImageReader::setAllocationLimit(0);
+
+        QImage img;
+        img.loadFromData(reinterpret_cast<const uchar*>(imageData.data()),
+                         (int)imageData.size(), "jpeg");
+        image2d->setImage(img);
+    }
+
+    sceneView->scene().addNode(image2d);
     ui->twScene->init(sceneView->scene());
 }
 

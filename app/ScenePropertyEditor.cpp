@@ -8,6 +8,7 @@
 #include "CListProperty.h"
 #include "CPropertyHeader.h"
 
+#include "Image2d.h"
 #include "ScenePropertyEditorUtils.h"
 #include "camera.h"
 #include "pointcloud.h"
@@ -32,6 +33,7 @@ void ScenePropertyEditor::init(SceneNode* sceneNode)
     // clang-format off
     if      (dynamic_cast<Camera*    >(sceneNode)) initFromCamera();
     else if (dynamic_cast<PointCloud*>(sceneNode)) initFromPointcloud();
+    else if (dynamic_cast<Image2d*   >(sceneNode)) initFromImage2d();
     // clang-format on
 
     adjustToContents();
@@ -46,6 +48,7 @@ void ScenePropertyEditor::onItemChanged(QTreeWidgetItem* item, int column)
     // clang-format off
     if      (dynamic_cast<Camera*    >(m_sceneNode)) changeFromCamera(item);
     else if (dynamic_cast<PointCloud*>(m_sceneNode)) changeFromPointcloud(item);
+    else if (dynamic_cast<Image2d*   >(m_sceneNode)) changeFromImage2d(item);
     // clang-format on
 }
 
@@ -98,6 +101,14 @@ void ScenePropertyEditor::initFromPointcloud()
     add(singleColor);
 }
 
+void ScenePropertyEditor::initFromImage2d()
+{
+    auto* image2d = dynamic_cast<Image2d*>(m_sceneNode);
+    auto* coneLength = new CDoubleProperty(
+        "coneLength", "Cone Length", image2d->coneLength(), 1.0, 0.01, 1000.0);
+    add(coneLength);
+}
+
 void ScenePropertyEditor::changeFromCamera(QTreeWidgetItem* item)
 {
     auto* camera = dynamic_cast<Camera*>(m_sceneNode);
@@ -138,5 +149,15 @@ void ScenePropertyEditor::changeFromPointcloud(QTreeWidgetItem* item)
     if (singleColor)
     {
         pointcloud->setSingleColor(*singleColor);
+    }
+}
+
+void ScenePropertyEditor::changeFromImage2d(QTreeWidgetItem* item)
+{
+    auto* image2d = dynamic_cast<Image2d*>(m_sceneNode);
+    auto coneLength = getDoubleValue(item, "coneLength");
+    if (coneLength)
+    {
+        image2d->setConeLength(static_cast<float>(*coneLength));
     }
 }

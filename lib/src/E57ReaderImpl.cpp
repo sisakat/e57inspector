@@ -152,6 +152,46 @@ E57Image2DPtr E57ReaderImpl::parseImage2D(const e57::StructureNode& node)
     parseFields(result, node,
                 {"pinholeRepresentation", "sphericalRepresentation",
                  "cylindricalRepresentation"});
+
+    if (isDefined(node, "pose"))
+    {
+        auto pose = e57::StructureNode(node.get("pose"));
+        if (isDefined(pose, "translation"))
+        {
+            result->pose().translation[0] =
+                e57::FloatNode(pose.get("translation/x")).value();
+            result->pose().translation[1] =
+                e57::FloatNode(pose.get("translation/y")).value();
+            result->pose().translation[2] =
+                e57::FloatNode(pose.get("translation/z")).value();
+        }
+        else
+        {
+            result->pose().translation[0] = 0.0;
+            result->pose().translation[1] = 0.0;
+            result->pose().translation[2] = 0.0;
+        }
+
+        if (isDefined(pose, "rotation"))
+        {
+            result->pose().rotation.x =
+                e57::FloatNode(pose.get("rotation/x")).value();
+            result->pose().rotation.y =
+                e57::FloatNode(pose.get("rotation/y")).value();
+            result->pose().rotation.z =
+                e57::FloatNode(pose.get("rotation/z")).value();
+            result->pose().rotation.w =
+                e57::FloatNode(pose.get("rotation/w")).value();
+        }
+        else
+        {
+            result->pose().rotation.x = 0.0;
+            result->pose().rotation.y = 0.0;
+            result->pose().rotation.z = 0.0;
+            result->pose().rotation.w = 0.0;
+        }
+    }
+
     return result;
 }
 

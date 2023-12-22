@@ -40,3 +40,15 @@ SceneNode* ScenePointcloudTreeNode::sceneNode()
 {
     return m_pointcloud;
 }
+
+SceneImage2dTreeNode::SceneImage2dTreeNode(Image2d* image2d)
+    : m_image2d(image2d)
+{
+    setText(0, QString::fromStdString(m_image2d->image2D()->name()));
+    setIcon(0, QIcon(":/icons/Image.png"));
+}
+
+SceneNode* SceneImage2dTreeNode::sceneNode()
+{
+    return m_image2d;
+}

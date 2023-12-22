@@ -1,4 +1,5 @@
-<!DOCTYPE RCC><RCC version="1.0">
+<!DOCTYPE RCC>
+<RCC version="1.0">
     <qresource>
         <file>icons/Data3D.png</file>
     </qresource>
@@ -44,5 +45,11 @@
     </qresource>
     <qresource>
         <file>shaders/default_fragment.glsl</file>
+    </qresource>
+    <qresource>
+        <file>shaders/line_vertex.glsl</file>
+    </qresource>
+    <qresource>
+        <file>shaders/line_fragment.glsl</file>
     </qresource>
 </RCC>

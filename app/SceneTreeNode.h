@@ -4,6 +4,7 @@
 #include <QMenu>
 #include <QTreeWidgetItem>
 
+#include "Image2d.h"
 #include "camera.h"
 #include "pointcloud.h"
 #include "scene.h"
@@ -39,6 +40,17 @@ public:
 
 private:
     PointCloud* m_pointcloud;
+};
+
+class SceneImage2dTreeNode : public SceneTreeNode
+{
+public:
+    explicit SceneImage2dTreeNode(Image2d* image2d);
+
+    SceneNode* sceneNode() override;
+
+private:
+    Image2d* m_image2d;
 };
 
 #endif // E57INSPECTOR_SCENETREENODE_H

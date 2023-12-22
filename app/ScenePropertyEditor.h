@@ -16,9 +16,11 @@ protected:
 
     void initFromCamera();
     void initFromPointcloud();
+    void initFromImage2d();
 
     void changeFromCamera(QTreeWidgetItem* item);
     void changeFromPointcloud(QTreeWidgetItem* item);
+    void changeFromImage2d(QTreeWidgetItem* item);
 
 private:
     SceneNode* m_sceneNode{};

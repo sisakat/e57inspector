@@ -82,7 +82,9 @@ add_executable(${PROJECT_NAME}
         ScenePropertyEditor.h
         ScenePropertyEditorUtils.h
         boundingbox.h
-        geometry.h)
+        geometry.h
+        Image2d.cpp
+        Image2d.h)
 target_link_libraries(${PROJECT_NAME} PRIVATE
         E57Format
         Qt6::Widgets

@@ -13,6 +13,10 @@ SceneTreeNode* SceneTreeNodeFactory::createSceneTreeNode(SceneNode* sceneNode)
         return new ScenePointcloudTreeNode(
             dynamic_cast<PointCloud*>(sceneNode));
     }
+    else if (dynamic_cast<Image2d*>(sceneNode))
+    {
+        return new SceneImage2dTreeNode(dynamic_cast<Image2d*>(sceneNode));
+    }
 
     return nullptr;
 }
