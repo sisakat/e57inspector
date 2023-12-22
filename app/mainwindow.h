@@ -44,8 +44,7 @@ private:
 
     void openFile();
     void loadE57(const std::string& filename);
-    void openImageBlob(const E57NodePtr& node, const std::string& blobName,
-                       const std::string& tabName);
+    void openImage(const E57Image2D& node, const std::string& tabName);
     void openPointCloud(const E57NodePtr& node, const std::string& dataName,
                         const std::string& tabName);
     void openPinholeRepresentation3d(

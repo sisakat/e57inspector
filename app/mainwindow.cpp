@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include "E57TreeNode.h"
+#include "E57Utils.h"
 #include "Image2d.h"
 #include "SceneView.h"
 #include "about.h"
@@ -127,38 +128,8 @@ void MainWindow::twMain_itemDoubleClicked(QTreeWidgetItem* item, int column)
     if (dynamic_cast<TNodeImage2D*>(node) != nullptr)
     {
         auto* image2D = dynamic_cast<TNodeImage2D*>(node);
-        // load image
         auto e57Image2D = std::dynamic_pointer_cast<E57Image2D>(node->node());
-
-        E57NodePtr imageRepresentation = nullptr;
-        if (e57Image2D->pinholeRepresentation())
-        {
-            imageRepresentation = e57Image2D->pinholeRepresentation();
-            openPinholeRepresentation3d(e57Image2D,
-                                        e57Image2D->pinholeRepresentation());
-        }
-        else if (e57Image2D->sphericalRepresentation())
-        {
-            imageRepresentation = e57Image2D->sphericalRepresentation();
-        }
-        else if (e57Image2D->cylindricalRepresentation())
-        {
-            imageRepresentation = e57Image2D->cylindricalRepresentation();
-        }
-
-        if (imageRepresentation)
-        {
-            if (imageRepresentation->blobs().contains("jpegImage"))
-            {
-                openImageBlob(imageRepresentation, "jpegImage",
-                              image2D->text(0).toStdString());
-            }
-            else if (imageRepresentation->blobs().contains("pngImage"))
-            {
-                openImageBlob(imageRepresentation, "pngImage",
-                              image2D->text(0).toStdString());
-            }
-        }
+        openImage(*e57Image2D, e57Image2D->name());
     }
     else if (dynamic_cast<TNodeData3D*>(node) != nullptr)
     {
@@ -180,27 +151,17 @@ void MainWindow::twViewProperties_itemChanged(QTreeWidgetItem* item, int column)
     }
 }
 
-void MainWindow::openImageBlob(const E57NodePtr& node,
-                               const std::string& blobName,
-                               const std::string& tabName)
+void MainWindow::openImage(const E57Image2D& node, const std::string& tabName)
 {
-    if (!node->blobs().contains(blobName))
+    auto image = E57Utils(*m_reader).getImage(node);
+    if (!image)
         return;
-    auto imageData = m_reader->blobData(node->blobs().at(blobName));
-    QByteArray data = QByteArray::fromRawData(
-        reinterpret_cast<const char*>(imageData.data()), imageData.size());
 
-    // Disable image allocation limit (else 128MB)
-    QImageReader::setAllocationLimit(0);
-
-    QImage img;
-    img.loadFromData(reinterpret_cast<const uchar*>(imageData.data()),
-                     (int)imageData.size(), "jpeg");
     auto* imageViewer = new SiImageViewer(ui->tabWidget);
     int tabIndex =
         ui->tabWidget->addTab(imageViewer, QString::fromStdString(tabName));
     ui->tabWidget->setCurrentIndex(tabIndex);
-    imageViewer->setImage(img);
+    imageViewer->setImage(*image);
 }
 
 void MainWindow::openPointCloud(const E57NodePtr& node,
@@ -382,22 +343,8 @@ void MainWindow::openPinholeRepresentation3d(
 
     image2d->setImage2D(image2D);
     image2d->setPinholeRepresentation(pinholeRepresentation);
-
-    if (pinholeRepresentation->blobs().contains("jpegImage"))
-    {
-        auto imageData = m_reader->blobData(pinholeRepresentation->blobs().at("jpegImage"));
-        QByteArray data = QByteArray::fromRawData(
-            reinterpret_cast<const char*>(imageData.data()), imageData.size());
-
-        // Disable image allocation limit (else 128MB)
-        QImageReader::setAllocationLimit(0);
-
-        QImage img;
-        img.loadFromData(reinterpret_cast<const uchar*>(imageData.data()),
-                         (int)imageData.size(), "jpeg");
-        image2d->setImage(img);
-    }
-
+    image2d->setImage(
+        E57Utils(*m_reader).getImage(*image2D).value_or(QImage()));
     sceneView->scene().addNode(image2d);
     ui->twScene->init(sceneView->scene());
 }
