@@ -1,10 +1,10 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
+#include "geometry.h"
 #include "scene.h"
 
 #include <QKeyEvent>
-#include <QMatrix4x4>
 #include <QOpenGLFunctions>
 #include <QPainter>
 
@@ -17,22 +17,26 @@ public:
 
     void setViewportWidth(uint32_t width) { m_viewportWidth = width; }
     void setViewportHeight(uint32_t height) { m_viewportHeight = height; }
-    [[nodiscard]] uint32_t viewportWidth() const { return m_viewportWidth; }
-    [[nodiscard]] uint32_t viewportHeight() const { return m_viewportHeight; }
-    [[nodiscard]] float fieldOfView() const { return m_fieldOfView; }
+    uint32_t viewportWidth() const { return m_viewportWidth; }
+    uint32_t viewportHeight() const { return m_viewportHeight; }
+    float fieldOfView() const { return m_fieldOfView; }
     void setFieldOfView(float fieldOfView) { m_fieldOfView = fieldOfView; }
 
     void render() override;
     void render2D(QPainter& painter) override;
+    void configureShader() override;
 
     void yaw(float angle);
     void pitch(float angle);
 
-    [[nodiscard]] QPoint pickpoint() const;
-    void updatePickpoint(const QPoint& window);
+    Vector2d pickpoint() const;
+    void updatePickpoint(const Vector2d& window);
 
-    [[nodiscard]] QVector4D unproject(const QVector3D& window) const;
-    [[nodiscard]] QVector3D project(const QVector4D& object) const;
+    Vector4d unproject(const Vector3d& window) const;
+    Vector3d project(const Vector4d& object) const;
+
+    float getDepth(int u, int v);
+    std::optional<Vector3d> findDepth(int u, int v);
 
     void mousePressEvent(QMouseEvent* event);
     void mouseReleaseEvent(QMouseEvent* event);
@@ -41,17 +45,26 @@ public:
     void keyPressEvent(QKeyEvent* event);
     void keyReleaseEvent(QKeyEvent* event);
 
+    bool constrained() const { return m_constrainedCamera; }
+    void setConstrained(bool constrained)
+    {
+        m_constrainedCamera = constrained;
+        m_position = Vector4d(X_AXIS, 1.0f);
+        m_center = NullPoint4d;
+        m_up = Vector4d(Z_AXIS, 0.0f);
+    }
+
 protected:
     void updateNearFar();
 
 private:
-    QVector3D m_position;
-    QVector3D m_center;
-    QVector3D m_up;
-    QVector4D m_pickpoint;
+    Vector4d m_position{1.0f, 0.0f, 0.0f, 1.0f};
+    Vector4d m_center{0.0f, 0.0f, 0.0f, 1.0f};
+    Vector4d m_up{0.0f, 0.0f, 1.0f, 0.0f};
+    Vector4d m_pickpoint{0.0f, 0.0f, 0.0f, 1.0f};
 
-    QMatrix4x4 m_view;
-    QMatrix4x4 m_projection;
+    Matrix4d m_view;
+    Matrix4d m_projection;
 
     int m_viewportX{0};
     int m_viewportY{0};
@@ -61,11 +74,13 @@ private:
     bool m_mouseDown{false};
     bool m_panning{false};
     bool m_zooming{false};
-    QPoint m_originalMousePosition;
+    Vector2d m_originalMousePosition;
 
     float m_fieldOfView{90.0};
     float m_near{0.001f};
     float m_far{1000.0f};
+
+    bool m_constrainedCamera{false};
 };
 
 #endif // CAMERA_H

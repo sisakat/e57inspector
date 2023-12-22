@@ -306,14 +306,14 @@ void MainWindow::openPointCloud(const E57NodePtr& node,
     }
 
     const auto& pose = e57Data3D->pose();
-    QQuaternion quaternion(static_cast<float>(pose.rotation.w),
-                           static_cast<float>(pose.rotation.x),
-                           static_cast<float>(pose.rotation.y),
-                           static_cast<float>(pose.rotation.z));
-    QMatrix4x4 sop(quaternion.toRotationMatrix());
-    sop.setColumn(3, QVector4D(static_cast<float>(pose.translation[0]),
-                               static_cast<float>(pose.translation[1]),
-                               static_cast<float>(pose.translation[2]), 1.0f));
+    glm::quat quaternion(static_cast<float>(pose.rotation.w),
+                         static_cast<float>(pose.rotation.x),
+                         static_cast<float>(pose.rotation.y),
+                         static_cast<float>(pose.rotation.z));
+    Matrix4d sop(quaternion);
+    sop[3] = Vector4d(static_cast<float>(pose.translation[0]),
+                      static_cast<float>(pose.translation[1]),
+                      static_cast<float>(pose.translation[2]), 1.0f);
     pointCloud->setSOP(sop);
 
     for (auto& node : sceneView->scene().nodes())
@@ -321,7 +321,7 @@ void MainWindow::openPointCloud(const E57NodePtr& node,
         if (std::dynamic_pointer_cast<PointCloud>(node))
         {
             auto firstPointCloud = std::dynamic_pointer_cast<PointCloud>(node);
-            pointCloud->setPose(firstPointCloud->sop().inverted() *
+            pointCloud->setPose(InverseMatrix(firstPointCloud->sop()) *
                                 pointCloud->sop());
             break;
         }

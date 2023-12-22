@@ -1,148 +1,186 @@
 #include "camera.h"
 
 #include <array>
+#include <queue>
+#include <set>
 
 const float ZOOM_FRAC = 0.25;
+const float WHEEL_ZOOM_FRAC = 0.25;
 
 Camera::Camera()
 {
     initializeOpenGLFunctions();
-
-    m_view.setToIdentity();
-    m_projection.setToIdentity();
-
-    m_position = QVector3D(1.0f, 0.0f, 0.0f);
-    m_center = QVector3D(0.0f, 0.0f, 0.0f);
-    m_up = QVector3D(0.0f, 0.0f, 1.0f);
 }
 
 void Camera::render()
 {
     SceneNode::render();
-    glViewport(0, 0, m_viewportWidth, m_viewportHeight);
-
-    m_view.setToIdentity();
-    m_view.lookAt(m_position, m_center, m_up);
-
-    updateNearFar();
-    m_projection.setToIdentity();
-    m_projection.perspective(m_fieldOfView / 2.0f,
-                             1.0f * m_viewportWidth / m_viewportHeight, m_near,
-                             m_far);
-
-    scene()->shader()->setUniformMat4("view", m_view.data());
-    scene()->shader()->setUniformMat4("projection", m_projection.data());
+    configureShader();
 }
 
 void Camera::render2D(QPainter& painter)
 {
     auto pp = pickpoint();
-    const int x = static_cast<int>(pp.x() - 2.0 * scene()->devicePixelRatio());
-    const int y = static_cast<int>(pp.y() - 2.0 * scene()->devicePixelRatio());
+    const int x = static_cast<int>(pp.x - 2.0 * scene()->devicePixelRatio());
+    const int y = static_cast<int>(pp.y - 2.0 * scene()->devicePixelRatio());
     const int d = static_cast<int>(4 * scene()->devicePixelRatio());
     painter.fillRect(x, y, d, d, Qt::red);
 }
 
+void Camera::configureShader()
+{
+    m_view =
+        glm::lookAt(Vector3d(m_position), Vector3d(m_center), Vector3d(m_up));
+    updateNearFar();
+    m_projection = glm::perspective(deg2rad(m_fieldOfView) / 2.0f,
+                                    1.0f * m_viewportWidth / m_viewportHeight,
+                                    m_near, m_far);
+
+    if (auto location = getUniformLocation("view"))
+    {
+        glUniformMatrix4fv(location.value(), 1, GL_FALSE, &m_view[0][0]);
+    }
+
+    if (auto location = getUniformLocation("projection"))
+    {
+        glUniformMatrix4fv(location.value(), 1, GL_FALSE, &m_projection[0][0]);
+    }
+}
 void Camera::yaw(float angle)
 {
-    const QVector3D zAxis(0.0f, 0.0f, 1.0f);
-
-    QMatrix4x4 transformation;
-    transformation.setToIdentity();
-    transformation.translate(m_pickpoint.toVector3D());
-    transformation.rotate(angle, zAxis);
-    transformation.translate(-1.0f * m_pickpoint.toVector3D());
-
-    QVector4D position(m_position);
-    position.setW(1.0f);
-    position = transformation * position;
-    m_position = position.toVector3D();
-
-    QVector4D center(m_center);
-    center.setW(1.0f);
-    center = transformation * center;
-    m_center = center.toVector3D();
-
-    QVector4D up(m_up);
-    up.setW(0.0f);
-    up = transformation * up;
-    m_up = up.toVector3D();
+    Vector3d rotationAxis = m_constrainedCamera ? Z_AXIS : Vector3d(m_up);
+    Matrix4d transformation = TranslationMatrix(m_pickpoint) *
+                              RotationMatrix(angle, rotationAxis) *
+                              TranslationMatrix(VectorNegate(m_pickpoint));
+    m_position = transformation * m_position;
+    m_center = transformation * m_center;
+    m_up = transformation * m_up;
 }
 
 void Camera::pitch(float angle)
 {
-    auto viewVec = (m_position - m_center).normalized();
-
-    QMatrix4x4 transformation;
-    transformation.setToIdentity();
-    transformation.translate(m_pickpoint.toVector3D());
-    transformation.rotate(angle, QVector3D::crossProduct(m_up, viewVec));
-    transformation.translate(-1.0f * m_pickpoint.toVector3D());
-
-    QVector4D position(m_position);
-    position.setW(1.0f);
-    position = transformation * position;
-
-    QVector4D center(m_center);
-    center.setW(1.0f);
-    center = transformation * center;
-
-    QVector4D up(m_up);
-    up.setW(0.0f);
-    up = transformation * up;
-
-    if (QVector3D::dotProduct({0.0f, 0.0f, 1.0f}, up.toVector3D()) >= 0.0f)
+    Vector3d viewVec = VectorNormalize(m_position - m_center);
+    Matrix4d transformation =
+        TranslationMatrix(m_pickpoint) *
+        RotationMatrix(angle, VectorCross(Vector3d(m_up), viewVec)) *
+        TranslationMatrix(VectorNegate(m_pickpoint));
+    Vector3d newUp = transformation * m_up;
+    if (!m_constrainedCamera || VectorDot(Z_AXIS, newUp) >= 0.0f)
     {
-        m_position = position.toVector3D();
-        m_center = center.toVector3D();
-        m_up = up.toVector3D();
+        m_position = transformation * m_position;
+        m_center = transformation * m_center;
+        m_up = Vector4d(newUp, 0.0f);
     }
 }
 
-void Camera::updatePickpoint(const QPoint& window)
+void Camera::updatePickpoint(const Vector2d& window)
 {
-    auto u = window.x();
-    auto v = m_viewportHeight - 1 - window.y();
-    auto depth = scene()->findDepth(u, v, m_viewportX, m_viewportY,
-                                    m_viewportWidth, m_viewportHeight);
+    auto u = window.x;
+    auto v = m_viewportHeight - 1 - window.y;
+    auto depth = findDepth(u, v);
     if (depth)
     {
         m_pickpoint = unproject(depth.value());
     }
 }
 
-QVector4D Camera::unproject(const QVector3D& window) const
+Vector4d Camera::unproject(const Vector3d& window) const
 {
-    QVector4D result;
-    result.setX((window.x() - static_cast<float>(m_viewportX)) /
-                    static_cast<float>(m_viewportWidth) * 2.0f -
-                1.0f);
-    result.setY((window.y() - static_cast<float>(m_viewportY)) /
-                    static_cast<float>(m_viewportHeight) * 2.0f -
-                1.0f);
-    result.setZ(window.z() * 2.0f - 1.0f);
-    result.setW(1.0f);
+    Vector4d result;
+    result.x = (window.x - static_cast<float>(m_viewportX)) /
+                   static_cast<float>(m_viewportWidth) * 2.0f -
+               1.0f;
+    result.y = (window.y - static_cast<float>(m_viewportY)) /
+                   static_cast<float>(m_viewportHeight) * 2.0f -
+               1.0f;
+    result.z = window.z * 2.0f - 1.0f;
+    result.w = 1.0f;
 
-    result = m_projection.inverted() * result;
-    result /= result.w();
-    result = m_view.inverted() * result;
+    result = InverseMatrix(m_projection) * result;
+    result = InverseMatrix(m_view) * result;
+    result /= result.w;
+
     return result;
 }
 
-QVector3D Camera::project(const QVector4D& object) const
+Vector3d Camera::project(const Vector4d& object) const
 {
-    QVector4D result(object);
-    result.setW(1.0f);
+    Vector4d result(object);
+    result.w = 1.0f;
+
     result = m_view * object;
     result = m_projection * result;
-    result /= result.w();
+    result /= result.w;
 
-    result.setX(((result.x() + 1.0f) / 2.0f + static_cast<float>(m_viewportX)) *
-                static_cast<float>(m_viewportWidth));
-    result.setY(((result.y() + 1.0f) / 2.0f + static_cast<float>(m_viewportY)) *
-                static_cast<float>(m_viewportHeight));
-    result.setZ((result.z() + 1.0f) / 2.0f);
-    return result.toVector3D();
+    result.x = ((result.x + 1.0f) / 2.0f + static_cast<float>(m_viewportX)) *
+               static_cast<float>(m_viewportWidth);
+    result.y = ((result.y + 1.0f) / 2.0f + static_cast<float>(m_viewportY)) *
+               static_cast<float>(m_viewportHeight);
+    result.z = (result.z + 1.0f) / 2.0f;
+    return result;
+}
+
+float Camera::getDepth(int u, int v)
+{
+    GLfloat depth = 0.0;
+    glReadPixels(u, v, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+    if ((depth > 0.0) && (depth < 1.0))
+    {
+        return depth;
+    }
+    return -1;
+}
+
+std::optional<Vector3d> Camera::findDepth(int u, int v)
+{
+    std::set<std::tuple<int, int>> visited;
+    std::queue<std::tuple<int, int>> pixels;
+    pixels.emplace(u, v);
+
+    float depth = getDepth(u, v);
+    if (depth > 0.0)
+    {
+        return Vector3d{static_cast<float>(u), static_cast<float>(v), depth};
+    }
+
+    std::vector<float> depthBuffer(m_viewportWidth * m_viewportHeight);
+    glReadPixels(m_viewportX, m_viewportY, m_viewportWidth, m_viewportHeight,
+                 GL_DEPTH_COMPONENT, GL_FLOAT, depthBuffer.data());
+
+    while (!pixels.empty())
+    {
+        auto pixel = pixels.front();
+        pixels.pop();
+
+        depth = depthBuffer.at(std::get<1>(pixel) * m_viewportWidth +
+                               std::get<0>(pixel));
+        if (depth > 0.0f && depth < 1.0f)
+        {
+            return Vector3d{static_cast<float>(std::get<0>(pixel)),
+                            static_cast<float>(std::get<1>(pixel)), depth};
+        }
+
+        for (int i = -1; i <= 1; ++i)
+        {
+            for (int j = -1; j <= 1; ++j)
+            {
+                if (i == 0 && j == 0)
+                    continue;
+                int newU = std::get<0>(pixel) + i;
+                int newV = std::get<1>(pixel) + j;
+                std::tuple<int, int> newPixel(newU, newV);
+                if (visited.find(newPixel) == visited.end() && newU >= 0 &&
+                    newU < m_viewportWidth && newV >= 0 &&
+                    newV < m_viewportHeight)
+                {
+                    visited.insert(newPixel);
+                    pixels.push(std::move(newPixel));
+                }
+            }
+        }
+    }
+
+    return std::nullopt;
 }
 
 void Camera::mousePressEvent(QMouseEvent* event)
@@ -160,8 +198,9 @@ void Camera::mousePressEvent(QMouseEvent* event)
         m_panning = true;
     }
 
-    m_originalMousePosition = event->pos();
-    updatePickpoint(event->pos());
+    m_originalMousePosition.x = event->pos().x();
+    m_originalMousePosition.y = event->pos().y();
+    updatePickpoint(m_originalMousePosition);
 }
 
 void Camera::mouseReleaseEvent(QMouseEvent* event)
@@ -179,33 +218,35 @@ void Camera::mouseReleaseEvent(QMouseEvent* event)
         m_panning = false;
     }
 
-    m_originalMousePosition = event->pos();
+    m_originalMousePosition.x = event->pos().x();
+    m_originalMousePosition.y = event->pos().y();
 }
 
 void Camera::mouseMoveEvent(QMouseEvent* event)
 {
+    Vector2d pos(event->pos().x(), event->pos().y());
+
     if (m_mouseDown)
     {
-        auto delta = event->pos() - m_originalMousePosition;
-        delta *= scene()->devicePixelRatio();
-        pitch(static_cast<float>(-delta.y()));
-        yaw(static_cast<float>(-delta.x()));
+        auto delta = pos - m_originalMousePosition;
+        pitch(deg2rad(static_cast<float>(-delta.y)));
+        yaw(deg2rad(static_cast<float>(-delta.x)));
     }
 
     if (m_zooming)
     {
-        auto deltaY = event->pos().y() - m_originalMousePosition.y();
-        auto viewDir = (m_position - m_pickpoint.toVector3D()).normalized();
-        auto lengthToTarget = (m_position - m_pickpoint.toVector3D()).length();
+        auto deltaY = pos.y - m_originalMousePosition.y;
+        auto viewDir = VectorNormalize(m_position - m_pickpoint);
+        auto lengthToTarget = VectorLength(m_position - m_pickpoint);
         if (deltaY < 0)
         {
-            m_position -= lengthToTarget * viewDir * ZOOM_FRAC * 0.5;
-            m_center -= lengthToTarget * viewDir * ZOOM_FRAC * 0.5;
+            m_position -= lengthToTarget * viewDir * ZOOM_FRAC * 0.5f;
+            m_center -= lengthToTarget * viewDir * ZOOM_FRAC * 0.5f;
         }
         else if (deltaY > 0)
         {
-            m_position += lengthToTarget * viewDir * ZOOM_FRAC * 0.5;
-            m_center += lengthToTarget * viewDir * ZOOM_FRAC * 0.5;
+            m_position += lengthToTarget * viewDir * ZOOM_FRAC * 0.5f;
+            m_center += lengthToTarget * viewDir * ZOOM_FRAC * 0.5f;
         }
     }
 
@@ -214,41 +255,43 @@ void Camera::mouseMoveEvent(QMouseEvent* event)
         int u = event->pos().x();
         int v = m_viewportHeight - 1 - event->pos().y();
 
-        int uOriginal = m_originalMousePosition.x();
-        int vOriginal = m_viewportHeight - 1 - m_originalMousePosition.y();
+        int uOriginal = m_originalMousePosition.x;
+        int vOriginal = m_viewportHeight - 1 - m_originalMousePosition.y;
 
         auto projectedPickpoint = project(m_pickpoint);
-        QVector3D currentMousePos(static_cast<float>(u), static_cast<float>(v),
-                                  projectedPickpoint.z());
-        QVector3D originalMousePos(static_cast<float>(uOriginal),
-                                   static_cast<float>(vOriginal),
-                                   projectedPickpoint.z());
-        QVector4D currentMousePosObject = unproject(currentMousePos);
-        QVector4D originalMousePosObject = unproject(originalMousePos);
-        QVector3D delta =
-            (currentMousePosObject - originalMousePosObject).toVector3D();
+        Vector3d currentMousePos(static_cast<float>(u), static_cast<float>(v),
+                                 projectedPickpoint.z);
+        Vector3d originalMousePos(static_cast<float>(uOriginal),
+                                  static_cast<float>(vOriginal),
+                                  projectedPickpoint.z);
+        Vector4d currentMousePosObject = unproject(currentMousePos);
+        Vector4d originalMousePosObject = unproject(originalMousePos);
+        Vector4d delta(currentMousePosObject - originalMousePosObject);
 
         m_position -= delta;
         m_center -= delta;
     }
 
-    m_originalMousePosition = event->pos();
+    m_originalMousePosition.x = event->pos().x();
+    m_originalMousePosition.y = event->pos().y();
 }
 
 void Camera::wheelEvent(QWheelEvent* event)
 {
-    updatePickpoint(event->position().toPoint());
-    auto viewDir = (m_position - m_pickpoint.toVector3D()).normalized();
-    auto lengthToTarget = (m_position - m_pickpoint.toVector3D()).length();
+    auto qPoint = event->position().toPoint();
+    Vector2d point(qPoint.x(), qPoint.y());
+    updatePickpoint(point);
+    auto viewDir = VectorNormalize(m_position - m_pickpoint);
+    auto lengthToTarget = VectorLength(m_position - m_pickpoint);
     if (event->angleDelta().y() > 0)
     {
-        m_position -= lengthToTarget * viewDir * ZOOM_FRAC;
-        m_center -= lengthToTarget * viewDir * ZOOM_FRAC;
+        m_position -= lengthToTarget * viewDir * WHEEL_ZOOM_FRAC;
+        m_center -= lengthToTarget * viewDir * WHEEL_ZOOM_FRAC;
     }
     else if (event->angleDelta().y() < 0)
     {
-        m_position += lengthToTarget * viewDir * ZOOM_FRAC;
-        m_center += lengthToTarget * viewDir * ZOOM_FRAC;
+        m_position += lengthToTarget * viewDir * WHEEL_ZOOM_FRAC;
+        m_center += lengthToTarget * viewDir * WHEEL_ZOOM_FRAC;
     }
 }
 
@@ -264,8 +307,9 @@ void Camera::updateNearFar()
     float minLength = std::numeric_limits<float>::max();
     for (const auto& point : bbPoints)
     {
-        auto dot = QVector3D::dotProduct(point - m_position,
-                                         (m_center - m_position).normalized());
+        auto dot = VectorDot(
+            point - Vector3d(m_position),
+            VectorNormalize(Vector3d(m_center) - Vector3d(m_position)));
         float length = std::abs(dot);
         if (length > maxLength)
         {
@@ -281,10 +325,10 @@ void Camera::updateNearFar()
     m_far = maxLength < 0.0f ? 100.0f : maxLength;
 }
 
-QPoint Camera::pickpoint() const
+Vector2d Camera::pickpoint() const
 {
     auto projectedPickpoint = project(m_pickpoint);
-    return {static_cast<int>(projectedPickpoint.x()),
+    return {static_cast<int>(projectedPickpoint.x),
             static_cast<int>(m_viewportHeight - 1 -
-                             static_cast<int>(projectedPickpoint.y()))};
+                             static_cast<int>(projectedPickpoint.y))};
 }

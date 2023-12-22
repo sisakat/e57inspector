@@ -113,18 +113,18 @@ void OctreeNode::updateBoundingBox()
 {
     for (const auto& element : m_elements)
     {
-        m_boundingBox.min.setX(
-            std::min(m_boundingBox.min.x(), element.data.xyz[0]));
-        m_boundingBox.min.setY(
-            std::min(m_boundingBox.min.y(), element.data.xyz[1]));
-        m_boundingBox.min.setZ(
-            std::min(m_boundingBox.min.z(), element.data.xyz[2]));
-        m_boundingBox.max.setX(
-            std::max(m_boundingBox.max.x(), element.data.xyz[0]));
-        m_boundingBox.max.setY(
-            std::max(m_boundingBox.max.y(), element.data.xyz[1]));
-        m_boundingBox.max.setZ(
-            std::max(m_boundingBox.max.z(), element.data.xyz[2]));
+        m_boundingBox.min.x =
+            std::min(m_boundingBox.min.x, element.data.xyz[0]);
+        m_boundingBox.min.y =
+            std::min(m_boundingBox.min.y, element.data.xyz[1]);
+        m_boundingBox.min.z =
+            std::min(m_boundingBox.min.z, element.data.xyz[2]);
+        m_boundingBox.max.x =
+            std::max(m_boundingBox.max.x, element.data.xyz[0]);
+        m_boundingBox.max.y =
+            std::max(m_boundingBox.max.y, element.data.xyz[1]);
+        m_boundingBox.max.z =
+            std::max(m_boundingBox.max.z, element.data.xyz[2]);
     }
 }
 

@@ -35,24 +35,24 @@ void PointCloud::render2D(QPainter& painter)
     if (!camera)
         return;
 
-    auto origin = QVector4D(0.0f, 0.0f, 0.0f, 1.0f);
+    auto origin = Vector4d(0.0f, 0.0f, 0.0f, 1.0f);
     origin = m_pose * origin;
     auto positionScreen = camera->project(origin);
 
-    if (positionScreen.z() < 1.0f)
+    if (positionScreen.z < 1.0f)
     {
         painter.setPen(Qt::black);
         painter.setBrush(Qt::white);
-        painter.drawEllipse(static_cast<int>(positionScreen.x()) - 5,
-                            static_cast<int>(camera->viewportHeight() - 1 -
-                                             positionScreen.y()) -
-                                5,
-                            10, 10);
+        painter.drawEllipse(
+            static_cast<int>(positionScreen.x) - 5,
+            static_cast<int>(camera->viewportHeight() - 1 - positionScreen.y) -
+                5,
+            10, 10);
 
         painter.setPen(Qt::white);
         painter.drawText(
-            static_cast<int>(positionScreen.x()) + 10,
-            static_cast<int>(camera->viewportHeight() - 1 - positionScreen.y()),
+            static_cast<int>(positionScreen.x) + 10,
+            static_cast<int>(camera->viewportHeight() - 1 - positionScreen.y),
             QString::fromStdString(m_data3D->name()));
     }
 }

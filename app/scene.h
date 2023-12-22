@@ -1,7 +1,6 @@
 #ifndef SCENE_H
 #define SCENE_H
 
-#include <QMatrix4x4>
 #include <QOpenGLFunctions>
 #include <QOpenGLFunctions_3_3_Core>
 #include <QPainter>
@@ -26,15 +25,17 @@ public:
 
     virtual void render();
     virtual void render2D(QPainter& painter);
+    virtual void configureShader();
+
     void addChild(Ptr node);
 
     [[nodiscard]] uint32_t id() const;
     [[nodiscard]] std::vector<Ptr>& children();
 
     [[nodiscard]] const std::vector<Ptr>& children() const;
-    [[nodiscard]] QMatrix4x4 pose() const;
+    [[nodiscard]] Matrix4d pose() const;
 
-    void setPose(const QMatrix4x4& newPose);
+    void setPose(const Matrix4d& newPose);
 
     [[nodiscard]] Scene* scene();
     [[nodiscard]] const Scene* scene() const;
@@ -44,12 +45,15 @@ public:
 
     [[nodiscard]] BoundingBox boundingBox() const;
 
+    std::optional<int> getCurrentShaderProgram();
+    std::optional<int> getUniformLocation(const std::string& name);
+
     friend class Scene;
 
 protected:
     uint32_t m_id;
     std::vector<Ptr> m_childNodes;
-    QMatrix4x4 m_pose;
+    Matrix4d m_pose;
     Scene* m_scene;
     SceneNode* m_parent{nullptr};
     BoundingBox m_boundingBox{};

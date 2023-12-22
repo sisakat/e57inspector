@@ -1,3 +1,6 @@
 [submodule "external/libE57Format"]
 	path = external/libE57Format
 	url = https://github.com/asmaloney/libE57Format.git
+[submodule "external/glm"]
+	path = external/glm
+	url = https://github.com/g-truc/glm.git

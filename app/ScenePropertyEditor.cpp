@@ -57,6 +57,10 @@ void ScenePropertyEditor::initFromCamera()
         new CDoubleProperty("fieldOfView", "Field of View",
                             camera->fieldOfView(), 90.0f, 1.0f, 179.0f);
     add(fieldOfView);
+
+    auto* constrained = new CBoolProperty("constrained", "Constrained",
+                                          camera->constrained(), true);
+    add(constrained);
 }
 
 void ScenePropertyEditor::initFromPointcloud()
@@ -101,6 +105,11 @@ void ScenePropertyEditor::changeFromCamera(QTreeWidgetItem* item)
     if (fieldOfView)
     {
         camera->setFieldOfView(*fieldOfView);
+    }
+    auto constrained = getBooleanValue(item, "constrained");
+    if (constrained)
+    {
+        camera->setConstrained(*constrained);
     }
 }
 
