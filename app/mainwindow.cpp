@@ -309,18 +309,6 @@ void MainWindow::openPointCloud(const E57NodePtr& node,
     }
 
     pointCloud->setPose(E57Utils::getPose(*e57Data3D));
-
-    for (auto& node : sceneView->scene().nodes())
-    {
-        if (std::dynamic_pointer_cast<PointCloud>(node))
-        {
-            auto firstPointCloud = std::dynamic_pointer_cast<PointCloud>(node);
-            pointCloud->setPose(InverseMatrix(firstPointCloud->sop()) *
-                                pointCloud->sop());
-            break;
-        }
-    }
-
     pointCloud->doneInserting();
     sceneView->scene().addNode(pointCloud);
 

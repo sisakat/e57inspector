@@ -36,9 +36,6 @@ public:
     [[nodiscard]] bool visible() const { return m_visible; }
     void setVisible(bool visible) { m_visible = visible; }
 
-    [[nodiscard]] Matrix4d sop() const { return m_sop; }
-    void setSOP(const Matrix4d& sop) { m_sop = sop; }
-
     void insertPoints(const std::vector<PointData>& data);
     void doneInserting();
 
@@ -51,7 +48,6 @@ private:
     int m_pointSize{1};
     PointCloudViewType m_viewType{PointCloudViewType::COLOR};
     QColor m_singleColor;
-    Matrix4d m_sop;
     bool m_visible{true};
     Shader m_shader;
 };
