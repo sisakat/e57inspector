@@ -79,6 +79,9 @@
            <property name="alternatingRowColors">
             <bool>false</bool>
            </property>
+           <property name="selectionMode">
+            <enum>QAbstractItemView::ExtendedSelection</enum>
+           </property>
            <column>
             <property name="text">
              <string notr="true">1</string>

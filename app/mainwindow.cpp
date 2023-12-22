@@ -156,30 +156,32 @@ void MainWindow::sceneView_itemDropped(SceneView* sender, QObject* source)
     auto* treeWidget = dynamic_cast<QTreeWidget*>(source);
     if (!treeWidget)
         return;
-    if (auto* nodeImage2D =
-            dynamic_cast<TNodeImage2D*>(treeWidget->currentItem()))
+    for (auto* item : treeWidget->selectedItems())
     {
-        Image2d::Ptr image2d = std::make_shared<Image2d>();
-        image2d->setName(nodeImage2D->node()->name());
+        if (auto* nodeImage2D = dynamic_cast<TNodeImage2D*>(item))
+        {
+            Image2d::Ptr image2d = std::make_shared<Image2d>();
+            image2d->setName(nodeImage2D->node()->name());
 
-        auto e57NodeImage2D =
-            std::dynamic_pointer_cast<E57Image2D>(nodeImage2D->node());
+            auto e57NodeImage2D =
+                std::dynamic_pointer_cast<E57Image2D>(nodeImage2D->node());
 
-        E57Utils utils(*m_reader);
-        auto image = utils.getImage(*e57NodeImage2D);
-        if (!image)
-            return;
-        image2d->setImage(*image);
-        auto imageParameters = utils.getImageParameters(*e57NodeImage2D);
-        if (!imageParameters || imageParameters->isSpherical)
-            return;
-        image2d->setImageWidth(imageParameters->width);
-        image2d->setImageHeight(imageParameters->height);
-        image2d->setPixelWidth(imageParameters->pixelWidth);
-        image2d->setPixelHeight(imageParameters->pixelHeight);
-        image2d->setFocalLength(imageParameters->focalLength);
-        image2d->setPose(E57Utils::getPose(*e57NodeImage2D));
-        sender->scene().addNode(image2d);
+            E57Utils utils(*m_reader);
+            auto image = utils.getImage(*e57NodeImage2D);
+            if (!image)
+                return;
+            image2d->setImage(*image);
+            auto imageParameters = utils.getImageParameters(*e57NodeImage2D);
+            if (!imageParameters || imageParameters->isSpherical)
+                return;
+            image2d->setImageWidth(imageParameters->width);
+            image2d->setImageHeight(imageParameters->height);
+            image2d->setPixelWidth(imageParameters->pixelWidth);
+            image2d->setPixelHeight(imageParameters->pixelHeight);
+            image2d->setFocalLength(imageParameters->focalLength);
+            image2d->setPose(E57Utils::getPose(*e57NodeImage2D));
+            sender->scene().addNode(image2d);
+        }
     }
 
     sender->update();
