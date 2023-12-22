@@ -5,7 +5,9 @@
 #include <utility>
 
 PointCloud::PointCloud(SceneNode* parent, E57Data3DPtr data3D)
-    : SceneNode(parent), m_data3D(std::move(data3D)), m_octree()
+    : SceneNode(parent), m_data3D(std::move(data3D)), m_octree(),
+      m_shader(":/shaders/default_vertex.glsl",
+               ":/shaders/default_fragment.glsl")
 {
 }
 
@@ -14,19 +16,23 @@ PointCloud::~PointCloud() = default;
 void PointCloud::render()
 {
     SceneNode::render();
+    m_shader.use();
+
     if (!visible())
         return;
 
-    scene()->shader()->setUniformInt("pointSize", m_pointSize);
-    scene()->shader()->setUniformInt("viewType", static_cast<int>(m_viewType));
-    float rgb[]{m_singleColor.redF(), m_singleColor.greenF(),
-                m_singleColor.blueF()};
-    scene()->shader()->setUniformVec3("singleColor", rgb);
+    configureShader();
+    auto* camera = scene()->findNode<Camera>();
+    if (camera)
+    {
+        camera->configureShader();
+    }
 
     for (auto& child : m_childNodes)
     {
         child->render();
     }
+    m_shader.release();
 }
 
 void PointCloud::render2D(QPainter& painter)
@@ -54,6 +60,28 @@ void PointCloud::render2D(QPainter& painter)
             static_cast<int>(positionScreen.x) + 10,
             static_cast<int>(camera->viewportHeight() - 1 - positionScreen.y),
             QString::fromStdString(m_data3D->name()));
+    }
+}
+
+void PointCloud::configureShader()
+{
+    SceneNode::configureShader();
+
+    if (auto location = getUniformLocation("pointSize"))
+    {
+        glUniform1i(location.value(), m_pointSize);
+    }
+
+    if (auto location = getUniformLocation("viewType"))
+    {
+        glUniform1i(location.value(), static_cast<int>(m_viewType));
+    }
+
+    if (auto location = getUniformLocation("singleColor"))
+    {
+        float rgb[]{m_singleColor.redF(), m_singleColor.greenF(),
+                    m_singleColor.blueF()};
+        glUniform3fv(location.value(), 1, rgb);
     }
 }
 

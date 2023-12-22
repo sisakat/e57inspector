@@ -4,8 +4,8 @@
 #include "e57inspector/E57Node.h"
 #include "octree.h"
 #include "scene.h"
+#include "shader.h"
 #include <QColor>
-#include <QMatrix4x4>
 
 enum class PointCloudViewType
 {
@@ -22,6 +22,7 @@ public:
 
     void render() override;
     void render2D(QPainter& painter) override;
+    void configureShader() override;
 
     [[nodiscard]] int pointSize() const { return m_pointSize; }
     void setPointSize(int value) { m_pointSize = value; }
@@ -52,6 +53,7 @@ private:
     QColor m_singleColor;
     Matrix4d m_sop;
     bool m_visible{true};
+    Shader m_shader;
 };
 
 class PointCloudOctreeNode : public SceneNode

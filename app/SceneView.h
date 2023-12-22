@@ -47,7 +47,6 @@ private:
     Camera::Ptr m_camera;
 
     void setupScene();
-    void setupShaders();
 };
 
 #endif // SIPOINTCLOUDRENDERER_H

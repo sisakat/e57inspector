@@ -34,12 +34,18 @@ SceneNode::SceneNode(SceneNode* parent) : m_parent{parent}
 
 void SceneNode::render()
 {
-    scene()->shader()->setUniformMat4("model", &pose()[0][0]);
+    configureShader();
 }
 
 void SceneNode::render2D(QPainter& painter) {}
 
-void SceneNode::configureShader() {}
+void SceneNode::configureShader()
+{
+    if (auto location = getUniformLocation("model"))
+    {
+        glUniformMatrix4fv(location.value(), 1, GL_FALSE, &pose()[0][0]);
+    }
+}
 
 void SceneNode::addChild(SceneNode::Ptr node)
 {
@@ -113,8 +119,7 @@ BoundingBox SceneNode::boundingBox() const
     BoundingBox result{m_boundingBox};
     for (const auto& child : m_childNodes)
     {
-        auto bb = child->boundingBox();
-        bb.transform(m_pose);
+        auto bb = child->boundingBox().transform(m_pose);
         result = result.combine(bb);
     }
     return result;
@@ -133,10 +138,11 @@ std::optional<int> SceneNode::getCurrentShaderProgram()
     return program;
 }
 
-std::optional<int> SceneNode::getUniformLocation(const std::string &name)
+std::optional<int> SceneNode::getUniformLocation(const std::string& name)
 {
     auto shaderProgram = getCurrentShaderProgram();
-    if (!shaderProgram) return std::nullopt;
+    if (!shaderProgram)
+        return std::nullopt;
 
     GLint location = glGetUniformLocation(shaderProgram.value(), name.c_str());
     if (location < 0)
@@ -161,16 +167,6 @@ Scene::BufferCache& Scene::bufferCache()
 const Scene::BufferCache& Scene::bufferCache() const
 {
     return m_bufferCache;
-}
-
-const Shader::Ptr& Scene::shader()
-{
-    return m_shader;
-}
-
-void Scene::setShader(const Shader::Ptr& shader)
-{
-    m_shader = shader;
 }
 
 std::vector<SceneNode::Ptr>& Scene::nodes()

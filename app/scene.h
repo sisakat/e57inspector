@@ -77,14 +77,6 @@ public:
     [[nodiscard]] BufferCache& bufferCache();
     [[nodiscard]] const BufferCache& bufferCache() const;
 
-    float getDepth(int u, int v);
-    [[nodiscard]] std::optional<QVector3D>
-    findDepth(int u, int v, int viewportX, int viewportY, int viewportWidth,
-              int viewportHeight);
-
-    [[nodiscard]] const Shader::Ptr& shader();
-    void setShader(const Shader::Ptr& shader);
-
     [[nodiscard]] std::vector<SceneNode::Ptr>& nodes();
     [[nodiscard]] const std::vector<SceneNode::Ptr>& nodes() const;
 
@@ -108,7 +100,6 @@ public:
 private:
     BufferCache m_bufferCache;
     std::vector<SceneNode::Ptr> m_nodes;
-    Shader::Ptr m_shader;
 
     float m_devicePixelRatio{1.0};
 };

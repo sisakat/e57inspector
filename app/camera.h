@@ -80,7 +80,7 @@ private:
     float m_near{0.001f};
     float m_far{1000.0f};
 
-    bool m_constrainedCamera{false};
+    bool m_constrainedCamera{true};
 };
 
 #endif // CAMERA_H

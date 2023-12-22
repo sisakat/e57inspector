@@ -41,7 +41,6 @@ void SceneView::initializeGL()
 
     makeCurrent();
     setupScene();
-    setupShaders();
 }
 
 void SceneView::paintGL()
@@ -52,9 +51,7 @@ void SceneView::paintGL()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_PROGRAM_POINT_SIZE);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    m_scene->shader()->use();
     m_scene->render();
-    m_scene->shader()->release();
     painter.endNativePainting();
 
     glDisable(GL_DEPTH_TEST);
@@ -65,7 +62,6 @@ void SceneView::resizeGL(int width, int height)
 {
     width = static_cast<int>(width * devicePixelRatio());
     height = static_cast<int>(height * devicePixelRatio());
-    m_scene->shader()->use();
     m_camera->setViewportWidth(width);
     m_camera->setViewportHeight(height);
     update();
@@ -74,7 +70,6 @@ void SceneView::resizeGL(int width, int height)
 void SceneView::mousePressEvent(QMouseEvent* event)
 {
     makeCurrent();
-    m_scene->shader()->use();
     m_camera->mousePressEvent(event);
     update();
 }
@@ -82,7 +77,6 @@ void SceneView::mousePressEvent(QMouseEvent* event)
 void SceneView::mouseReleaseEvent(QMouseEvent* event)
 {
     makeCurrent();
-    m_scene->shader()->use();
     m_camera->mouseReleaseEvent(event);
     update();
 }
@@ -90,7 +84,6 @@ void SceneView::mouseReleaseEvent(QMouseEvent* event)
 void SceneView::mouseMoveEvent(QMouseEvent* event)
 {
     makeCurrent();
-    m_scene->shader()->use();
     m_camera->mouseMoveEvent(event);
     update();
 }
@@ -98,7 +91,6 @@ void SceneView::mouseMoveEvent(QMouseEvent* event)
 void SceneView::wheelEvent(QWheelEvent* event)
 {
     makeCurrent();
-    m_scene->shader()->use();
     m_camera->wheelEvent(event);
     update();
 }
@@ -106,7 +98,6 @@ void SceneView::wheelEvent(QWheelEvent* event)
 void SceneView::keyPressEvent(QKeyEvent* event)
 {
     makeCurrent();
-    m_scene->shader()->use();
     m_camera->keyPressEvent(event);
     update();
 }
@@ -114,7 +105,6 @@ void SceneView::keyPressEvent(QKeyEvent* event)
 void SceneView::keyReleaseEvent(QKeyEvent* event)
 {
     makeCurrent();
-    m_scene->shader()->use();
     m_camera->keyReleaseEvent(event);
     update();
 }
@@ -130,12 +120,4 @@ void SceneView::setupScene()
     m_camera = std::make_shared<Camera>();
     m_scene->setDevicePixelRatio(static_cast<float>(devicePixelRatio()));
     m_scene->addNode(m_camera);
-}
-
-void SceneView::setupShaders()
-{
-    m_shader = std::make_shared<Shader>(":/shaders/default_vertex.glsl",
-                                        ":/shaders/default_fragment.glsl");
-    m_shader->use();
-    m_scene->setShader(m_shader);
 }
