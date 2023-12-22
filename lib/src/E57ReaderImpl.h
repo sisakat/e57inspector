@@ -68,6 +68,7 @@ private:
     E57RootPtr parseRoot(const e57::StructureNode& node);
     E57Image2DPtr parseImage2D(const e57::StructureNode& node);
     E57Data3DPtr parseData3D(const e57::StructureNode& node);
+    E57Pose parsePose(const e57::StructureNode& node);
 
     uint32_t registerBlob(e57::BlobNode& blob);
     uint32_t registerData(e57::CompressedVectorNode& data);
