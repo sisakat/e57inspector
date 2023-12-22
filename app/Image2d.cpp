@@ -34,8 +34,8 @@ void Image2d::render()
     double imageHeightMeter = imageHeight * pixelHeight;
     double coneLength = m_coneLength;
 
-    double tanX = std::atan2(imageWidthMeter / 2.0, focalLength);
-    double tanY = std::atan2(imageHeightMeter / 2.0, focalLength);
+    double tanX = (imageWidthMeter / 2.0) / focalLength;
+    double tanY = (imageHeightMeter / 2.0) / focalLength;
 
     std::vector<Vector3d> lines{
         {0.0f, 0.0f, 0.0f},
