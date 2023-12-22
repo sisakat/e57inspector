@@ -25,6 +25,9 @@ public:
 
     Scene& scene();
 
+signals:
+    void itemDropped(SceneView* sender, QObject* source);
+
 protected:
     void initializeGL() override;
     void paintGL() override;
@@ -35,6 +38,9 @@ protected:
     void wheelEvent(QWheelEvent* event) override;
     void keyPressEvent(QKeyEvent* event) override;
     void keyReleaseEvent(QKeyEvent* event) override;
+
+    void dragEnterEvent(QDragEnterEvent* event) override;
+    void dropEvent(QDropEvent* event) override;
 
 private slots:
     void onMessageLogged(const QOpenGLDebugMessage& debugMessage);

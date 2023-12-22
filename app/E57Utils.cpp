@@ -86,3 +86,53 @@ E57Utils::getImageFormat(const E57NodePtr& node) const
 
     return std::nullopt;
 }
+std::optional<E57Utils::ImageParameters>
+E57Utils::getImageParameters(const E57Image2D& image2D) const
+{
+    auto representation = getImageRepresentation(image2D);
+    if (!representation)
+        return std::nullopt;
+
+    E57Utils::ImageParameters parameters{};
+
+    // spherical image not supported
+    if (std::dynamic_pointer_cast<E57SphericalRepresentation>(
+            representation.value()))
+    {
+        parameters.isSpherical = true;
+    }
+    else
+    {
+        parameters.focalLength =
+            representation.value()->getDouble("focalLength");
+    }
+
+    parameters.width = representation.value()->getInteger("imageWidth");
+    parameters.height = representation.value()->getInteger("imageHeight");
+    parameters.pixelWidth = representation.value()->getDouble("pixelWidth");
+    parameters.pixelHeight = representation.value()->getDouble("pixelHeight");
+    return parameters;
+}
+
+Matrix4d e57PoseToMatrix4d(const E57Pose& pose)
+{
+    glm::quat quaternion(static_cast<float>(pose.rotation.w),
+                         static_cast<float>(pose.rotation.x),
+                         static_cast<float>(pose.rotation.y),
+                         static_cast<float>(pose.rotation.z));
+    Matrix4d mat(quaternion);
+    mat[3] = Vector4d(static_cast<float>(pose.translation[0]),
+                      static_cast<float>(pose.translation[1]),
+                      static_cast<float>(pose.translation[2]), 1.0f);
+    return mat;
+}
+
+Matrix4d E57Utils::getPose(const E57Data3D& node)
+{
+    return e57PoseToMatrix4d(node.pose());
+}
+
+Matrix4d E57Utils::getPose(const E57Image2D& node)
+{
+    return e57PoseToMatrix4d(node.pose());
+}

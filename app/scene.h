@@ -32,6 +32,9 @@ public:
     [[nodiscard]] uint32_t id() const;
     [[nodiscard]] std::vector<Ptr>& children();
 
+    [[nodiscard]] const std::string& name() const { return m_name; }
+    void setName(const std::string& name) { m_name = name; }
+
     [[nodiscard]] const std::vector<Ptr>& children() const;
     [[nodiscard]] Matrix4d pose() const;
 
@@ -52,13 +55,16 @@ public:
 
 protected:
     uint32_t m_id;
+    std::string m_name;
     std::vector<Ptr> m_childNodes;
-    Matrix4d m_pose;
     Scene* m_scene;
     SceneNode* m_parent{nullptr};
     BoundingBox m_boundingBox{};
 
     void setScene(Scene* scene);
+
+private:
+    Matrix4d m_pose{IdentityMatrix4d};
 };
 
 class Scene
@@ -97,9 +103,13 @@ public:
     void setDevicePixelRatio(float value) { m_devicePixelRatio = value; }
     [[nodiscard]] float devicePixelRatio() const { return m_devicePixelRatio; }
 
+    const Matrix4d& getPose() const;
+    void setPose(const Matrix4d& pose);
+
 private:
     BufferCache m_bufferCache;
     std::vector<SceneNode::Ptr> m_nodes;
+    Matrix4d m_pose{IdentityMatrix4d};
 
     float m_devicePixelRatio{1.0};
 };

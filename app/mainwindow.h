@@ -37,6 +37,7 @@ private slots:
     void tabWidget_currentChanged(int index);
     void twMain_itemDoubleClicked(QTreeWidgetItem* item, int column);
     void twViewProperties_itemChanged(QTreeWidgetItem* item, int column);
+    void sceneView_itemDropped(SceneView* sender, QObject* source);
 
 private:
     Ui::MainWindow* ui;

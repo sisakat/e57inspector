@@ -62,6 +62,7 @@ Matrix4d SceneNode::pose() const
         result = parent->m_pose * result;
         parent = parent->parent();
     }
+    result = scene()->getPose() * result;
     return result;
 }
 
@@ -116,10 +117,10 @@ uint32_t SceneNode::id() const
 
 BoundingBox SceneNode::boundingBox() const
 {
-    BoundingBox result{m_boundingBox};
+    BoundingBox result{m_boundingBox.transform(pose())};
     for (const auto& child : m_childNodes)
     {
-        auto bb = child->boundingBox().transform(m_pose);
+        auto bb = child->boundingBox();
         result = result.combine(bb);
     }
     return result;
@@ -195,4 +196,14 @@ void Scene::removeNode(SceneNode* node)
     std::queue<SceneNode*> nodes;
 
     std::erase_if(m_nodes, [node](auto& ptr) { return ptr.get() == node; });
+}
+
+const Matrix4d& Scene::getPose() const
+{
+    return m_pose;
+}
+
+void Scene::setPose(const Matrix4d& pose)
+{
+    m_pose = pose;
 }

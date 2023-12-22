@@ -21,31 +21,33 @@ public:
     void render2D(QPainter& painter) override;
     void configureShader() override;
 
-    void setImage2D(E57Image2DPtr image2D) { m_image2D = std::move(image2D); }
-
-    void
-    setPinholeRepresentation(E57PinholeRepresentationPtr pinholeRepresentation)
-    {
-        m_pinholeRepresentation = std::move(pinholeRepresentation);
-    }
-
-    E57Image2DPtr image2D() const { return m_image2D; }
-
     void setImage(const QImage& image);
 
     float coneLength() const { return m_coneLength; }
     void setConeLength(float coneLength) { m_coneLength = coneLength; }
 
+    uint32_t getImageWidth() const { return m_imageWidth; }
+    void setImageWidth(uint32_t imageWidth) { m_imageWidth = imageWidth; }
+    uint32_t getImageHeight() const { return m_imageHeight; }
+    void setImageHeight(uint32_t imageHeight) { m_imageHeight = imageHeight; }
+    double getPixelWidth() const { return m_pixelWidth; }
+    void setPixelWidth(double pixelWidth) { m_pixelWidth = pixelWidth; }
+    double getPixelHeight() const { return m_pixelHeight; }
+    void setPixelHeight(double pixelHeight) { m_pixelHeight = pixelHeight; }
+    double getFocalLength() const { return m_focalLength; }
+    void setFocalLength(double focalLength) { m_focalLength = focalLength; }
+
 private:
     Shader m_shader;
-
-    E57Image2DPtr m_image2D;
-    E57PinholeRepresentationPtr m_pinholeRepresentation;
     QImage m_image;
-
     GLuint m_texture;
-
     float m_coneLength{1.0f};
+
+    uint32_t m_imageWidth;
+    uint32_t m_imageHeight;
+    double m_pixelWidth;
+    double m_pixelHeight;
+    double m_focalLength;
 };
 
 #endif // E57INSPECTOR_IMAGE2D_H

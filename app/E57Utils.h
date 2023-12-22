@@ -7,6 +7,8 @@
 #include <e57inspector/E57Reader.h>
 #include <e57inspector/E57Node.h>
 
+#include "geometry.h"
+
 class E57Utils
 {
 public:
@@ -16,12 +18,26 @@ public:
         PNG
     };
 
+    struct ImageParameters
+    {
+        uint32_t width;
+        uint32_t height;
+        double pixelWidth;
+        double pixelHeight;
+        double focalLength;
+        bool isSpherical{false};
+    };
+
     explicit E57Utils(const E57Reader& reader);
 
     std::optional<E57NodePtr> getImageRepresentation(const E57Image2D& image2D) const;
     std::optional<QImage> getImage(const E57Image2D& image2D) const;
     std::optional<uint32_t> getImageBlobId(const E57NodePtr& node) const;
     std::optional<ImageFormat> getImageFormat(const E57NodePtr& node) const;
+    std::optional<ImageParameters> getImageParameters(const E57Image2D& image2D) const;
+
+    static Matrix4d getPose(const E57Data3D& node) ;
+    static Matrix4d getPose(const E57Image2D& node) ;
 
 private:
     const E57Reader& m_reader;

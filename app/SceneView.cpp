@@ -1,7 +1,12 @@
 #include "SceneView.h"
+#include "E57TreeNode.h"
+#include "E57Utils.h"
+#include "Image2d.h"
 
 #include <QFile>
+#include <QMimeData>
 #include <QPainter>
+#include <QStandardItemModel>
 #include <queue>
 
 SceneView::SceneView(QWidget* parent) : QOpenGLWidget(parent)
@@ -17,6 +22,8 @@ SceneView::SceneView(QWidget* parent) : QOpenGLWidget(parent)
     format.setOption(QSurfaceFormat::DebugContext);
 #endif
     setFormat(format);
+
+    setAcceptDrops(true);
 }
 
 SceneView::~SceneView() = default;
@@ -120,4 +127,22 @@ void SceneView::setupScene()
     m_camera = std::make_shared<Camera>();
     m_scene->setDevicePixelRatio(static_cast<float>(devicePixelRatio()));
     m_scene->addNode(m_camera);
+}
+
+void SceneView::dragEnterEvent(QDragEnterEvent* event)
+{
+    if (event->mimeData()->hasFormat(
+            "application/x-qabstractitemmodeldatalist"))
+    {
+        event->accept();
+    }
+}
+
+void SceneView::dropEvent(QDropEvent* event)
+{
+    event->acceptProposedAction();
+    if (event->source())
+    {
+        emit itemDropped(this, event->source());
+    }
 }

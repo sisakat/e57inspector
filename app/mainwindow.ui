@@ -73,6 +73,9 @@
            <property name="frameShadow">
             <enum>QFrame::Sunken</enum>
            </property>
+           <property name="dragDropMode">
+            <enum>QAbstractItemView::DragOnly</enum>
+           </property>
            <property name="alternatingRowColors">
             <bool>false</bool>
            </property>

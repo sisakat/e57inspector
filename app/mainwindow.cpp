@@ -151,6 +151,41 @@ void MainWindow::twViewProperties_itemChanged(QTreeWidgetItem* item, int column)
     }
 }
 
+void MainWindow::sceneView_itemDropped(SceneView* sender, QObject* source)
+{
+    auto* treeWidget = dynamic_cast<QTreeWidget*>(source);
+    if (!treeWidget)
+        return;
+    if (auto* nodeImage2D =
+            dynamic_cast<TNodeImage2D*>(treeWidget->currentItem()))
+    {
+        Image2d::Ptr image2d = std::make_shared<Image2d>();
+        image2d->setName(nodeImage2D->node()->name());
+
+        auto e57NodeImage2D =
+            std::dynamic_pointer_cast<E57Image2D>(nodeImage2D->node());
+
+        E57Utils utils(*m_reader);
+        auto image = utils.getImage(*e57NodeImage2D);
+        if (!image)
+            return;
+        image2d->setImage(*image);
+        auto imageParameters = utils.getImageParameters(*e57NodeImage2D);
+        if (!imageParameters || imageParameters->isSpherical)
+            return;
+        image2d->setImageWidth(imageParameters->width);
+        image2d->setImageHeight(imageParameters->height);
+        image2d->setPixelWidth(imageParameters->pixelWidth);
+        image2d->setPixelHeight(imageParameters->pixelHeight);
+        image2d->setFocalLength(imageParameters->focalLength);
+        image2d->setPose(E57Utils::getPose(*e57NodeImage2D));
+        sender->scene().addNode(image2d);
+    }
+
+    sender->update();
+    ui->twScene->init(sender->scene());
+}
+
 void MainWindow::openImage(const E57Image2D& node, const std::string& tabName)
 {
     auto image = E57Utils(*m_reader).getImage(node);
@@ -178,9 +213,13 @@ void MainWindow::openPointCloud(const E57NodePtr& node,
     if (!sceneView)
     {
         sceneView = new SceneView(ui->tabWidget);
+        connect(sceneView, &SceneView::itemDropped, this,
+                &MainWindow::sceneView_itemDropped);
         int tabIndex =
             ui->tabWidget->addTab(sceneView, QString::fromStdString(tabName));
         ui->tabWidget->setCurrentIndex(tabIndex);
+        sceneView->scene().setPose(
+            InverseMatrix(E57Utils::getPose(*e57Data3D)));
     }
     else
     {
@@ -269,16 +308,7 @@ void MainWindow::openPointCloud(const E57NodePtr& node,
         totalCount += count;
     }
 
-    const auto& pose = e57Data3D->pose();
-    glm::quat quaternion(static_cast<float>(pose.rotation.w),
-                         static_cast<float>(pose.rotation.x),
-                         static_cast<float>(pose.rotation.y),
-                         static_cast<float>(pose.rotation.z));
-    Matrix4d sop(quaternion);
-    sop[3] = Vector4d(static_cast<float>(pose.translation[0]),
-                      static_cast<float>(pose.translation[1]),
-                      static_cast<float>(pose.translation[2]), 1.0f);
-    pointCloud->setSOP(sop);
+    pointCloud->setPose(E57Utils::getPose(*e57Data3D));
 
     for (auto& node : sceneView->scene().nodes())
     {
@@ -294,58 +324,6 @@ void MainWindow::openPointCloud(const E57NodePtr& node,
     pointCloud->doneInserting();
     sceneView->scene().addNode(pointCloud);
 
-    ui->twScene->init(sceneView->scene());
-}
-
-void MainWindow::openPinholeRepresentation3d(
-    const E57Image2DPtr& image2D,
-    const E57PinholeRepresentationPtr& pinholeRepresentation)
-{
-    const auto tabName = image2D->name();
-
-    auto* sceneView = findSceneView();
-    if (!sceneView)
-    {
-        sceneView = new SceneView(ui->tabWidget);
-        int tabIndex =
-            ui->tabWidget->addTab(sceneView, QString::fromStdString(tabName));
-        ui->tabWidget->setCurrentIndex(tabIndex);
-    }
-    else
-    {
-        ui->tabWidget->setCurrentWidget(sceneView);
-        ui->tabWidget->setTabText(ui->tabWidget->currentIndex(),
-                                  QString("Combined View"));
-    }
-
-    sceneView->makeCurrent();
-    Image2d::Ptr image2d = std::make_shared<Image2d>();
-
-    const auto& pose = image2D->pose();
-    glm::quat quaternion(static_cast<float>(pose.rotation.w),
-                         static_cast<float>(pose.rotation.x),
-                         static_cast<float>(pose.rotation.y),
-                         static_cast<float>(pose.rotation.z));
-    Matrix4d sop(quaternion);
-    sop[3] = Vector4d(static_cast<float>(pose.translation[0]),
-                      static_cast<float>(pose.translation[1]),
-                      static_cast<float>(pose.translation[2]), 1.0f);
-
-    for (auto& node : sceneView->scene().nodes())
-    {
-        if (std::dynamic_pointer_cast<PointCloud>(node))
-        {
-            auto firstPointCloud = std::dynamic_pointer_cast<PointCloud>(node);
-            image2d->setPose(InverseMatrix(firstPointCloud->sop()) * sop);
-            break;
-        }
-    }
-
-    image2d->setImage2D(image2D);
-    image2d->setPinholeRepresentation(pinholeRepresentation);
-    image2d->setImage(
-        E57Utils(*m_reader).getImage(*image2D).value_or(QImage()));
-    sceneView->scene().addNode(image2d);
     ui->twScene->init(sceneView->scene());
 }
 

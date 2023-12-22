@@ -19,23 +19,12 @@ void Image2d::render()
         camera->configureShader();
     }
 
-    if (!m_pinholeRepresentation)
-    {
-        return;
-    }
-
-    int imageWidth = m_pinholeRepresentation->getInteger("imageWidth");
-    int imageHeight = m_pinholeRepresentation->getInteger("imageHeight");
-    double pixelWidth = m_pinholeRepresentation->getDouble("pixelWidth");
-    double pixelHeight = m_pinholeRepresentation->getDouble("pixelHeight");
-    double focalLength = m_pinholeRepresentation->getDouble("focalLength");
-
-    double imageWidthMeter = imageWidth * pixelWidth;
-    double imageHeightMeter = imageHeight * pixelHeight;
+    double imageWidthMeter = m_imageWidth * m_pixelWidth;
+    double imageHeightMeter = m_imageHeight * m_pixelHeight;
     double coneLength = m_coneLength;
 
-    double tanX = (imageWidthMeter / 2.0) / focalLength;
-    double tanY = (imageHeightMeter / 2.0) / focalLength;
+    double tanX = (imageWidthMeter / 2.0) / m_focalLength;
+    double tanY = (imageHeightMeter / 2.0) / m_focalLength;
 
     std::vector<Vector3d> lines{
         {0.0f, 0.0f, 0.0f},
@@ -140,7 +129,7 @@ void Image2d::render2D(QPainter& painter)
         return;
 
     auto origin = Vector4d(0.0f, 0.0f, 0.0f, 1.0f);
-    origin = m_pose * origin;
+    origin = pose() * origin;
     auto positionScreen = camera->project(origin);
 
     if (positionScreen.z < 1.0f)
@@ -157,7 +146,7 @@ void Image2d::render2D(QPainter& painter)
         painter.drawText(
             static_cast<int>(positionScreen.x) + 10,
             static_cast<int>(camera->viewportHeight() - 1 - positionScreen.y),
-            QString::fromStdString(m_image2D->name()));
+            QString::fromStdString(name()));
     }
 }
 

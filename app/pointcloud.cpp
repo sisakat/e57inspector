@@ -42,7 +42,7 @@ void PointCloud::render2D(QPainter& painter)
         return;
 
     auto origin = Vector4d(0.0f, 0.0f, 0.0f, 1.0f);
-    origin = m_pose * origin;
+    origin = pose() * origin;
     auto positionScreen = camera->project(origin);
 
     if (positionScreen.z < 1.0f)
