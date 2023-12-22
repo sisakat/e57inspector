@@ -84,7 +84,9 @@ add_executable(${PROJECT_NAME}
         boundingbox.h
         geometry.h
         Image2d.cpp
-        Image2d.h)
+        Image2d.h
+        E57Utils.cpp
+        E57Utils.h)
 target_link_libraries(${PROJECT_NAME} PRIVATE
         E57Format
         Qt6::Widgets
