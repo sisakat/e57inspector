@@ -51,7 +51,6 @@ public:
         m_constrainedCamera = constrained;
         m_position = NullPoint4d;
         m_center = Vector4d(X_AXIS, 1.0f);
-        ;
         m_up = Vector4d(Z_AXIS, 0.0f);
     }
 
