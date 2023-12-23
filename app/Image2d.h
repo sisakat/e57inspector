@@ -37,11 +37,15 @@ public:
     double getFocalLength() const { return m_focalLength; }
     void setFocalLength(double focalLength) { m_focalLength = focalLength; }
 
+    bool isVisible() const;
+    void setVisible(bool visible);
+
 private:
     Shader m_shader;
     QImage m_image;
     GLuint m_texture;
     float m_coneLength{1.0f};
+    bool m_visible{true};
 
     uint32_t m_imageWidth;
     uint32_t m_imageHeight;

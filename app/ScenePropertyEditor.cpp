@@ -107,6 +107,10 @@ void ScenePropertyEditor::initFromImage2d()
     auto* coneLength = new CDoubleProperty(
         "coneLength", "Cone Length", image2d->coneLength(), 1.0, 0.01, 1000.0);
     add(coneLength);
+
+    auto* visible =
+        new CBoolProperty("visible", "Visible", image2d->isVisible(), true);
+    add(visible);
 }
 
 void ScenePropertyEditor::changeFromCamera(QTreeWidgetItem* item)
@@ -159,5 +163,11 @@ void ScenePropertyEditor::changeFromImage2d(QTreeWidgetItem* item)
     if (coneLength)
     {
         image2d->setConeLength(static_cast<float>(*coneLength));
+    }
+
+    auto visible = getBooleanValue(item, "visible");
+    if (visible)
+    {
+        image2d->setVisible(*visible);
     }
 }

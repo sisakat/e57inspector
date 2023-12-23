@@ -9,6 +9,8 @@ Image2d::Image2d(SceneNode* parent)
 
 void Image2d::render()
 {
+    if (!isVisible()) return;
+
     SceneNode::render();
     m_shader.use();
     configureShader();
@@ -123,6 +125,8 @@ void Image2d::render()
 
 void Image2d::render2D(QPainter& painter)
 {
+    if (!isVisible()) return;
+
     SceneNode::render2D(painter);
     auto* camera = scene()->findNode<Camera>();
     if (!camera)
@@ -182,4 +186,14 @@ Image2d::~Image2d()
     {
         glDeleteTextures(1, &m_texture);
     }
+}
+
+bool Image2d::isVisible() const
+{
+    return m_visible;
+}
+
+void Image2d::setVisible(bool visible)
+{
+    m_visible = visible;
 }
