@@ -45,6 +45,20 @@ public:
     bool isVisible() const;
     void setVisible(bool visible);
 
+    bool isShowCoordinateSystemAxes() const { return m_showCoordinateSystemAxes; }
+    void setShowCoordinateSystemAxes(bool showCoordinateAxes)
+    {
+        m_showCoordinateSystemAxes = showCoordinateAxes;
+        ++m_revision;
+    }
+
+    int getSegments() const { return m_segments; }
+    void setSegments(int segments)
+    {
+        m_segments = segments;
+        ++m_revision;
+    }
+
     bool isSpherical() const { return m_isSpherical; }
     void setIsSpherical(bool isSpherical)
     {
@@ -58,6 +72,7 @@ private:
     GLuint m_texture;
     float m_coneLength{1.0f};
     bool m_visible{true};
+    bool m_showCoordinateSystemAxes{true};
     int m_lastRevision{-1};
     int m_revision{0};
     int m_segments{20};

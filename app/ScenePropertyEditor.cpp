@@ -111,6 +111,15 @@ void ScenePropertyEditor::initFromImage2d()
     auto* visible =
         new CBoolProperty("visible", "Visible", image2d->isVisible(), true);
     add(visible);
+
+    auto* showCoordinateSystemAxes =
+        new CBoolProperty("showCoordinateSystemAxes", "Show Axes",
+                          image2d->isShowCoordinateSystemAxes(), true);
+    add(showCoordinateSystemAxes);
+
+    auto* segments = new CIntegerProperty("segments", "Segments",
+                                          image2d->getSegments(), 20, 4, 1000);
+    add(segments);
 }
 
 void ScenePropertyEditor::changeFromCamera(QTreeWidgetItem* item)
@@ -169,5 +178,18 @@ void ScenePropertyEditor::changeFromImage2d(QTreeWidgetItem* item)
     if (visible)
     {
         image2d->setVisible(*visible);
+    }
+
+    auto showCoordinateSystemAxes =
+        getBooleanValue(item, "showCoordinateSystemAxes");
+    if (showCoordinateSystemAxes)
+    {
+        image2d->setShowCoordinateSystemAxes(*showCoordinateSystemAxes);
+    }
+
+    auto segments = getIntegerValue(item, "segments");
+    if (segments)
+    {
+        image2d->setSegments(*segments);
     }
 }

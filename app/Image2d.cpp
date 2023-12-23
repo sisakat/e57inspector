@@ -213,6 +213,22 @@ void Image2d::createViewConeLines()
     data.push_back({{tanX * m_coneLength,  tanY * m_coneLength, -m_coneLength}, rgb, tex});
     // clang-format on
 
+    if (m_showCoordinateSystemAxes)
+    {
+        Vector3d red{1.0f, 0.0f, 0.0f};
+        Vector3d green{0.0f, 1.0f, 0.0f};
+        Vector3d blue{0.0f, 0.0f, 1.0f};
+
+        data.push_back({NullPoint3d, red, tex});
+        data.push_back({X_AXIS, red, tex});
+
+        data.push_back({NullPoint3d, green, tex});
+        data.push_back({Y_AXIS, green, tex});
+
+        data.push_back({NullPoint3d, blue, tex});
+        data.push_back({Z_AXIS, blue, tex});
+    }
+
     m_lineBuffer = std::make_shared<OpenGLArrayBuffer>(
         data.data(), GL_FLOAT, 3 + 3 + 2, data.size(), GL_STATIC_DRAW);
 }
@@ -323,18 +339,21 @@ void Image2d::createViewConeLinesSpherical()
         }
     }
 
-    Vector3d red{1.0f, 0.0f, 0.0f};
-    Vector3d green{0.0f, 1.0f, 0.0f};
-    Vector3d blue{0.0f, 0.0f, 1.0f};
+    if (m_showCoordinateSystemAxes)
+    {
+        Vector3d red{1.0f, 0.0f, 0.0f};
+        Vector3d green{0.0f, 1.0f, 0.0f};
+        Vector3d blue{0.0f, 0.0f, 1.0f};
 
-    data.push_back({NullPoint3d, red, tex});
-    data.push_back({{m_coneLength, 0.0f, 0.0f}, red, tex});
+        data.push_back({NullPoint3d, red, tex});
+        data.push_back({X_AXIS, red, tex});
 
-    data.push_back({NullPoint3d, green, tex});
-    data.push_back({{0.0f, m_coneLength, 0.0f}, green, tex});
+        data.push_back({NullPoint3d, green, tex});
+        data.push_back({Y_AXIS, green, tex});
 
-    data.push_back({NullPoint3d, blue, tex});
-    data.push_back({{0.0f, 0.0f, m_coneLength}, blue, tex});
+        data.push_back({NullPoint3d, blue, tex});
+        data.push_back({Z_AXIS, blue, tex});
+    }
 
     m_lineBuffer = std::make_shared<OpenGLArrayBuffer>(
         data.data(), GL_FLOAT, 3 + 3 + 2, data.size(), GL_STATIC_DRAW);

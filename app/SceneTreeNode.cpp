@@ -45,7 +45,14 @@ SceneImage2dTreeNode::SceneImage2dTreeNode(Image2d* image2d)
     : m_image2d(image2d)
 {
     setText(0, QString::fromStdString(m_image2d->name()));
-    setIcon(0, QIcon(":/icons/Image.png"));
+    if (m_image2d->isSpherical())
+    {
+        setIcon(0, QIcon(":/icons/Spherical.png"));
+    }
+    else
+    {
+        setIcon(0, QIcon(":/icons/Image.png"));
+    }
 }
 
 SceneNode* SceneImage2dTreeNode::sceneNode()
