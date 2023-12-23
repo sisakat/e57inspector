@@ -1,4 +1,5 @@
 #include "pointcloud.h"
+#include "ShaderFactory.h"
 #include "camera.h"
 
 #include <queue>
@@ -6,8 +7,8 @@
 
 PointCloud::PointCloud(SceneNode* parent, E57Data3DPtr data3D)
     : SceneNode(parent), m_data3D(std::move(data3D)), m_octree(),
-      m_shader(":/shaders/default_vertex.glsl",
-               ":/shaders/default_fragment.glsl")
+      m_shader(ShaderFactory::createShader(":/shaders/default_vertex.glsl",
+                                           ":/shaders/default_fragment.glsl"))
 {
 }
 
@@ -16,7 +17,7 @@ PointCloud::~PointCloud() = default;
 void PointCloud::render()
 {
     SceneNode::render();
-    m_shader.use();
+    m_shader->use();
 
     if (!visible())
         return;
@@ -32,7 +33,7 @@ void PointCloud::render()
     {
         child->render();
     }
-    m_shader.release();
+    m_shader->release();
 }
 
 void PointCloud::render2D(QPainter& painter)

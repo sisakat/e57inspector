@@ -1,18 +1,21 @@
 #include "Image2d.h"
+#include "ShaderFactory.h"
 #include "camera.h"
 
 Image2d::Image2d(SceneNode* parent)
     : SceneNode(parent),
-      m_shader(":/shaders/line_vertex.glsl", ":/shaders/line_fragment.glsl")
+      m_shader(ShaderFactory::createShader(":/shaders/line_vertex.glsl",
+                                           ":/shaders/line_fragment.glsl"))
 {
 }
 
 void Image2d::render()
 {
-    if (!isVisible()) return;
+    if (!isVisible())
+        return;
 
     SceneNode::render();
-    m_shader.use();
+    m_shader->use();
     configureShader();
 
     auto* camera = scene()->findNode<Camera>();
@@ -120,12 +123,13 @@ void Image2d::render()
         glDeleteVertexArrays(1, &vao);
     }
 
-    m_shader.release();
+    m_shader->release();
 }
 
 void Image2d::render2D(QPainter& painter)
 {
-    if (!isVisible()) return;
+    if (!isVisible())
+        return;
 
     SceneNode::render2D(painter);
     auto* camera = scene()->findNode<Camera>();

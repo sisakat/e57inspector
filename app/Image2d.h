@@ -41,7 +41,7 @@ public:
     void setVisible(bool visible);
 
 private:
-    Shader m_shader;
+    Shader::Ptr m_shader;
     QImage m_image;
     GLuint m_texture;
     float m_coneLength{1.0f};

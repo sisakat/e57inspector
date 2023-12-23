@@ -86,7 +86,9 @@ add_executable(${PROJECT_NAME}
         Image2d.cpp
         Image2d.h
         E57Utils.cpp
-        E57Utils.h)
+        E57Utils.h
+        ShaderFactory.cpp
+        ShaderFactory.h)
 target_link_libraries(${PROJECT_NAME} PRIVATE
         E57Format
         Qt6::Widgets

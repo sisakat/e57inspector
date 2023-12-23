@@ -49,7 +49,7 @@ private:
     PointCloudViewType m_viewType{PointCloudViewType::COLOR};
     QColor m_singleColor;
     bool m_visible{true};
-    Shader m_shader;
+    Shader::Ptr m_shader;
 };
 
 class PointCloudOctreeNode : public SceneNode
