@@ -183,6 +183,7 @@ void MainWindow::sceneView_itemDropped(SceneView* sender, QObject* source)
             if (imageParameters->isSpherical)
             {
                 image2d->setFocalLength(1.0);
+                image2d->setIsSpherical(true);
             }
             sender->scene().addNode(image2d);
         }

@@ -45,6 +45,13 @@ public:
     bool isVisible() const;
     void setVisible(bool visible);
 
+    bool isSpherical() const { return m_isSpherical; }
+    void setIsSpherical(bool isSpherical)
+    {
+        m_isSpherical = isSpherical;
+        ++m_revision;
+    }
+
 private:
     Shader::Ptr m_shader;
     QImage m_image;
@@ -53,6 +60,7 @@ private:
     bool m_visible{true};
     int m_lastRevision{-1};
     int m_revision{0};
+    int m_segments{20};
 
     OpenGLArrayBuffer::Ptr m_lineBuffer;
     OpenGLArrayBuffer::Ptr m_triangleBuffer;
@@ -62,6 +70,7 @@ private:
     double m_pixelWidth;
     double m_pixelHeight;
     double m_focalLength;
+    bool m_isSpherical{false};
 
     struct VertexData
     {
@@ -73,7 +82,8 @@ private:
     void createBuffers();
     void createViewConeLines();
     void createViewConeImage();
-
+    void createViewConeLinesSpherical();
+    void createViewConeImageSpherical();
 };
 
 #endif // E57INSPECTOR_IMAGE2D_H
