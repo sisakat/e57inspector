@@ -29,6 +29,8 @@ MainWindow::MainWindow(QWidget* parent)
             &MainWindow::actionClose_triggered);
     connect(ui->actionAbout, &QAction::triggered, this,
             &MainWindow::actionAbout_triggered);
+    connect(ui->actionCamera_Top, &QAction::triggered, this,
+            &MainWindow::actionCamera_Top_triggered);
     connect(ui->twMain, &E57Tree::nodeSelected, this,
             &MainWindow::twMain_nodeSelected);
     connect(ui->tabWidget, &QTabWidget::tabCloseRequested, this,
@@ -64,6 +66,20 @@ void MainWindow::actionAbout_triggered()
     auto* about = new About(this);
     about->setModal(true);
     about->show();
+}
+
+void MainWindow::actionCamera_Top_triggered()
+{
+    auto sceneView = findSceneView();
+    if (sceneView)
+    {
+        auto camera = sceneView->scene().findNode<Camera>();
+        if (camera)
+        {
+            camera->topView();
+        }
+        sceneView->update();
+    }
 }
 
 void MainWindow::openFile()

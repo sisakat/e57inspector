@@ -32,7 +32,7 @@ void Camera::configureShader()
     m_view =
         glm::lookAt(Vector3d(m_position), Vector3d(m_center), Vector3d(m_up));
     updateNearFar();
-    m_projection = glm::perspective(deg2rad(m_fieldOfView) / 2.0f,
+    m_projection = glm::perspective(deg2rad(m_fieldOfView),
                                     1.0f * m_viewportWidth / m_viewportHeight,
                                     m_near, m_far);
 
@@ -331,4 +331,26 @@ Vector2d Camera::pickpoint() const
     return {static_cast<int>(projectedPickpoint.x),
             static_cast<int>(m_viewportHeight - 1 -
                              static_cast<int>(projectedPickpoint.y))};
+}
+
+void Camera::topView()
+{
+    auto bb = scene()->boundingBox();
+    Vector3d bbCenter = (bb.min + bb.max) / 2.0f; // Bounding box center point
+    Vector3d bbExtents =
+        (bb.max - bb.min) / 2.0f; // Bounding box half width and height
+
+    float aspect = 1.0f * m_viewportWidth / m_viewportHeight;
+    float tanVfov2 = std::tan(deg2rad(m_fieldOfView) / 2.0f);
+    float tanHfov2 = tanVfov2 * aspect;
+
+    // find height above bb center point so that the camera frustum sees all
+    // bounding box corners
+    float length1 = bbExtents.y * 1.0f / tanHfov2;
+    float length2 = bbExtents.x * 1.0f / tanVfov2;
+    float length = std::max(length1, length2) + bbExtents.z;
+
+    m_position = Vector4d(bbCenter + Z_AXIS * length, 1.0f);
+    m_center = Vector4d(bbCenter, 1.0f);
+    m_up = Vector4d(X_AXIS, 0.0f);
 }

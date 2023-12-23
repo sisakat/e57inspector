@@ -54,6 +54,8 @@ public:
         m_up = Vector4d(Z_AXIS, 0.0f);
     }
 
+    void topView();
+
 protected:
     void updateNearFar();
 
@@ -76,7 +78,7 @@ private:
     bool m_zooming{false};
     Vector2d m_originalMousePosition;
 
-    float m_fieldOfView{90.0};
+    float m_fieldOfView{45.0};
     float m_near{0.001f};
     float m_far{1000.0f};
 
