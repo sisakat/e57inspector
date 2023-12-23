@@ -24,62 +24,37 @@ void Image2d::render()
         camera->configureShader();
     }
 
-    double imageWidthMeter = m_imageWidth * m_pixelWidth;
-    double imageHeightMeter = m_imageHeight * m_pixelHeight;
-    double coneLength = m_coneLength;
-
-    double tanX = (imageWidthMeter / 2.0) / m_focalLength;
-    double tanY = (imageHeightMeter / 2.0) / m_focalLength;
-
-    std::vector<Vector3d> lines{
-        {0.0f, 0.0f, 0.0f},
-        {tanX * coneLength, tanY * coneLength, -coneLength},
-        {0.0f, 0.0f, 0.0f},
-        {-tanX * coneLength, tanY * coneLength, -coneLength},
-        {0.0f, 0.0f, 0.0f},
-        {tanX * coneLength, -tanY * coneLength, -coneLength},
-        {0.0f, 0.0f, 0.0f},
-        {-tanX * coneLength, -tanY * coneLength, -coneLength},
-
-        {tanX * coneLength, tanY * coneLength, -coneLength},
-        {-tanX * coneLength, tanY * coneLength, -coneLength},
-        {-tanX * coneLength, tanY * coneLength, -coneLength},
-        {-tanX * coneLength, -tanY * coneLength, -coneLength},
-        {-tanX * coneLength, -tanY * coneLength, -coneLength},
-        {tanX * coneLength, -tanY * coneLength, -coneLength},
-        {tanX * coneLength, -tanY * coneLength, -coneLength},
-        {tanX * coneLength, tanY * coneLength, -coneLength}};
-
-    std::vector<Vector3d> triangles{lines.at(7), lines.at(5), lines.at(1),
-                                    lines.at(7), lines.at(1), lines.at(3)};
-
-    std::vector<Vector2d> textureCoordinates{{0.0f, 0.0f}, {1.0f, 0.0f},
-                                             {1.0f, 1.0f}, {0.0f, 0.0f},
-                                             {1.0f, 1.0f}, {0.0f, 1.0f}};
-
     if (auto location = getUniformLocation("useTexture"))
     {
         glUniform1i(location.value(), 0);
     }
 
+    createBuffers();
+
+    auto createVAO = [this](OpenGLArrayBuffer::Ptr& buffer) -> GLuint
+    {
+        GLuint vao;
+        glGenVertexArrays(1, &vao);
+        glBindVertexArray(vao);
+
+        glBindBuffer(GL_ARRAY_BUFFER, buffer->buffer());
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat),
+                              (char*)0);
+        glEnableVertexAttribArray(0);
+
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat),
+                              (char*)0 + 3 * sizeof(GLfloat));
+        glEnableVertexAttribArray(1);
+
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat),
+                              (char*)0 + 6 * sizeof(GLfloat));
+        glEnableVertexAttribArray(2);
+        return vao;
+    };
+
     GLuint vao;
-    GLuint vbo;
-    GLuint vto;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
-
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, lines.size() * 3 * sizeof(GLfloat),
-                 lines.data(), GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat),
-                          (char*)0);
-    glEnableVertexAttribArray(0);
-
-    glDrawArrays(GL_LINES, 0, lines.size());
-
-    glDeleteBuffers(1, &vbo);
+    vao = createVAO(m_lineBuffer);
+    glDrawArrays(GL_LINES, 0, m_lineBuffer->elementCount());
     glDeleteVertexArrays(1, &vao);
 
     if (m_image.sizeInBytes() > 0)
@@ -89,37 +64,15 @@ void Image2d::render()
             glUniform1i(location.value(), 1);
         }
 
-        glGenVertexArrays(1, &vao);
-        glBindVertexArray(vao);
-
-        glGenBuffers(1, &vbo);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, triangles.size() * 3 * sizeof(GLfloat),
-                     triangles.data(), GL_STATIC_DRAW);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat),
-                              (char*)0);
-        glEnableVertexAttribArray(0);
-
-        glGenBuffers(1, &vto);
-        glBindBuffer(GL_ARRAY_BUFFER, vto);
-        glBufferData(GL_ARRAY_BUFFER,
-                     textureCoordinates.size() * 2 * sizeof(GLfloat),
-                     textureCoordinates.data(), GL_STATIC_DRAW);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat),
-                              (char*)0);
-        glEnableVertexAttribArray(1);
-
         if (auto location = getUniformLocation("imageTexture"))
         {
             glUniform1i(location.value(), 0);
         }
 
+        vao = createVAO(m_triangleBuffer);
         glBindTexture(GL_TEXTURE_2D, m_texture);
-        glDrawArrays(GL_TRIANGLES, 0, triangles.size());
+        glDrawArrays(GL_TRIANGLES, 0, m_triangleBuffer->elementCount());
         glBindTexture(GL_TEXTURE_2D, 0);
-
-        glDeleteBuffers(1, &vbo);
-        glDeleteBuffers(1, &vto);
         glDeleteVertexArrays(1, &vao);
     }
 
@@ -200,4 +153,84 @@ bool Image2d::isVisible() const
 void Image2d::setVisible(bool visible)
 {
     m_visible = visible;
+}
+
+void Image2d::createBuffers()
+{
+    if (m_lastRevision < m_revision)
+    {
+        createViewConeLines();
+        createViewConeImage();
+    }
+}
+
+void Image2d::createViewConeLines()
+{
+    std::vector<Image2d::VertexData> data;
+
+    double imageWidthMeter = m_imageWidth * m_pixelWidth;
+    double imageHeightMeter = m_imageHeight * m_pixelHeight;
+
+    double tanX = (imageWidthMeter / 2.0) / m_focalLength;
+    double tanY = (imageHeightMeter / 2.0) / m_focalLength;
+
+    Vector3d rgb{1.0f, 1.0f, 1.0f};
+    Vector2d tex{0.0f, 0.0f};
+
+    // clang-format off
+    // cone lines
+    data.push_back({NullPoint3d, rgb, tex});
+    data.push_back({{ tanX * m_coneLength,  tanY * m_coneLength, -m_coneLength}, rgb, tex});
+
+    data.push_back({NullPoint3d, rgb, tex});
+    data.push_back({{-tanX * m_coneLength,  tanY * m_coneLength, -m_coneLength}, rgb, tex});
+
+    data.push_back({NullPoint3d, rgb, tex});
+    data.push_back({{ tanX * m_coneLength, -tanY * m_coneLength, -m_coneLength}, rgb, tex});
+
+    data.push_back({NullPoint3d, rgb, tex});
+    data.push_back({{-tanX * m_coneLength, -tanY * m_coneLength, -m_coneLength}, rgb, tex});
+
+    // image rectangle
+    data.push_back({{ tanX * m_coneLength, tanY * m_coneLength, -m_coneLength}, rgb, tex});
+    data.push_back({{-tanX * m_coneLength, tanY * m_coneLength, -m_coneLength}, rgb, tex});
+
+    data.push_back({{-tanX * m_coneLength,  tanY * m_coneLength, -m_coneLength}, rgb, tex});
+    data.push_back({{-tanX * m_coneLength, -tanY * m_coneLength, -m_coneLength}, rgb, tex});
+
+    data.push_back({{-tanX * m_coneLength, -tanY * m_coneLength, -m_coneLength}, rgb, tex});
+    data.push_back({{ tanX * m_coneLength, -tanY * m_coneLength, -m_coneLength}, rgb, tex});
+
+    data.push_back({{tanX * m_coneLength, -tanY * m_coneLength, -m_coneLength}, rgb, tex});
+    data.push_back({{tanX * m_coneLength,  tanY * m_coneLength, -m_coneLength}, rgb, tex});
+    // clang-format on
+
+    m_lineBuffer = std::make_shared<OpenGLArrayBuffer>(
+        data.data(), GL_FLOAT, 3 + 3 + 2, data.size(), GL_STATIC_DRAW);
+}
+
+void Image2d::createViewConeImage()
+{
+    std::vector<Image2d::VertexData> data;
+
+    double imageWidthMeter = m_imageWidth * m_pixelWidth;
+    double imageHeightMeter = m_imageHeight * m_pixelHeight;
+
+    double tanX = (imageWidthMeter / 2.0) / m_focalLength;
+    double tanY = (imageHeightMeter / 2.0) / m_focalLength;
+
+    Vector3d rgb{1.0f, 1.0f, 1.0f};
+
+    // clang-format off
+    data.push_back({{-tanX * m_coneLength, -tanY * m_coneLength, -m_coneLength}, rgb, {0.0f, 0.0f}});
+    data.push_back({{tanX * m_coneLength, -tanY * m_coneLength, -m_coneLength}, rgb, {1.0f, 0.0f}});
+    data.push_back({{tanX * m_coneLength, tanY * m_coneLength, -m_coneLength}, rgb, {1.0f, 1.0f}});
+
+    data.push_back({{-tanX * m_coneLength, -tanY * m_coneLength, -m_coneLength}, rgb, {0.0f, 0.0f}});
+    data.push_back({{tanX * m_coneLength, tanY * m_coneLength, -m_coneLength}, rgb, {1.0f, 1.0f}});
+    data.push_back({{-tanX * m_coneLength, tanY * m_coneLength, -m_coneLength}, rgb, {0.0f, 1.0f}});
+    // clang-format on
+
+    m_triangleBuffer = std::make_shared<OpenGLArrayBuffer>(
+        data.data(), GL_FLOAT, 3 + 3 + 2, data.size(), GL_STATIC_DRAW);
 }

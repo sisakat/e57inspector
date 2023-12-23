@@ -1,6 +1,7 @@
 #ifndef E57INSPECTOR_IMAGE2D_H
 #define E57INSPECTOR_IMAGE2D_H
 
+#include "openglarraybuffer.h"
 #include "scene.h"
 #include "shader.h"
 #include <e57inspector/E57Node.h>
@@ -24,7 +25,11 @@ public:
     void setImage(const QImage& image);
 
     float coneLength() const { return m_coneLength; }
-    void setConeLength(float coneLength) { m_coneLength = coneLength; }
+    void setConeLength(float coneLength)
+    {
+        m_coneLength = coneLength;
+        ++m_revision;
+    }
 
     uint32_t getImageWidth() const { return m_imageWidth; }
     void setImageWidth(uint32_t imageWidth) { m_imageWidth = imageWidth; }
@@ -46,12 +51,29 @@ private:
     GLuint m_texture;
     float m_coneLength{1.0f};
     bool m_visible{true};
+    int m_lastRevision{-1};
+    int m_revision{0};
+
+    OpenGLArrayBuffer::Ptr m_lineBuffer;
+    OpenGLArrayBuffer::Ptr m_triangleBuffer;
 
     uint32_t m_imageWidth;
     uint32_t m_imageHeight;
     double m_pixelWidth;
     double m_pixelHeight;
     double m_focalLength;
+
+    struct VertexData
+    {
+        Vector3d xyz;
+        Vector3d rgb;
+        Vector2d tex;
+    };
+
+    void createBuffers();
+    void createViewConeLines();
+    void createViewConeImage();
+
 };
 
 #endif // E57INSPECTOR_IMAGE2D_H
