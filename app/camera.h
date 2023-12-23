@@ -49,8 +49,9 @@ public:
     void setConstrained(bool constrained)
     {
         m_constrainedCamera = constrained;
-        m_position = Vector4d(X_AXIS, 1.0f);
-        m_center = NullPoint4d;
+        m_position = NullPoint4d;
+        m_center = Vector4d(X_AXIS, 1.0f);
+        ;
         m_up = Vector4d(Z_AXIS, 0.0f);
     }
 
@@ -58,8 +59,8 @@ protected:
     void updateNearFar();
 
 private:
-    Vector4d m_position{1.0f, 0.0f, 0.0f, 1.0f};
-    Vector4d m_center{0.0f, 0.0f, 0.0f, 1.0f};
+    Vector4d m_position{0.0f, 0.0f, 0.0f, 1.0f};
+    Vector4d m_center{1.0f, 0.0f, 0.0f, 1.0f};
     Vector4d m_up{0.0f, 0.0f, 1.0f, 0.0f};
     Vector4d m_pickpoint{0.0f, 0.0f, 0.0f, 1.0f};
 
