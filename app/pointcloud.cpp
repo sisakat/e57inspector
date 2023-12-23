@@ -38,6 +38,9 @@ void PointCloud::render()
 
 void PointCloud::render2D(QPainter& painter)
 {
+    if (!visible())
+        return;
+    
     auto* camera = scene()->findNode<Camera>();
     if (!camera)
         return;
