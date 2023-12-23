@@ -172,7 +172,7 @@ void MainWindow::sceneView_itemDropped(SceneView* sender, QObject* source)
                 return;
             image2d->setImage(*image);
             auto imageParameters = utils.getImageParameters(*e57NodeImage2D);
-            if (!imageParameters || imageParameters->isSpherical)
+            if (!imageParameters)
                 return;
             image2d->setImageWidth(imageParameters->width);
             image2d->setImageHeight(imageParameters->height);
@@ -180,6 +180,10 @@ void MainWindow::sceneView_itemDropped(SceneView* sender, QObject* source)
             image2d->setPixelHeight(imageParameters->pixelHeight);
             image2d->setFocalLength(imageParameters->focalLength);
             image2d->setPose(E57Utils::getPose(*e57NodeImage2D));
+            if (imageParameters->isSpherical)
+            {
+                image2d->setFocalLength(1.0);
+            }
             sender->scene().addNode(image2d);
         }
     }
