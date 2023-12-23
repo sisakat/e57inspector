@@ -323,11 +323,25 @@ void Image2d::createViewConeLinesSpherical()
         }
     }
 
+    Vector3d red{1.0f, 0.0f, 0.0f};
+    Vector3d green{0.0f, 1.0f, 0.0f};
+    Vector3d blue{0.0f, 0.0f, 1.0f};
+
+    data.push_back({NullPoint3d, red, tex});
+    data.push_back({{m_coneLength, 0.0f, 0.0f}, red, tex});
+
+    data.push_back({NullPoint3d, green, tex});
+    data.push_back({{0.0f, m_coneLength, 0.0f}, green, tex});
+
+    data.push_back({NullPoint3d, blue, tex});
+    data.push_back({{0.0f, 0.0f, m_coneLength}, blue, tex});
+
     m_lineBuffer = std::make_shared<OpenGLArrayBuffer>(
         data.data(), GL_FLOAT, 3 + 3 + 2, data.size(), GL_STATIC_DRAW);
 }
 
-void Image2d::createViewConeImageSpherical() {
+void Image2d::createViewConeImageSpherical()
+{
     std::vector<Image2d::VertexData> data;
 
     double imageWidthRadians = m_imageWidth * m_pixelWidth;
@@ -370,14 +384,18 @@ void Image2d::createViewConeImageSpherical() {
         double theta = -imageHeightRadians / 2.0;
 
         Vector3d rtp{m_coneLength, theta, phi};
-        data.push_back({polarToCartesian(rtp), rgb, {1.0 - 1.0f/m_segments * i, 0.0f}});
+        data.push_back(
+            {polarToCartesian(rtp), rgb, {1.0 - 1.0f / m_segments * i, 0.0f}});
 
         rtp = {m_coneLength, -theta, phi};
-        data.push_back({polarToCartesian(rtp), rgb, {1.0 - 1.0f/m_segments * i, 1.0f}});
+        data.push_back(
+            {polarToCartesian(rtp), rgb, {1.0 - 1.0f / m_segments * i, 1.0f}});
         if (i < m_segments)
         {
             rtp = {m_coneLength, theta, phi};
-            data.push_back({polarToCartesian(rtp), rgb, {1.0 - 1.0f/m_segments * i, 0.0f}});
+            data.push_back({polarToCartesian(rtp),
+                            rgb,
+                            {1.0 - 1.0f / m_segments * i, 0.0f}});
         }
     }
 
@@ -390,15 +408,20 @@ void Image2d::createViewConeImageSpherical() {
         double theta = -imageHeightRadians / 2.0;
 
         rtp = {m_coneLength, -theta, phi};
-        data.push_back({polarToCartesian(rtp), rgb, {1.0 - 1.0f/m_segments * i, 1.0f}});
+        data.push_back(
+            {polarToCartesian(rtp), rgb, {1.0 - 1.0f / m_segments * i, 1.0f}});
 
         Vector3d rtp{m_coneLength, theta, phi - increment};
-        data.push_back({polarToCartesian(rtp), rgb, {1.0 - 1.0f/m_segments * (i-1), 0.0f}});
+        data.push_back({polarToCartesian(rtp),
+                        rgb,
+                        {1.0 - 1.0f / m_segments * (i - 1), 0.0f}});
 
         if (i < m_segments)
         {
             rtp = {m_coneLength, -theta, phi};
-            data.push_back({polarToCartesian(rtp), rgb, {1.0 - 1.0f/m_segments * i, 1.0f}});
+            data.push_back({polarToCartesian(rtp),
+                            rgb,
+                            {1.0 - 1.0f / m_segments * i, 1.0f}});
         }
     }
 
