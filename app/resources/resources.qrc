@@ -31,6 +31,9 @@
         <file>icons/String.png</file>
     </qresource>
     <qresource>
+        <file>icons/TopView.png</file>
+    </qresource>
+    <qresource>
         <file>icons/logo64.png</file>
     </qresource>
     <qresource>

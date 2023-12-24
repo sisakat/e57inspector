@@ -81,6 +81,9 @@ public:
     void addNode(SceneNode::Ptr node);
     void removeNode(SceneNode* node);
 
+    bool invokeAgain() const { return m_invokeAgain; }
+    void setInvokeAgain(bool invokeAgain) { m_invokeAgain = invokeAgain; }
+    
     [[nodiscard]] BufferCache& bufferCache();
     [[nodiscard]] const BufferCache& bufferCache() const;
 
@@ -111,6 +114,8 @@ private:
     BufferCache m_bufferCache;
     std::vector<SceneNode::Ptr> m_nodes;
     Matrix4d m_pose{IdentityMatrix4d};
+
+    bool m_invokeAgain{false};
 
     float m_devicePixelRatio{1.0};
 };

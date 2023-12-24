@@ -56,6 +56,7 @@ void Image2d::render()
     vao = createVAO(m_lineBuffer);
     glDrawArrays(GL_LINES, 0, m_lineBuffer->elementCount());
     glDeleteVertexArrays(1, &vao);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     if (m_image.sizeInBytes() > 0)
     {
@@ -73,6 +74,7 @@ void Image2d::render()
         glBindTexture(GL_TEXTURE_2D, m_texture);
         glDrawArrays(GL_TRIANGLES, 0, m_triangleBuffer->elementCount());
         glBindTexture(GL_TEXTURE_2D, 0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
         glDeleteVertexArrays(1, &vao);
     }
 

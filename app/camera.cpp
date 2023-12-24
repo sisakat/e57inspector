@@ -14,6 +14,10 @@ Camera::Camera()
 
 void Camera::render()
 {
+    if (m_topView)
+    {
+        topView();
+    }
     SceneNode::render();
     configureShader();
 }

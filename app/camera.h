@@ -84,6 +84,10 @@ private:
     float m_far{1000.0f};
 
     bool m_constrainedCamera{true};
+
+    bool m_topView{false};
+
+    void topView_impl();
 };
 
 #endif // CAMERA_H

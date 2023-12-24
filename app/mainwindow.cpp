@@ -42,6 +42,8 @@ MainWindow::MainWindow(QWidget* parent)
     connect(ui->twViewProperties, &ScenePropertyEditor::itemChanged, this,
             &MainWindow::twViewProperties_itemChanged);
 
+    ui->actionCamera_Top->setIcon(QIcon(":/icons/TopView.png"));
+
     ui->twScene->setScenePropertyEditor(ui->twViewProperties);
     ui->tabWidget->addTab(new Welcome(ui->tabWidget), tr("Welcome"));
 }
@@ -169,15 +171,19 @@ void MainWindow::twViewProperties_itemChanged(QTreeWidgetItem* item, int column)
 
 void MainWindow::sceneView_itemDropped(SceneView* sender, QObject* source)
 {
+    bool sceneViewCreated = false;
     if (!sender)
     {
         sender = createSceneView();
+        sceneViewCreated = true;
     }
 
     E57Utils utils(*m_reader);
     auto* treeWidget = dynamic_cast<QTreeWidget*>(source);
     if (!treeWidget)
         return;
+
+    sender->makeCurrent();
     for (auto* item : treeWidget->selectedItems())
     {
         if (auto* nodeImage2D = dynamic_cast<TNodeImage2D*>(item))
@@ -239,8 +245,6 @@ void MainWindow::sceneView_itemDropped(SceneView* sender, QObject* source)
                 sender->scene().setPose(
                     InverseMatrix(E57Utils::getPose(*e57NodeData3D)));
             }
-
-            sender->makeCurrent();
 
             std::vector<std::array<float, 3>> xyz(BUFFER_SIZE);
             auto dataReader =
@@ -330,6 +334,17 @@ void MainWindow::sceneView_itemDropped(SceneView* sender, QObject* source)
 
     sender->update();
     ui->twScene->init(sender->scene());
+
+    if (sceneViewCreated)
+    {
+        sender->scene().render();
+        auto camera = sender->scene().findNode<Camera>();
+        if (camera)
+        {
+            camera->topView();
+            sender->update();
+        }
+    }
 }
 
 void MainWindow::openImage(const E57Image2D& node, const std::string& tabName)

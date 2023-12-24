@@ -58,7 +58,13 @@ void SceneView::paintGL()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_PROGRAM_POINT_SIZE);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    m_scene->render();
+
+    m_scene->setInvokeAgain(true);
+    while (m_scene->invokeAgain())
+    {
+        m_scene->setInvokeAgain(false);
+        m_scene->render();
+    }
     painter.endNativePainting();
 
     glDisable(GL_DEPTH_TEST);

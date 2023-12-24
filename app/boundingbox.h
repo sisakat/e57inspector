@@ -54,12 +54,24 @@ struct BoundingBox
         std::for_each(bbPoints.begin(), bbPoints.end(),
                       [&result](const auto& point)
                       {
-                          result.min.x = std::min(result.min.x, point.x);
-                          result.min.y = std::min(result.min.y, point.y);
-                          result.min.z = std::min(result.min.z, point.z);
-                          result.max.x = std::max(result.max.x, point.x);
-                          result.max.y = std::max(result.max.y, point.y);
-                          result.max.z = std::max(result.max.z, point.z);
+                          if (result.isValid())
+                          {
+                              result.min.x = std::min(result.min.x, point.x);
+                              result.min.y = std::min(result.min.y, point.y);
+                              result.min.z = std::min(result.min.z, point.z);
+                              result.max.x = std::max(result.max.x, point.x);
+                              result.max.y = std::max(result.max.y, point.y);
+                              result.max.z = std::max(result.max.z, point.z);
+                          }
+                          else
+                          {
+                              result.min.x = point.x;
+                              result.min.y = point.y;
+                              result.min.z = point.z;
+                              result.max.x = point.x;
+                              result.max.y = point.y;
+                              result.max.z = point.z;
+                          }
                       });
         return result;
     }
@@ -97,12 +109,24 @@ struct BoundingBox
 
     inline void update(const Vector3d& point)
     {
-        min.x = std::min(min.x, point.x);
-        min.y = std::min(min.y, point.y);
-        min.z = std::min(min.z, point.z);
-        max.x = std::max(max.x, point.x);
-        max.y = std::max(max.y, point.y);
-        max.z = std::max(max.z, point.z);
+        if (isValid())
+        {
+            min.x = std::min(min.x, point.x);
+            min.y = std::min(min.y, point.y);
+            min.z = std::min(min.z, point.z);
+            max.x = std::max(max.x, point.x);
+            max.y = std::max(max.y, point.y);
+            max.z = std::max(max.z, point.z);
+        }
+        else
+        {
+            min.x = point.x;
+            min.y = point.y;
+            min.z = point.z;
+            max.x = point.x;
+            max.y = point.y;
+            max.z = point.z;
+        }
     }
 
     inline void reset() { *this = {}; }

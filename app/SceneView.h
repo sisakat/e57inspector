@@ -49,7 +49,6 @@ private:
     QOpenGLDebugLogger m_openGLLogger;
 
     Scene::Ptr m_scene;
-    Shader::Ptr m_shader;
     Camera::Ptr m_camera;
 
     void setupScene();
