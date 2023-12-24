@@ -100,6 +100,9 @@ void Image2d::render2D(QPainter& painter)
     if (!camera)
         return;
 
+    if (!camera->isPickpointNavigation())
+        return;
+
     auto origin = Vector4d(0.0f, 0.0f, 0.0f, 1.0f);
     origin = modelMatrix() * origin;
     auto positionScreen = camera->project(origin);

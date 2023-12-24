@@ -13,6 +13,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QImageReader>
+#include <QLabel>
 #include <QMimeData>
 
 static const int BUFFER_SIZE = 10000;
@@ -81,6 +82,7 @@ void MainWindow::actionCamera_Top_triggered()
         if (camera)
         {
             camera->topView();
+            camera->setPickpointNavigation(true);
         }
         sceneView->update();
     }
@@ -106,6 +108,28 @@ void MainWindow::loadE57(const std::string& filename)
     ui->twMain->init(m_reader->root());
     ui->twViewProperties->init(nullptr);
     ui->tabWidget->clear();
+
+    QScrollArea* scrollArea = new QScrollArea(ui->tabWidget);
+    scrollArea->setVerticalScrollBarPolicy(
+        Qt::ScrollBarPolicy::ScrollBarAsNeeded);
+    scrollArea->setHorizontalScrollBarPolicy(
+        Qt::ScrollBarPolicy::ScrollBarAlwaysOff);
+    auto* layout = new QVBoxLayout();
+    scrollArea->setLayout(layout);
+    QLabel* test = new QLabel(scrollArea);
+    layout->addWidget(test);
+    test->setWordWrap(true);
+    test->setTextFormat(Qt::TextFormat::MarkdownText);
+
+    std::stringstream ss;
+    ss << "# " << std::filesystem::path(filename).stem().string() << "\n";
+    ss << "**Scans:** " << m_reader->root()->data3D().size() << "\n\n";
+    ss << "**Images:** " << m_reader->root()->images2D().size() << "\n";
+    test->setText(QString::fromStdString(ss.str()));
+
+    test->setAlignment(Qt::Alignment(Qt::AlignmentFlag::AlignTop));
+    test->setMargin(10);
+    ui->tabWidget->addTab(scrollArea, tr("Summary"));
 }
 
 void MainWindow::twMain_nodeSelected(TNode* node)
@@ -124,6 +148,8 @@ void MainWindow::tabWidget_tabClosesRequested(int index)
     ui->tabWidget->removeTab(index);
     delete tabItem;
     tabItem = nullptr;
+
+    ui->twViewProperties->clear();
 }
 
 void MainWindow::tabWidget_currentChanged(int index)
@@ -133,6 +159,7 @@ void MainWindow::tabWidget_currentChanged(int index)
     {
         auto* renderer = dynamic_cast<SceneView*>(widget);
         ui->twScene->init(renderer->scene());
+        ui->twViewProperties->clear();
     }
     else
     {
@@ -173,6 +200,7 @@ void MainWindow::twViewProperties_itemChanged(QTreeWidgetItem* item, int column)
 
 void MainWindow::sceneView_itemDropped(SceneView* sender, QObject* source)
 {
+    bool topView = true;
     bool sceneViewCreated = false;
     if (!sender)
     {
@@ -235,6 +263,24 @@ void MainWindow::sceneView_itemDropped(SceneView* sender, QObject* source)
                 image2d->setIsSpherical(true);
             }
             sender->scene().addNode(image2d);
+
+            auto camera = sender->scene().findNode<Camera>();
+            if (camera)
+            {
+                if (//image2d->isFullPanorama() &&
+                    sender->scene().nodes().size() < 3)
+                {
+                    image2d->setShowCoordinateSystemAxes(false);
+                    camera->setPickpointNavigation(false);
+                    camera->setPosition(image2d->modelMatrix()[3]);
+                    camera->setFieldOfView(75.0f);
+                    topView = false;
+                }
+                else
+                {
+                    camera->setPickpointNavigation(true);
+                }
+            }
         }
         else if (auto* nodeData3D = dynamic_cast<TNodeData3D*>(item))
         {
@@ -332,17 +378,24 @@ void MainWindow::sceneView_itemDropped(SceneView* sender, QObject* source)
             pointCloud->setPose(E57Utils::getPose(*e57NodeData3D));
             pointCloud->doneInserting();
             sender->scene().addNode(pointCloud);
+
+            auto camera = sender->scene().findNode<Camera>();
+            if (camera)
+            {
+                camera->setPickpointNavigation(true);
+            }
         }
     }
 
     sender->update();
     ui->twScene->init(sender->scene());
+    ui->twViewProperties->clear();
 
     if (sceneViewCreated)
     {
         sender->scene().render();
         auto camera = sender->scene().findNode<Camera>();
-        if (camera)
+        if (camera && topView)
         {
             camera->topView();
             sender->update();
@@ -477,6 +530,7 @@ void MainWindow::openPointCloud(const E57NodePtr& node,
     sceneView->scene().addNode(pointCloud);
 
     ui->twScene->init(sceneView->scene());
+    ui->twViewProperties->clear();
 }
 
 SceneView* MainWindow::findSceneView()

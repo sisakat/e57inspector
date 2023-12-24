@@ -48,6 +48,21 @@ SceneImage2dTreeNode::SceneImage2dTreeNode(Image2d* image2d)
     if (m_image2d->isSpherical())
     {
         setIcon(0, QIcon(":/icons/Spherical.png"));
+
+        m_contextMenu.addAction(
+            "Set camera to sphere center",
+            [this]()
+            {
+                auto camera = this->sceneNode()->scene()->findNode<Camera>();
+                if (camera)
+                {
+                    camera->setPosition(this->sceneNode()->modelMatrix()[3]);
+                    camera->setPickpointNavigation(false);
+                    camera->setFieldOfView(75.0f);
+                    dynamic_cast<Image2d*>(this->sceneNode())
+                        ->setShowCoordinateSystemAxes(false);
+                }
+            });
     }
     else
     {

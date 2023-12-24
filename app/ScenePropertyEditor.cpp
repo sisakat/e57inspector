@@ -64,6 +64,11 @@ void ScenePropertyEditor::initFromCamera()
     auto* constrained = new CBoolProperty("constrained", "Constrained",
                                           camera->constrained(), true);
     add(constrained);
+
+    auto* pickpointNavigation =
+        new CBoolProperty("pickpointNavigation", "Pickpoint Navigation",
+                          camera->isPickpointNavigation(), true);
+    add(pickpointNavigation);
 }
 
 void ScenePropertyEditor::initFromPointcloud()
@@ -135,10 +140,17 @@ void ScenePropertyEditor::changeFromCamera(QTreeWidgetItem* item)
     {
         camera->setFieldOfView(*fieldOfView);
     }
+
     auto constrained = getBooleanValue(item, "constrained");
     if (constrained)
     {
         camera->setConstrained(*constrained);
+    }
+
+    auto pickpointNavigation = getBooleanValue(item, "pickpointNavigation");
+    if (pickpointNavigation)
+    {
+        camera->setPickpointNavigation(*pickpointNavigation);
     }
 }
 

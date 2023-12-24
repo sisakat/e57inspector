@@ -55,6 +55,17 @@ public:
         m_up = Vector4d(Z_AXIS, 0.0f);
     }
 
+    bool isPickpointNavigation() const { return m_pickpointNavigation; }
+    void setPickpointNavigation(bool pickpointNavigation)
+    {
+        m_pickpointNavigation = pickpointNavigation;
+    }
+
+    void setPosition(const Vector3d& position)
+    {
+        m_position = Vector4d(position, 1.0f);
+    }
+
     void topView();
 
 protected:
@@ -84,6 +95,7 @@ private:
     float m_far{1000.0f};
 
     bool m_constrainedCamera{true};
+    bool m_pickpointNavigation{true};
 
     bool m_topView{false};
 

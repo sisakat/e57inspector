@@ -24,11 +24,16 @@ void Camera::render()
 
 void Camera::render2D(QPainter& painter)
 {
-    auto pp = pickpoint();
-    const int x = static_cast<int>(pp.x - 2.0 * scene()->devicePixelRatio());
-    const int y = static_cast<int>(pp.y - 2.0 * scene()->devicePixelRatio());
-    const int d = static_cast<int>(4 * scene()->devicePixelRatio());
-    painter.fillRect(x, y, d, d, Qt::red);
+    if (m_pickpointNavigation)
+    {
+        auto pp = pickpoint();
+        const int x =
+            static_cast<int>(pp.x - 2.0 * scene()->devicePixelRatio());
+        const int y =
+            static_cast<int>(pp.y - 2.0 * scene()->devicePixelRatio());
+        const int d = static_cast<int>(4 * scene()->devicePixelRatio());
+        painter.fillRect(x, y, d, d, Qt::red);
+    }
 }
 
 void Camera::renderBoundingBox(QPainter& painter,
@@ -95,6 +100,12 @@ void Camera::pitch(float angle)
 
 void Camera::updatePickpoint(const Vector2d& window)
 {
+    if (!m_pickpointNavigation)
+    {
+        m_pickpoint = m_position;
+        return;
+    }
+
     auto u = window.x;
     auto v = m_viewportHeight - 1 - window.y;
     auto depth = findDepth(u, v);
@@ -253,7 +264,7 @@ void Camera::mouseMoveEvent(QMouseEvent* event)
         yaw(deg2rad(static_cast<float>(-delta.x)));
     }
 
-    if (m_zooming)
+    if (m_zooming && m_pickpointNavigation)
     {
         auto deltaY = pos.y - m_originalMousePosition.y;
         auto viewDir = VectorNormalize(m_position - m_pickpoint);
@@ -270,7 +281,7 @@ void Camera::mouseMoveEvent(QMouseEvent* event)
         }
     }
 
-    if (m_panning)
+    if (m_panning && m_pickpointNavigation)
     {
         int u = event->pos().x();
         int v = m_viewportHeight - 1 - event->pos().y();
@@ -298,6 +309,9 @@ void Camera::mouseMoveEvent(QMouseEvent* event)
 
 void Camera::wheelEvent(QWheelEvent* event)
 {
+    if (!m_pickpointNavigation)
+        return;
+
     auto qPoint = event->position().toPoint();
     Vector2d point(qPoint.x(), qPoint.y());
     updatePickpoint(point);
