@@ -17,7 +17,6 @@ uint32_t calculateChildIndex(const OctreeElement& element,
 OctreeNode::OctreeNode(uint32_t elementLimit, double resolution)
     : m_elementLimit{elementLimit}, m_resolution{resolution}
 {
-    m_boundingBox.setToInfinite();
 }
 
 void OctreeNode::insert(const std::vector<OctreeElement>& elements,
@@ -111,20 +110,12 @@ int OctreeNode::getOnlyChildIndex() const
 
 void OctreeNode::updateBoundingBox()
 {
+    m_boundingBox.reset();
     for (const auto& element : m_elements)
     {
-        m_boundingBox.min.x =
-            std::min(m_boundingBox.min.x, element.data.xyz[0]);
-        m_boundingBox.min.y =
-            std::min(m_boundingBox.min.y, element.data.xyz[1]);
-        m_boundingBox.min.z =
-            std::min(m_boundingBox.min.z, element.data.xyz[2]);
-        m_boundingBox.max.x =
-            std::max(m_boundingBox.max.x, element.data.xyz[0]);
-        m_boundingBox.max.y =
-            std::max(m_boundingBox.max.y, element.data.xyz[1]);
-        m_boundingBox.max.z =
-            std::max(m_boundingBox.max.z, element.data.xyz[2]);
+        Vector3d xyz(element.data.xyz[0], element.data.xyz[1],
+                     element.data.xyz[2]);
+        m_boundingBox.update(xyz);
     }
 }
 

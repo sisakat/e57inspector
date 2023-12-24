@@ -6,7 +6,20 @@
 
 class TNode : public QTreeWidgetItem
 {
-
+public:
+    template <typename T> T* findParent()
+    {
+        QTreeWidgetItem* parent = this->parent();
+        while (parent != nullptr)
+        {
+            if (dynamic_cast<T*>(parent))
+            {
+                return dynamic_cast<T*>(parent);
+            }
+            parent = parent->parent();
+        }
+        return nullptr;
+    }
 };
 
 class TE57Node : public TNode
@@ -25,7 +38,8 @@ public:
     explicit TNodeE57(const E57RootPtr& root);
 };
 
-class TNodeImages : public TNode {
+class TNodeImages : public TNode
+{
 public:
     TNodeImages();
 };
@@ -36,6 +50,7 @@ public:
     explicit TNodeData3D(const E57Data3DPtr& node);
 
     TNodeImages* images() { return m_images; }
+
 private:
     TNodeImages* m_images;
 };

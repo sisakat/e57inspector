@@ -29,7 +29,6 @@ SceneNode::SceneNode(SceneNode* parent) : m_parent{parent}
     {
         throw std::runtime_error("Could not initialize OpenGL functions!");
     }
-    m_pose = IdentityMatrix4d;
 }
 
 void SceneNode::render()
@@ -43,7 +42,7 @@ void SceneNode::configureShader()
 {
     if (auto location = getUniformLocation("model"))
     {
-        glUniformMatrix4fv(location.value(), 1, GL_FALSE, &pose()[0][0]);
+        glUniformMatrix4fv(location.value(), 1, GL_FALSE, &modelMatrix()[0][0]);
     }
 }
 
@@ -53,7 +52,7 @@ void SceneNode::addChild(SceneNode::Ptr node)
     m_childNodes.emplace_back(std::move(node));
 }
 
-Matrix4d SceneNode::pose() const
+Matrix4d SceneNode::modelMatrix() const
 {
     Matrix4d result(m_pose);
     SceneNode* parent = m_parent;
@@ -64,6 +63,11 @@ Matrix4d SceneNode::pose() const
     }
     result = scene()->getPose() * result;
     return result;
+}
+
+Matrix4d SceneNode::pose() const
+{
+    return m_pose;
 }
 
 void SceneNode::setScene(Scene* scene)
@@ -117,10 +121,10 @@ uint32_t SceneNode::id() const
 
 BoundingBox SceneNode::boundingBox() const
 {
-    BoundingBox result{m_boundingBox.transform(pose())};
+    BoundingBox result = m_boundingBox;
     for (const auto& child : m_childNodes)
     {
-        auto bb = child->boundingBox();
+        auto bb = child->boundingBox().transform(child->pose());
         result = result.combine(bb);
     }
     return result;
@@ -183,11 +187,11 @@ const std::vector<SceneNode::Ptr>& Scene::nodes() const
 BoundingBox Scene::boundingBox() const
 {
     BoundingBox result;
-    result.setToInfinite();
     for (const auto& node : m_nodes)
     {
-        result = result.combine(node->boundingBox());
+        result = result.combine(node->boundingBox().transform(node->pose()));
     }
+    result = result.transform(getPose());
     return result;
 }
 

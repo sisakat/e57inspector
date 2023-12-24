@@ -49,9 +49,7 @@ private:
     void openImage(const E57Image2D& node, const std::string& tabName);
     void openPointCloud(const E57NodePtr& node, const std::string& dataName,
                         const std::string& tabName);
-    void openPinholeRepresentation3d(
-        const E57Image2DPtr& image2D,
-        const E57PinholeRepresentationPtr& pinholeRepresentation);
+    SceneView* createSceneView(const std::string& name = "New View");
 
     SceneView* findSceneView();
 };

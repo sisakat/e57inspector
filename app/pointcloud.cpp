@@ -2,13 +2,16 @@
 #include "ShaderFactory.h"
 #include "camera.h"
 
+#include <array>
 #include <queue>
 #include <utility>
 
 PointCloud::PointCloud(SceneNode* parent, E57Data3DPtr data3D)
     : SceneNode(parent), m_data3D(std::move(data3D)), m_octree(),
       m_shader(ShaderFactory::createShader(":/shaders/default_vertex.glsl",
-                                           ":/shaders/default_fragment.glsl"))
+                                           ":/shaders/default_fragment.glsl")),
+      m_lineShader(ShaderFactory::createShader(":/shaders/line_vertex.glsl",
+                                               ":/shaders/line_fragment.glsl"))
 {
 }
 
@@ -40,13 +43,13 @@ void PointCloud::render2D(QPainter& painter)
 {
     if (!visible())
         return;
-    
+
     auto* camera = scene()->findNode<Camera>();
     if (!camera)
         return;
 
     auto origin = Vector4d(0.0f, 0.0f, 0.0f, 1.0f);
-    origin = pose() * origin;
+    origin = modelMatrix() * origin;
     auto positionScreen = camera->project(origin);
 
     if (positionScreen.z < 1.0f)

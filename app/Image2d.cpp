@@ -90,7 +90,7 @@ void Image2d::render2D(QPainter& painter)
         return;
 
     auto origin = Vector4d(0.0f, 0.0f, 0.0f, 1.0f);
-    origin = pose() * origin;
+    origin = modelMatrix() * origin;
     auto positionScreen = camera->project(origin);
 
     if (positionScreen.z < 1.0f)
@@ -212,6 +212,13 @@ void Image2d::createViewConeLines()
     data.push_back({{tanX * m_coneLength, -tanY * m_coneLength, -m_coneLength}, rgb, tex});
     data.push_back({{tanX * m_coneLength,  tanY * m_coneLength, -m_coneLength}, rgb, tex});
     // clang-format on
+
+    m_boundingBox.reset();
+    for (const auto& point : data)
+    {
+        const auto& xyz = point.xyz;
+        m_boundingBox.update(xyz);
+    }
 
     if (m_showCoordinateSystemAxes)
     {
@@ -337,6 +344,13 @@ void Image2d::createViewConeLinesSpherical()
         {
             data.push_back({polarToCartesian(rtp), rgb, tex});
         }
+    }
+
+    m_boundingBox.reset();
+    for (const auto& point : data)
+    {
+        const auto& xyz = point.xyz;
+        m_boundingBox.update(xyz);
     }
 
     if (m_showCoordinateSystemAxes)

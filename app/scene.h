@@ -36,6 +36,7 @@ public:
     void setName(const std::string& name) { m_name = name; }
 
     [[nodiscard]] const std::vector<Ptr>& children() const;
+    [[nodiscard]] Matrix4d modelMatrix() const;
     [[nodiscard]] Matrix4d pose() const;
 
     void setPose(const Matrix4d& newPose);

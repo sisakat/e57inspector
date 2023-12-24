@@ -169,6 +169,12 @@ void MainWindow::twViewProperties_itemChanged(QTreeWidgetItem* item, int column)
 
 void MainWindow::sceneView_itemDropped(SceneView* sender, QObject* source)
 {
+    if (!sender)
+    {
+        sender = createSceneView();
+    }
+
+    E57Utils utils(*m_reader);
     auto* treeWidget = dynamic_cast<QTreeWidget*>(source);
     if (!treeWidget)
         return;
@@ -179,10 +185,28 @@ void MainWindow::sceneView_itemDropped(SceneView* sender, QObject* source)
             Image2d::Ptr image2d = std::make_shared<Image2d>();
             image2d->setName(nodeImage2D->node()->name());
 
+            auto associatedData3D =
+                dynamic_cast<TNode*>(item)->findParent<TNodeData3D>();
+
             auto e57NodeImage2D =
                 std::dynamic_pointer_cast<E57Image2D>(nodeImage2D->node());
 
-            E57Utils utils(*m_reader);
+            if (sender->scene().nodes().size() < 2)
+            {
+                if (associatedData3D)
+                {
+                    auto e57Data3D = std::dynamic_pointer_cast<E57Data3D>(
+                        associatedData3D->node());
+                    sender->scene().setPose(
+                        InverseMatrix(E57Utils::getPose(*e57Data3D)));
+                }
+                else
+                {
+                    sender->scene().setPose(
+                        InverseMatrix(E57Utils::getPose(*e57NodeImage2D)));
+                }
+            }
+
             auto image = utils.getImage(*e57NodeImage2D);
             if (!image)
                 return;
@@ -202,6 +226,105 @@ void MainWindow::sceneView_itemDropped(SceneView* sender, QObject* source)
                 image2d->setIsSpherical(true);
             }
             sender->scene().addNode(image2d);
+        }
+        else if (auto* nodeData3D = dynamic_cast<TNodeData3D*>(item))
+        {
+            auto e57NodeData3D =
+                std::dynamic_pointer_cast<E57Data3D>(nodeData3D->node());
+            auto dataInfo =
+                m_reader->dataInfo(e57NodeData3D->data().at("points"));
+
+            if (sender->scene().nodes().size() < 2)
+            {
+                sender->scene().setPose(
+                    InverseMatrix(E57Utils::getPose(*e57NodeData3D)));
+            }
+
+            sender->makeCurrent();
+
+            std::vector<std::array<float, 3>> xyz(BUFFER_SIZE);
+            auto dataReader =
+                m_reader->dataReader(e57NodeData3D->data().at("points"));
+            dataReader.bindBuffer("cartesianX", (float*)&xyz[0][0], xyz.size(),
+                                  3 * sizeof(float));
+            dataReader.bindBuffer("cartesianY", (float*)&xyz[0][1], xyz.size(),
+                                  3 * sizeof(float));
+            dataReader.bindBuffer("cartesianZ", (float*)&xyz[0][2], xyz.size(),
+                                  3 * sizeof(float));
+
+            bool hasColor = false;
+            bool hasIntensity = false;
+
+            std::vector<std::array<float, 3>> rgb(0);
+            if (std::any_of(dataInfo.begin(), dataInfo.end(),
+                            [](const auto& info)
+                            { return info.identifier == "colorRed"; }))
+            {
+                rgb.resize(BUFFER_SIZE);
+                hasColor = true;
+                dataReader.bindBuffer("colorRed", (float*)&rgb[0][0],
+                                      rgb.size(), 3 * sizeof(float));
+                dataReader.bindBuffer("colorGreen", (float*)&rgb[0][1],
+                                      rgb.size(), 3 * sizeof(float));
+                dataReader.bindBuffer("colorBlue", (float*)&rgb[0][2],
+                                      rgb.size(), 3 * sizeof(float));
+            }
+
+            std::vector<float> intensity(0);
+            if (std::any_of(dataInfo.begin(), dataInfo.end(),
+                            [](const auto& info)
+                            { return info.identifier == "intensity"; }))
+            {
+                intensity.resize(BUFFER_SIZE);
+                hasIntensity = true;
+                dataReader.bindBuffer("intensity", (float*)&intensity[0],
+                                      intensity.size());
+            }
+
+            auto pointCloud =
+                std::make_shared<PointCloud>(nullptr, e57NodeData3D);
+
+            uint64_t count;
+            uint64_t totalCount = 0;
+            while ((count = dataReader.read()) > 0)
+            {
+                std::vector<PointData> pointData;
+                for (size_t i = 0; i < count; ++i)
+                {
+                    PointData pd{};
+                    pd.xyz = xyz[i];
+                    if (hasColor)
+                    {
+                        pd.rgb = rgb[i];
+                        pd.rgb[0] /= 255.0;
+                        pd.rgb[1] /= 255.0;
+                        pd.rgb[2] /= 255.0;
+                    }
+                    else
+                    {
+                        pd.rgb[0] = 1.0;
+                        pd.rgb[1] = 1.0;
+                        pd.rgb[2] = 1.0;
+                    }
+
+                    if (hasIntensity)
+                    {
+                        pd.intensity = intensity[i];
+                    }
+                    else
+                    {
+                        pd.intensity = 1.0f;
+                    }
+
+                    pointData.push_back(pd);
+                }
+                pointCloud->insertPoints(pointData);
+                totalCount += count;
+            }
+
+            pointCloud->setPose(E57Utils::getPose(*e57NodeData3D));
+            pointCloud->doneInserting();
+            sender->scene().addNode(pointCloud);
         }
     }
 
@@ -359,11 +482,41 @@ void MainWindow::dragEnterEvent(QDragEnterEvent* event)
     {
         event->acceptProposedAction();
     }
+
+    if (event->mimeData()->hasFormat(
+            "application/x-qabstractitemmodeldatalist"))
+    {
+        event->accept();
+    }
 }
 
 void MainWindow::dropEvent(QDropEvent* event)
 {
-    const auto url = event->mimeData()->urls().first();
-    auto filename = url.toLocalFile();
-    loadE57(filename.toStdString());
+    if (event->mimeData()->hasUrls() && event->mimeData()->urls().size() == 1 &&
+        event->mimeData()->urls().first().toLocalFile().endsWith(".e57"))
+    {
+        const auto url = event->mimeData()->urls().first();
+        auto filename = url.toLocalFile();
+        loadE57(filename.toStdString());
+    }
+
+    if (event->mimeData()->hasFormat(
+            "application/x-qabstractitemmodeldatalist"))
+    {
+        if (event->source())
+        {
+            sceneView_itemDropped(nullptr, event->source());
+        }
+    }
+}
+
+SceneView* MainWindow::createSceneView(const std::string& name)
+{
+    auto sceneView = new SceneView(ui->tabWidget);
+    connect(sceneView, &SceneView::itemDropped, this,
+            &MainWindow::sceneView_itemDropped);
+    int tabIndex =
+        ui->tabWidget->addTab(sceneView, QString::fromStdString(name));
+    ui->tabWidget->setCurrentIndex(tabIndex);
+    return sceneView;
 }

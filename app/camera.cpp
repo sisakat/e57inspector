@@ -27,6 +27,22 @@ void Camera::render2D(QPainter& painter)
     painter.fillRect(x, y, d, d, Qt::red);
 }
 
+void Camera::renderBoundingBox(QPainter& painter,
+                               const BoundingBox& boundingBox)
+{
+    auto toWindow = [this](const Vector3d& window) {
+        return Vector3d{window.x, m_viewportHeight - 1 - window.y, window.z};
+    };
+
+    auto bbPoints = boundingBox.points();
+
+    for (const auto& point : bbPoints)
+    {
+        auto pointScreen = toWindow(project(Vector4d(point, 1.0f)));
+        painter.fillRect(pointScreen.x - 5, pointScreen.y - 5, 5, 5, Qt::blue);
+    }
+}
+
 void Camera::configureShader()
 {
     m_view =
@@ -301,15 +317,17 @@ void Camera::keyReleaseEvent(QKeyEvent* event) {}
 
 void Camera::updateNearFar()
 {
+    Vector3d cameraPosition = m_position;
+    Vector3d cameraCenter = m_center;
+
     auto bb = scene()->boundingBox();
     auto bbPoints = bb.points();
     float maxLength = std::numeric_limits<float>::min();
     float minLength = std::numeric_limits<float>::max();
     for (const auto& point : bbPoints)
     {
-        auto dot = VectorDot(
-            point - Vector3d(m_position),
-            VectorNormalize(Vector3d(m_center) - Vector3d(m_position)));
+        auto dot = VectorDot(point - cameraPosition,
+                             VectorNormalize(cameraCenter - cameraPosition));
         float length = std::abs(dot);
         if (length > maxLength)
         {

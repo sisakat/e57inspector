@@ -24,6 +24,7 @@ public:
 
     void render() override;
     void render2D(QPainter& painter) override;
+    void renderBoundingBox(QPainter& painter, const BoundingBox& boundingBox);
     void configureShader() override;
 
     void yaw(float angle);
