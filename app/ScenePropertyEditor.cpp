@@ -120,6 +120,11 @@ void ScenePropertyEditor::initFromImage2d()
     auto* segments = new CIntegerProperty("segments", "Segments",
                                           image2d->getSegments(), 20, 4, 1000);
     add(segments);
+
+    auto* backfaceCulling =
+        new CBoolProperty("backfaceCulling", "Backface Culling",
+                          image2d->isBackfaceCulling(), false);
+    add(backfaceCulling);
 }
 
 void ScenePropertyEditor::changeFromCamera(QTreeWidgetItem* item)
@@ -191,5 +196,11 @@ void ScenePropertyEditor::changeFromImage2d(QTreeWidgetItem* item)
     if (segments)
     {
         image2d->setSegments(*segments);
+    }
+
+    auto backfaceCulling = getBooleanValue(item, "backfaceCulling");
+    if (backfaceCulling)
+    {
+        image2d->setBackfaceCulling(*backfaceCulling);
     }
 }

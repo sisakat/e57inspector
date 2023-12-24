@@ -227,6 +227,7 @@ void MainWindow::sceneView_itemDropped(SceneView* sender, QObject* source)
             image2d->setPixelWidth(imageParameters->pixelWidth);
             image2d->setPixelHeight(imageParameters->pixelHeight);
             image2d->setFocalLength(imageParameters->focalLength);
+            image2d->setBackfaceCulling(image2d->isFullPanorama());
             image2d->setPose(E57Utils::getPose(*e57NodeImage2D));
             if (imageParameters->isSpherical)
             {

@@ -70,12 +70,21 @@ void Image2d::render()
             glUniform1i(location.value(), 0);
         }
 
+        if (m_backfaceCulling)
+        {
+            glEnable(GL_CULL_FACE);
+            glCullFace(GL_BACK);
+        }
+
         vao = createVAO(m_triangleBuffer);
         glBindTexture(GL_TEXTURE_2D, m_texture);
         glDrawArrays(GL_TRIANGLES, 0, m_triangleBuffer->elementCount());
         glBindTexture(GL_TEXTURE_2D, 0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glDeleteVertexArrays(1, &vao);
+
+        glCullFace(GL_NONE);
+        glDisable(GL_CULL_FACE);
     }
 
     m_shader->release();
@@ -288,11 +297,12 @@ void Image2d::createViewConeLinesSpherical()
     auto polarToCartesian = [](const Vector3d& rtp) -> Vector3d
     {
         double sinTheta = std::sin(rtp.y);
+        double cosTheta = std::cos(rtp.y);
         double sinPhi = std::sin(rtp.z);
         double cosPhi = std::cos(rtp.z);
 
         double z = sinTheta * rtp.x;
-        double a = std::sqrt(rtp.x * rtp.x + z * z);
+        double a = cosTheta * rtp.x;
 
         return {cosPhi * a, sinPhi * a, z};
     };
@@ -395,11 +405,12 @@ void Image2d::createViewConeImageSpherical()
     auto polarToCartesian = [](const Vector3d& rtp) -> Vector3d
     {
         double sinTheta = std::sin(rtp.y);
+        double cosTheta = std::cos(rtp.y);
         double sinPhi = std::sin(rtp.z);
         double cosPhi = std::cos(rtp.z);
 
         double z = sinTheta * rtp.x;
-        double a = std::sqrt(rtp.x * rtp.x + z * z);
+        double a = cosTheta * rtp.x;
 
         return {cosPhi * a, sinPhi * a, z};
     };
@@ -408,58 +419,71 @@ void Image2d::createViewConeImageSpherical()
 
     double phiStart = -imageWidthRadians / 2.0;
     double phiStop = imageWidthRadians / 2.0;
-    double increment = (phiStop - phiStart) / m_segments;
+    double thetaStart = -imageHeightRadians / 2.0;
+    double thetaStop = imageHeightRadians / 2.0;
+    double phiIncrement = (phiStop - phiStart) / m_segments;
+    double thetaIncrement = (thetaStop - thetaStart) / m_segments;
 
-    Vector3d rtp{m_coneLength, -imageHeightRadians / 2.0, phiStart};
-    data.push_back({polarToCartesian(rtp), rgb, {1.0f, 0.0f}});
-
-    for (int i = 1; i <= m_segments; ++i)
+    for (int i = 0; i < m_segments; ++i)
     {
-        double phi = phiStart + i * increment;
-        double theta = -imageHeightRadians / 2.0;
-
-        Vector3d rtp{m_coneLength, theta, phi};
-        data.push_back(
-            {polarToCartesian(rtp), rgb, {1.0 - 1.0f / m_segments * i, 0.0f}});
-
-        rtp = {m_coneLength, -theta, phi};
-        data.push_back(
-            {polarToCartesian(rtp), rgb, {1.0 - 1.0f / m_segments * i, 1.0f}});
-        if (i < m_segments)
+        double phi = phiStart + i * phiIncrement;
+        for (int j = 0; j < m_segments; ++j)
         {
-            rtp = {m_coneLength, theta, phi};
+            double theta = thetaStart + j * thetaIncrement;
+
+            // triangle 1
+            Vector3d rtp{m_coneLength, theta, phi};
+            data.push_back(
+                {polarToCartesian(rtp),
+                 rgb,
+                 {1.0 - 1.0f / m_segments * i, 1.0f / m_segments * j}});
+
+            rtp = {m_coneLength, theta + thetaIncrement, phi};
+            data.push_back(
+                {polarToCartesian(rtp),
+                 rgb,
+                 {1.0 - 1.0f / m_segments * i, 1.0f / m_segments * (j + 1)}});
+
+            rtp = {m_coneLength, theta + thetaIncrement, phi + phiIncrement};
             data.push_back({polarToCartesian(rtp),
                             rgb,
-                            {1.0 - 1.0f / m_segments * i, 0.0f}});
+                            {1.0 - 1.0f / m_segments * (i + 1),
+                             1.0f / m_segments * (j + 1)}});
+
+            // triangle 2
+            rtp = {m_coneLength, theta, phi};
+            data.push_back(
+                {polarToCartesian(rtp),
+                 rgb,
+                 {1.0 - 1.0f / m_segments * i, 1.0f / m_segments * j}});
+
+            rtp = {m_coneLength, theta + thetaIncrement, phi + phiIncrement};
+            data.push_back({polarToCartesian(rtp),
+                            rgb,
+                            {1.0 - 1.0f / m_segments * (i + 1),
+                             1.0f / m_segments * (j + 1)}});
+
+            rtp = {m_coneLength, theta, phi + phiIncrement};
+            data.push_back(
+                {polarToCartesian(rtp),
+                 rgb,
+                 {1.0 - 1.0f / m_segments * (i + 1), 1.0f / m_segments * j}});
         }
     }
 
-    rtp = {m_coneLength, imageHeightRadians / 2.0, phiStart};
-    data.push_back({polarToCartesian(rtp), rgb, {1.0f, 1.0f}});
-
-    for (int i = 1; i <= m_segments; ++i)
+    m_boundingBox.reset();
+    for (const auto& point : data)
     {
-        double phi = phiStart + i * increment;
-        double theta = -imageHeightRadians / 2.0;
-
-        rtp = {m_coneLength, -theta, phi};
-        data.push_back(
-            {polarToCartesian(rtp), rgb, {1.0 - 1.0f / m_segments * i, 1.0f}});
-
-        Vector3d rtp{m_coneLength, theta, phi - increment};
-        data.push_back({polarToCartesian(rtp),
-                        rgb,
-                        {1.0 - 1.0f / m_segments * (i - 1), 0.0f}});
-
-        if (i < m_segments)
-        {
-            rtp = {m_coneLength, -theta, phi};
-            data.push_back({polarToCartesian(rtp),
-                            rgb,
-                            {1.0 - 1.0f / m_segments * i, 1.0f}});
-        }
+        const auto& xyz = point.xyz;
+        m_boundingBox.update(xyz);
     }
 
     m_triangleBuffer = std::make_shared<OpenGLArrayBuffer>(
         data.data(), GL_FLOAT, 3 + 3 + 2, data.size(), GL_STATIC_DRAW);
+}
+
+bool Image2d::isFullPanorama() const
+{
+    return std::abs((m_imageWidth * m_pixelWidth) - 2 * M_PI) <
+           std::numeric_limits<float>::epsilon();
 }

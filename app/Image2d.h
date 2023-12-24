@@ -66,6 +66,14 @@ public:
         ++m_revision;
     }
 
+    bool isBackfaceCulling() const { return m_backfaceCulling; }
+    void setBackfaceCulling(bool backfaceCulling)
+    {
+        m_backfaceCulling = backfaceCulling;
+    }
+
+    bool isFullPanorama() const;
+
 private:
     Shader::Ptr m_shader;
     QImage m_image;
@@ -76,6 +84,7 @@ private:
     int m_lastRevision{-1};
     int m_revision{0};
     int m_segments{20};
+    bool m_backfaceCulling{false};
 
     OpenGLArrayBuffer::Ptr m_lineBuffer;
     OpenGLArrayBuffer::Ptr m_triangleBuffer;
