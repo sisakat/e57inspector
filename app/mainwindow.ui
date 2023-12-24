@@ -204,8 +204,8 @@
     <addaction name="actionCamera_Top"/>
    </widget>
    <addaction name="menuFile"/>
-   <addaction name="menuHelp"/>
    <addaction name="menuView"/>
+   <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
@@ -223,6 +223,7 @@
    </attribute>
    <addaction name="actionOpen"/>
    <addaction name="actionCamera_Top"/>
+   <addaction name="actionClose"/>
   </widget>
   <action name="actionOpen">
    <property name="text">

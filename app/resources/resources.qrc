@@ -31,6 +31,12 @@
         <file>icons/String.png</file>
     </qresource>
     <qresource>
+        <file>icons/Open.png</file>
+    </qresource>
+    <qresource>
+        <file>icons/Close.png</file>
+    </qresource>
+    <qresource>
         <file>icons/TopView.png</file>
     </qresource>
     <qresource>

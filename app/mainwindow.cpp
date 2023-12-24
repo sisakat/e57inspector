@@ -42,7 +42,9 @@ MainWindow::MainWindow(QWidget* parent)
     connect(ui->twViewProperties, &ScenePropertyEditor::itemChanged, this,
             &MainWindow::twViewProperties_itemChanged);
 
+    ui->actionOpen->setIcon(QIcon(":/icons/Open.png"));
     ui->actionCamera_Top->setIcon(QIcon(":/icons/TopView.png"));
+    ui->actionClose->setIcon(QIcon(":/icons/Close.png"));
 
     ui->twScene->setScenePropertyEditor(ui->twViewProperties);
     ui->tabWidget->addTab(new Welcome(ui->tabWidget), tr("Welcome"));
