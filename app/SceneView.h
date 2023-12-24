@@ -44,6 +44,7 @@ protected:
 
 private slots:
     void onMessageLogged(const QOpenGLDebugMessage& debugMessage);
+    void scene_update();
 
 private:
     QOpenGLDebugLogger m_openGLLogger;

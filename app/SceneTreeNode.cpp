@@ -62,6 +62,7 @@ SceneImage2dTreeNode::SceneImage2dTreeNode(Image2d* image2d)
                     dynamic_cast<Image2d*>(this->sceneNode())
                         ->setShowCoordinateSystemAxes(false);
                 }
+                this->sceneNode()->scene()->update();
             });
     }
     else

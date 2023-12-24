@@ -133,6 +133,8 @@ void SceneView::setupScene()
     m_camera = std::make_shared<Camera>();
     m_scene->setDevicePixelRatio(static_cast<float>(devicePixelRatio()));
     m_scene->addNode(m_camera);
+
+    connect(&(*m_scene), &Scene::update, this, &SceneView::scene_update);
 }
 
 void SceneView::dragEnterEvent(QDragEnterEvent* event)
@@ -151,4 +153,9 @@ void SceneView::dropEvent(QDropEvent* event)
     {
         emit itemDropped(this, event->source());
     }
+}
+
+void SceneView::scene_update()
+{
+    update();
 }

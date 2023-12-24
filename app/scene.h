@@ -68,8 +68,9 @@ private:
     Matrix4d m_pose{IdentityMatrix4d};
 };
 
-class Scene
+class Scene : public QObject
 {
+    Q_OBJECT
 public:
     using Ptr = std::shared_ptr<Scene>;
     using BufferCache =
@@ -109,6 +110,9 @@ public:
 
     const Matrix4d& getPose() const;
     void setPose(const Matrix4d& pose);
+
+signals:
+    void update();
 
 private:
     BufferCache m_bufferCache;
