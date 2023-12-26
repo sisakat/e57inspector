@@ -74,6 +74,8 @@ public:
 
     bool isFullPanorama() const;
 
+    void cameraToImageView();
+
 private:
     Shader::Ptr m_shader;
     QImage m_image;

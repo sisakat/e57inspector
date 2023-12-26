@@ -490,3 +490,18 @@ bool Image2d::isFullPanorama() const
     return std::abs((m_imageWidth * m_pixelWidth) - 2 * M_PI) <
            std::numeric_limits<float>::epsilon();
 }
+
+void Image2d::cameraToImageView()
+{
+    auto camera = scene()->findNode<Camera>();
+    if (camera)
+    {
+        camera->setPosition(modelMatrix()[3]);
+        camera->setCenter(modelMatrix() *
+                          (isSpherical() ? X_AXIS4d : -Z_AXIS4d));
+        camera->setPickpointNavigation(false);
+        camera->setFieldOfView(75.0f);
+        setShowCoordinateSystemAxes(false);
+    }
+    scene()->update();
+}

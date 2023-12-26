@@ -267,14 +267,13 @@ void MainWindow::sceneView_itemDropped(SceneView* sender, QObject* source)
             auto camera = sender->scene().findNode<Camera>();
             if (camera)
             {
-                if (//image2d->isFullPanorama() &&
-                    sender->scene().nodes().size() < 3)
+                if (sender->scene().nodes().size() < 3)
                 {
-                    image2d->setShowCoordinateSystemAxes(false);
-                    camera->setPickpointNavigation(false);
-                    camera->setPosition(image2d->modelMatrix()[3]);
-                    camera->setFieldOfView(75.0f);
-                    topView = false;
+                    if (image2d->isSpherical())
+                    {
+                        image2d->cameraToImageView();
+                        topView = false;
+                    }
                 }
                 else
                 {
@@ -460,8 +459,7 @@ void MainWindow::openPointCloud(const E57NodePtr& node,
     bool hasIntensity = false;
 
     std::vector<std::array<float, 3>> rgb(0);
-    if (std::any_of(dataInfo.begin(), dataInfo.end(),
-                    [](const auto& info)
+    if (std::any_of(dataInfo.begin(), dataInfo.end(), [](const auto& info)
                     { return info.identifier == "colorRed"; }))
     {
         rgb.resize(BUFFER_SIZE);
@@ -475,8 +473,7 @@ void MainWindow::openPointCloud(const E57NodePtr& node,
     }
 
     std::vector<float> intensity(0);
-    if (std::any_of(dataInfo.begin(), dataInfo.end(),
-                    [](const auto& info)
+    if (std::any_of(dataInfo.begin(), dataInfo.end(), [](const auto& info)
                     { return info.identifier == "intensity"; }))
     {
         intensity.resize(BUFFER_SIZE);

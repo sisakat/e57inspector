@@ -40,6 +40,9 @@
         <file>icons/TopView.png</file>
     </qresource>
     <qresource>
+        <file>icons/PickpointNavigation.png</file>
+    </qresource>
+    <qresource>
         <file>icons/logo64.png</file>
     </qresource>
     <qresource>

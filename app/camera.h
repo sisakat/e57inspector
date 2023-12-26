@@ -66,6 +66,11 @@ public:
         m_position = Vector4d(position, 1.0f);
     }
 
+    void setCenter(const Vector3d& center)
+    {
+        m_center = Vector4d(center, 1.0f);
+    }
+
     void topView();
 
 protected:
