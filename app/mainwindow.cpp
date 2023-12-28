@@ -65,6 +65,9 @@ MainWindow::MainWindow(QWidget* parent)
 
     ui->twScene->setScenePropertyEditor(ui->twViewProperties);
     ui->tabWidget->addTab(new Welcome(ui->tabWidget), tr("Welcome"));
+
+    ui->tabWidgetMain->setVisible(false);
+    ui->tabWidgetScene->setVisible(false);
 }
 
 MainWindow::~MainWindow()
@@ -221,6 +224,9 @@ void MainWindow::loadE57(const std::string& filename)
     test->setAlignment(Qt::Alignment(Qt::AlignmentFlag::AlignTop));
     test->setMargin(10);
     ui->tabWidget->addTab(scrollArea, tr("Summary"));
+
+    ui->tabWidgetMain->setVisible(true);
+    ui->tabWidgetScene->setVisible(true);
 }
 
 void MainWindow::twMain_nodeSelected(TNode* node)
@@ -472,6 +478,8 @@ void MainWindow::sceneView_itemDropped(SceneView* sender, QObject* source)
             auto camera = sender->scene().findNode<Camera>();
             if (camera)
             {
+                camera->setUp(Z_AXIS);
+                camera->setConstrainedUp(Z_AXIS4d);
                 camera->setPickpointNavigation(true);
             }
         }

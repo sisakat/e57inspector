@@ -58,6 +58,12 @@ SceneImage2dTreeNode::SceneImage2dTreeNode(Image2d* image2d)
     else
     {
         setIcon(0, QIcon(":/icons/Image.png"));
+
+        m_contextMenu.addAction(
+            "Set camera to origin",
+            [this]() {
+                dynamic_cast<Image2d*>(this->sceneNode())->cameraToImageView();
+            });
     }
 }
 

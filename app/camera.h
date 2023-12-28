@@ -53,6 +53,13 @@ public:
         m_position = NullPoint4d;
         m_center = Vector4d(X_AXIS, 1.0f);
         m_up = Vector4d(Z_AXIS, 0.0f);
+        m_constrainedUp = Vector4d(Z_AXIS, 0.0f);
+    }
+
+    const Vector4d& getConstrainedUp() const { return m_constrainedUp; }
+    void setConstrainedUp(const Vector4d& constrainedUp)
+    {
+        m_constrainedUp = constrainedUp;
     }
 
     bool isPickpointNavigation() const { return m_pickpointNavigation; }
@@ -88,6 +95,7 @@ private:
     Vector4d m_center{1.0f, 0.0f, 0.0f, 1.0f};
     Vector4d m_up{0.0f, 0.0f, 1.0f, 0.0f};
     Vector4d m_pickpoint{0.0f, 0.0f, 0.0f, 1.0f};
+    Vector4d m_constrainedUp{Z_AXIS, 0.0f};
 
     Matrix4d m_view;
     Matrix4d m_projection;
@@ -111,13 +119,15 @@ private:
 
     bool m_topView{false};
 
-    struct FieldOfView {
+    struct FieldOfView
+    {
         float aspect;
         float tanHalfVFov;
         float tanHalfHFov;
     };
 
-    struct BoundingBoxExtents {
+    struct BoundingBoxExtents
+    {
         Vector3d center;
         Vector3d extents;
     };

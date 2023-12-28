@@ -496,13 +496,16 @@ void Image2d::cameraToImageView()
     auto camera = scene()->findNode<Camera>();
     if (camera)
     {
+        camera->setConstrainedUp(modelMatrix() *
+                                 (isSpherical() ? Z_AXIS4d : Y_AXIS4d));
         camera->setPosition(modelMatrix()[3]);
-        camera->setCenter(modelMatrix() *
-                          (isSpherical() ? X_AXIS4d : -Z_AXIS4d));
+        camera->setCenter(modelMatrix() * (isSpherical()
+                                               ? Vector4d(X_AXIS, 1.0f)
+                                               : Vector4d(-Z_AXIS, 1.0f)));
         camera->setUp(modelMatrix() * (isSpherical() ? Z_AXIS4d : Y_AXIS4d));
         camera->setPickpointNavigation(false);
         camera->setFieldOfView(75.0f);
-        setShowCoordinateSystemAxes(false);
+        setShowCoordinateSystemAxes(true);
     }
     scene()->update();
 }

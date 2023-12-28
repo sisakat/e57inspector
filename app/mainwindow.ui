@@ -30,7 +30,7 @@
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
-      <widget class="QTabWidget" name="tabWidget_3">
+      <widget class="QTabWidget" name="tabWidgetMain">
        <property name="tabPosition">
         <enum>QTabWidget::North</enum>
        </property>
@@ -58,7 +58,7 @@
        <property name="tabBarAutoHide">
         <bool>true</bool>
        </property>
-       <widget class="QWidget" name="tab_3">
+       <widget class="QWidget" name="tabPageMain">
         <attribute name="title">
          <string>File</string>
         </attribute>
@@ -106,11 +106,11 @@
         <bool>true</bool>
        </property>
       </widget>
-      <widget class="QTabWidget" name="tabWidget_2">
+      <widget class="QTabWidget" name="tabWidgetScene">
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
-       <widget class="QWidget" name="tab">
+       <widget class="QWidget" name="tabPageProperties">
         <attribute name="title">
          <string>Properties</string>
         </attribute>
@@ -134,7 +134,7 @@
          </item>
         </layout>
        </widget>
-       <widget class="QWidget" name="tab_2">
+       <widget class="QWidget" name="tabPageScene">
         <attribute name="title">
          <string>View</string>
         </attribute>
