@@ -37,7 +37,25 @@
         <file>icons/Close.png</file>
     </qresource>
     <qresource>
-        <file>icons/TopView.png</file>
+        <file>icons/SideViewTop.png</file>
+    </qresource>
+    <qresource>
+        <file>icons/About.png</file>
+    </qresource>
+    <qresource>
+        <file>icons/SideViewBottom.png</file>
+    </qresource>
+    <qresource>
+        <file>icons/SideViewLeft.png</file>
+    </qresource>
+    <qresource>
+        <file>icons/SideViewRight.png</file>
+    </qresource>
+    <qresource>
+        <file>icons/SideViewFront.png</file>
+    </qresource>
+    <qresource>
+        <file>icons/SideViewBack.png</file>
     </qresource>
     <qresource>
         <file>icons/PickpointNavigation.png</file>

@@ -74,6 +74,11 @@ public:
     void setUp(const Vector3d& up) { m_up = Vector4d(up, 1.0f); }
 
     void topView();
+    void bottomView();
+    void leftView();
+    void rightView();
+    void frontView();
+    void backView();
 
 protected:
     void updateNearFar();
@@ -106,7 +111,19 @@ private:
 
     bool m_topView{false};
 
-    void topView_impl();
+    struct FieldOfView {
+        float aspect;
+        float tanHalfVFov;
+        float tanHalfHFov;
+    };
+
+    struct BoundingBoxExtents {
+        Vector3d center;
+        Vector3d extents;
+    };
+
+    FieldOfView calculateFieldOfView();
+    BoundingBoxExtents calculateBoundingBoxExtents();
 };
 
 #endif // CAMERA_H

@@ -33,6 +33,11 @@ private slots:
     void actionClose_triggered();
     void actionAbout_triggered();
     void actionCamera_Top_triggered();
+    void actionCamera_Bottom_triggered();
+    void actionCamera_Left_triggered();
+    void actionCamera_Right_triggered();
+    void actionCamera_Front_triggered();
+    void actionCamera_Back_triggered();
     void twMain_nodeSelected(TNode* node);
     void tabWidget_tabClosesRequested(int index);
     void tabWidget_currentChanged(int index);

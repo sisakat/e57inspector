@@ -202,6 +202,11 @@
      <string>View</string>
     </property>
     <addaction name="actionCamera_Top"/>
+    <addaction name="actionCamera_Bottom"/>
+    <addaction name="actionCamera_Left"/>
+    <addaction name="actionCamera_Right"/>
+    <addaction name="actionCamera_Front"/>
+    <addaction name="actionCamera_Back"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
@@ -215,6 +220,15 @@
    <property name="movable">
     <bool>false</bool>
    </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>32</width>
+     <height>32</height>
+    </size>
+   </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
    </attribute>
@@ -223,6 +237,12 @@
    </attribute>
    <addaction name="actionOpen"/>
    <addaction name="actionCamera_Top"/>
+   <addaction name="actionCamera_Bottom"/>
+   <addaction name="actionCamera_Left"/>
+   <addaction name="actionCamera_Right"/>
+   <addaction name="actionCamera_Front"/>
+   <addaction name="actionCamera_Back"/>
+   <addaction name="actionAbout"/>
    <addaction name="actionClose"/>
   </widget>
   <action name="actionOpen">
@@ -243,6 +263,31 @@
   <action name="actionCamera_Top">
    <property name="text">
     <string>Camera Top</string>
+   </property>
+  </action>
+  <action name="actionCamera_Bottom">
+   <property name="text">
+    <string>Camera Bottom</string>
+   </property>
+  </action>
+  <action name="actionCamera_Left">
+   <property name="text">
+    <string>Camera Left</string>
+   </property>
+  </action>
+  <action name="actionCamera_Right">
+   <property name="text">
+    <string>Camera Right</string>
+   </property>
+  </action>
+  <action name="actionCamera_Front">
+   <property name="text">
+    <string>Camera Front</string>
+   </property>
+  </action>
+  <action name="actionCamera_Back">
+   <property name="text">
+    <string>Camera Back</string>
    </property>
   </action>
  </widget>

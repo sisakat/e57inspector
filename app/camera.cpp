@@ -371,22 +371,84 @@ Vector2d Camera::pickpoint() const
 
 void Camera::topView()
 {
+    auto bb = calculateBoundingBoxExtents();
+    auto fov = calculateFieldOfView();
+
+    // find height above bb center point so that the camera frustum sees all
+    // bounding box corners
+    float length1 = bb.extents.y * 1.0f / fov.tanHalfHFov;
+    float length2 = bb.extents.x * 1.0f / fov.tanHalfVFov;
+    float length = std::max(length1, length2) + bb.extents.z;
+
+    m_position = Vector4d(bb.center + Z_AXIS * length, 1.0f);
+    m_center = Vector4d(bb.center, 1.0f);
+    m_up = Vector4d(X_AXIS, 0.0f);
+}
+
+void Camera::bottomView()
+{
+    topView();
+    m_position = Vector4d(Vector3d(m_position) * -1.0f, 1.0f);
+    m_up = Vector4d(Vector3d(m_up) * -1.0f, 0.0f);
+}
+
+void Camera::leftView()
+{
+    auto bb = calculateBoundingBoxExtents();
+    auto fov = calculateFieldOfView();
+
+    // find height above bb center point so that the camera frustum sees all
+    // bounding box corners
+    float length1 = bb.extents.z * 1.0f / fov.tanHalfHFov;
+    float length2 = bb.extents.y * 1.0f / fov.tanHalfVFov;
+    float length = std::max(length1, length2) + bb.extents.y;
+
+    m_position = Vector4d(bb.extents + Y_AXIS * length, 1.0f);
+    m_center = Vector4d(bb.center, 1.0f);
+    m_up = Vector4d(Z_AXIS, 0.0f);
+}
+
+void Camera::rightView()
+{
+    leftView();
+    m_position = Vector4d(Vector3d(m_position) * -1.0f, 1.0f);
+}
+
+void Camera::frontView()
+{
+    auto bb = calculateBoundingBoxExtents();
+    auto fov = calculateFieldOfView();
+
+    // find height above bb center point so that the camera frustum sees all
+    // bounding box corners
+    float length1 = bb.extents.z * 1.0f / fov.tanHalfHFov;
+    float length2 = bb.extents.x * 1.0f / fov.tanHalfVFov;
+    float length = std::max(length1, length2) + bb.extents.x;
+
+    m_position = Vector4d(bb.extents + X_AXIS * length, 1.0f);
+    m_center = Vector4d(bb.center, 1.0f);
+    m_up = Vector4d(Z_AXIS, 0.0f);
+}
+
+void Camera::backView()
+{
+    frontView();
+    m_position = Vector4d(Vector3d(m_position) * -1.0f, 1.0f);
+}
+
+Camera::FieldOfView Camera::calculateFieldOfView()
+{
+    float aspect = 1.0f * m_viewportWidth / m_viewportHeight;
+    float tanVfov2 = std::tan(deg2rad(m_fieldOfView) / 2.0f);
+    float tanHfov2 = tanVfov2 * aspect;
+    return {aspect, tanVfov2, tanHfov2};
+}
+
+Camera::BoundingBoxExtents Camera::calculateBoundingBoxExtents()
+{
     auto bb = scene()->boundingBox();
     Vector3d bbCenter = (bb.min + bb.max) / 2.0f; // Bounding box center point
     Vector3d bbExtents =
         (bb.max - bb.min) / 2.0f; // Bounding box half width and height
-
-    float aspect = 1.0f * m_viewportWidth / m_viewportHeight;
-    float tanVfov2 = std::tan(deg2rad(m_fieldOfView) / 2.0f);
-    float tanHfov2 = tanVfov2 * aspect;
-
-    // find height above bb center point so that the camera frustum sees all
-    // bounding box corners
-    float length1 = bbExtents.y * 1.0f / tanHfov2;
-    float length2 = bbExtents.x * 1.0f / tanVfov2;
-    float length = std::max(length1, length2) + bbExtents.z;
-
-    m_position = Vector4d(bbCenter + Z_AXIS * length, 1.0f);
-    m_center = Vector4d(bbCenter, 1.0f);
-    m_up = Vector4d(X_AXIS, 0.0f);
+    return {bbCenter, bbExtents};
 }

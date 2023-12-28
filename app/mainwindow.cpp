@@ -32,6 +32,16 @@ MainWindow::MainWindow(QWidget* parent)
             &MainWindow::actionAbout_triggered);
     connect(ui->actionCamera_Top, &QAction::triggered, this,
             &MainWindow::actionCamera_Top_triggered);
+    connect(ui->actionCamera_Bottom, &QAction::triggered, this,
+            &MainWindow::actionCamera_Bottom_triggered);
+    connect(ui->actionCamera_Left, &QAction::triggered, this,
+            &MainWindow::actionCamera_Left_triggered);
+    connect(ui->actionCamera_Right, &QAction::triggered, this,
+            &MainWindow::actionCamera_Right_triggered);
+    connect(ui->actionCamera_Front, &QAction::triggered, this,
+            &MainWindow::actionCamera_Front_triggered);
+    connect(ui->actionCamera_Back, &QAction::triggered, this,
+            &MainWindow::actionCamera_Back_triggered);
     connect(ui->twMain, &E57Tree::nodeSelected, this,
             &MainWindow::twMain_nodeSelected);
     connect(ui->tabWidget, &QTabWidget::tabCloseRequested, this,
@@ -44,8 +54,14 @@ MainWindow::MainWindow(QWidget* parent)
             &MainWindow::twViewProperties_itemChanged);
 
     ui->actionOpen->setIcon(QIcon(":/icons/Open.png"));
-    ui->actionCamera_Top->setIcon(QIcon(":/icons/TopView.png"));
+    ui->actionCamera_Top->setIcon(QIcon(":/icons/SideViewTop.png"));
+    ui->actionCamera_Bottom->setIcon(QIcon(":/icons/SideViewBottom.png"));
+    ui->actionCamera_Left->setIcon(QIcon(":/icons/SideViewLeft.png"));
+    ui->actionCamera_Right->setIcon(QIcon(":/icons/SideViewRight.png"));
+    ui->actionCamera_Front->setIcon(QIcon(":/icons/SideViewFront.png"));
+    ui->actionCamera_Back->setIcon(QIcon(":/icons/SideViewBack.png"));
     ui->actionClose->setIcon(QIcon(":/icons/Close.png"));
+    ui->actionAbout->setIcon(QIcon(":/icons/About.png"));
 
     ui->twScene->setScenePropertyEditor(ui->twViewProperties);
     ui->tabWidget->addTab(new Welcome(ui->tabWidget), tr("Welcome"));
@@ -82,6 +98,81 @@ void MainWindow::actionCamera_Top_triggered()
         if (camera)
         {
             camera->topView();
+            camera->setPickpointNavigation(true);
+        }
+        sceneView->update();
+    }
+}
+
+void MainWindow::actionCamera_Bottom_triggered()
+{
+    auto sceneView = findSceneView();
+    if (sceneView)
+    {
+        auto camera = sceneView->scene().findNode<Camera>();
+        if (camera)
+        {
+            camera->bottomView();
+            camera->setPickpointNavigation(true);
+        }
+        sceneView->update();
+    }
+}
+
+void MainWindow::actionCamera_Left_triggered()
+{
+    auto sceneView = findSceneView();
+    if (sceneView)
+    {
+        auto camera = sceneView->scene().findNode<Camera>();
+        if (camera)
+        {
+            camera->leftView();
+            camera->setPickpointNavigation(true);
+        }
+        sceneView->update();
+    }
+}
+
+void MainWindow::actionCamera_Right_triggered()
+{
+    auto sceneView = findSceneView();
+    if (sceneView)
+    {
+        auto camera = sceneView->scene().findNode<Camera>();
+        if (camera)
+        {
+            camera->rightView();
+            camera->setPickpointNavigation(true);
+        }
+        sceneView->update();
+    }
+}
+
+void MainWindow::actionCamera_Front_triggered()
+{
+    auto sceneView = findSceneView();
+    if (sceneView)
+    {
+        auto camera = sceneView->scene().findNode<Camera>();
+        if (camera)
+        {
+            camera->frontView();
+            camera->setPickpointNavigation(true);
+        }
+        sceneView->update();
+    }
+}
+
+void MainWindow::actionCamera_Back_triggered()
+{
+    auto sceneView = findSceneView();
+    if (sceneView)
+    {
+        auto camera = sceneView->scene().findNode<Camera>();
+        if (camera)
+        {
+            camera->backView();
             camera->setPickpointNavigation(true);
         }
         sceneView->update();
