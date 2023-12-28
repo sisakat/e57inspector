@@ -66,8 +66,8 @@ MainWindow::MainWindow(QWidget* parent)
     ui->twScene->setScenePropertyEditor(ui->twViewProperties);
     ui->tabWidget->addTab(new Welcome(ui->tabWidget), tr("Welcome"));
 
-    ui->tabWidgetMain->setVisible(false);
-    ui->tabWidgetScene->setVisible(false);
+    ui->tabWidgetMain->setHidden(true);
+    ui->tabWidgetScene->setHidden(true);
 }
 
 MainWindow::~MainWindow()
@@ -225,8 +225,11 @@ void MainWindow::loadE57(const std::string& filename)
     test->setMargin(10);
     ui->tabWidget->addTab(scrollArea, tr("Summary"));
 
-    ui->tabWidgetMain->setVisible(true);
-    ui->tabWidgetScene->setVisible(true);
+    ui->tabWidgetMain->setHidden(false);
+    ui->tabWidgetScene->setHidden(false);
+    ui->tabWidgetScene->clear();
+    ui->tabWidgetScene->addTab(ui->tabPageProperties, tr("Properties"));
+    ui->tabWidgetScene->addTab(ui->tabPageScene, tr("View"));
 }
 
 void MainWindow::twMain_nodeSelected(TNode* node)
