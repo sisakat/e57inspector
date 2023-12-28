@@ -2,16 +2,26 @@
 #define POINTCLOUD_H
 
 #include "e57inspector/E57Node.h"
-#include "octree.h"
 #include "scene.h"
 #include "shader.h"
 #include <QColor>
+
+#include <array>
+#include <vector>
 
 enum class PointCloudViewType
 {
     COLOR = 0,
     INTENSITY = 1,
     SINGLECOLOR = 2
+};
+
+struct PointCloudData
+{
+    std::vector<std::array<float, 3>> xyz;
+    std::vector<std::array<float, 3>> normal;
+    std::vector<float> intensity;
+    std::vector<std::array<float, 4>> rgba;
 };
 
 class PointCloud : public SceneNode
@@ -36,35 +46,26 @@ public:
     [[nodiscard]] bool visible() const { return m_visible; }
     void setVisible(bool visible) { m_visible = visible; }
 
-    void insertPoints(const std::vector<PointData>& data);
-    void doneInserting();
+    void setPointCloudData(const PointCloudData& pointCloudData);
 
     [[nodiscard]] const E57Data3D& data3D() const { return *m_data3D; }
 
 private:
     E57Data3DPtr m_data3D;
-    Octree m_octree;
-    std::vector<OctreeNode*> m_octreeNodes;
     int m_pointSize{1};
     PointCloudViewType m_viewType{PointCloudViewType::COLOR};
     QColor m_singleColor;
     bool m_visible{true};
-    bool m_renderBoundingBox{true};
     Shader::Ptr m_shader;
     Shader::Ptr m_lineShader;
-};
 
-class PointCloudOctreeNode : public SceneNode
-{
-public:
-    explicit PointCloudOctreeNode(SceneNode* parent, OctreeNode* node);
-    ~PointCloudOctreeNode() override;
+    OpenGLArrayBuffer::Ptr m_bufferXYZ;
+    OpenGLArrayBuffer::Ptr m_bufferNormal;
+    OpenGLArrayBuffer::Ptr m_bufferIntensity;
+    OpenGLArrayBuffer::Ptr m_bufferRGBA;
 
-    void render() override;
-
-private:
-    GLuint m_vao{};
-    OctreeNode* m_node;
+    int64_t m_vao{-1};
+    uint64_t m_pointCount{0};
 };
 
 #endif // POINTCLOUD_H

@@ -11,7 +11,6 @@
 #include <vector>
 
 #include "camera.h"
-#include "octree.h"
 #include "pointcloud.h"
 #include "scene.h"
 #include "shader.h"

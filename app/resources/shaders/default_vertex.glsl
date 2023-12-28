@@ -1,8 +1,9 @@
 #version 330
 
 layout(location = 0) in vec3  in_vtx_xyz;
-layout(location = 1) in vec3  in_vtx_rgb;
+layout(location = 1) in vec3  in_vtx_normal;
 layout(location = 2) in float in_vtx_intensity;
+layout(location = 3) in vec4  in_vtx_rgba;
 
 out vec3 var_vtx_rgb;
 
@@ -20,7 +21,7 @@ void main()
 
     if (viewType == 0)
     {
-        var_vtx_rgb = in_vtx_rgb;
+        var_vtx_rgb = in_vtx_rgba.xyz;
     }
     else if (viewType == 1)
     {

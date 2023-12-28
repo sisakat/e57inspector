@@ -32,8 +32,6 @@ add_executable(${PROJECT_NAME}
         SceneView.h
         openglarraybuffer.cpp
         openglarraybuffer.h
-        octree.h
-        octree.cpp
         silrucache.h
         scene.h
         scene.cpp

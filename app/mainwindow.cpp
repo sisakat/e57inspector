@@ -284,7 +284,7 @@ void MainWindow::twMain_itemDoubleClicked(QTreeWidgetItem* item, int column)
         auto e57Data3D = std::dynamic_pointer_cast<E57Data3D>(node->node());
         if (e57Data3D->data().contains("points"))
         {
-            openPointCloud(e57Data3D, "points", data3D->text(0).toStdString());
+            sceneView_itemDropped(nullptr, ui->twMain);
         }
     }
 }
@@ -438,44 +438,61 @@ void MainWindow::sceneView_itemDropped(SceneView* sender, QObject* source)
 
             uint64_t count;
             uint64_t totalCount = 0;
+            PointCloudData data;
             while ((count = dataReader.read()) > 0)
             {
-                std::vector<PointData> pointData;
                 for (size_t i = 0; i < count; ++i)
                 {
-                    PointData pd{};
-                    pd.xyz = xyz[i];
+                    data.xyz.push_back(xyz[i]);
+
                     if (hasColor)
                     {
-                        pd.rgb = rgb[i];
-                        pd.rgb[0] /= 255.0;
-                        pd.rgb[1] /= 255.0;
-                        pd.rgb[2] /= 255.0;
-                    }
-                    else
-                    {
-                        pd.rgb[0] = 1.0;
-                        pd.rgb[1] = 1.0;
-                        pd.rgb[2] = 1.0;
+                        data.rgba.push_back({rgb[i][0] / 255.0f,
+                                             rgb[i][1] / 255.0f,
+                                             rgb[i][2] / 255.0f, 1.0f});
                     }
 
                     if (hasIntensity)
                     {
-                        pd.intensity = intensity[i];
+                        data.intensity.push_back(intensity[i]);
                     }
                     else
                     {
-                        pd.intensity = 1.0f;
+                        data.intensity.push_back(1.0f);
                     }
-
-                    pointData.push_back(pd);
                 }
-                pointCloud->insertPoints(pointData);
-                totalCount += count;
+            }
+
+            if (!data.intensity.empty())
+            {
+                float minIntensity = *std::min_element(data.intensity.begin(),
+                                                       data.intensity.end());
+                float maxIntensity = *std::max_element(data.intensity.begin(),
+                                                       data.intensity.end());
+                std::for_each(data.intensity.begin(), data.intensity.end(),
+                              [minIntensity, maxIntensity](auto& intensity)
+                              {
+                                  intensity -= minIntensity;
+                                  intensity /= (maxIntensity - minIntensity);
+                              });
+            }
+
+            if (!data.rgba.empty())
+            {
+                pointCloud->setViewType(PointCloudViewType::COLOR);
+            }
+            else if (!data.intensity.empty())
+            {
+                pointCloud->setViewType(PointCloudViewType::INTENSITY);
+            }
+            else
+            {
+                pointCloud->setViewType(PointCloudViewType::SINGLECOLOR);
+                pointCloud->setSingleColor(Qt::white);
             }
 
             pointCloud->setPose(E57Utils::getPose(*e57NodeData3D));
-            pointCloud->doneInserting();
+            pointCloud->setPointCloudData(data);
             sender->scene().addNode(pointCloud);
 
             auto camera = sender->scene().findNode<Camera>();
@@ -515,121 +532,6 @@ void MainWindow::openImage(const E57Image2D& node, const std::string& tabName)
         ui->tabWidget->addTab(imageViewer, QString::fromStdString(tabName));
     ui->tabWidget->setCurrentIndex(tabIndex);
     imageViewer->setImage(*image);
-}
-
-void MainWindow::openPointCloud(const E57NodePtr& node,
-                                const std::string& dataName,
-                                const std::string& tabName)
-{
-    if (!node->data().contains(dataName))
-        return;
-
-    auto e57Data3D = std::dynamic_pointer_cast<E57Data3D>(node);
-    auto dataInfo = m_reader->dataInfo(node->data().at(dataName));
-
-    auto* sceneView = findSceneView();
-    if (!sceneView)
-    {
-        sceneView = new SceneView(ui->tabWidget);
-        connect(sceneView, &SceneView::itemDropped, this,
-                &MainWindow::sceneView_itemDropped);
-        int tabIndex =
-            ui->tabWidget->addTab(sceneView, QString::fromStdString(tabName));
-        ui->tabWidget->setCurrentIndex(tabIndex);
-        sceneView->scene().setPose(
-            InverseMatrix(E57Utils::getPose(*e57Data3D)));
-    }
-    else
-    {
-        ui->tabWidget->setCurrentWidget(sceneView);
-        ui->tabWidget->setTabText(ui->tabWidget->currentIndex(),
-                                  QString("Combined View"));
-    }
-
-    sceneView->makeCurrent();
-
-    std::vector<std::array<float, 3>> xyz(BUFFER_SIZE);
-    auto dataReader = m_reader->dataReader(node->data().at(dataName));
-    dataReader.bindBuffer("cartesianX", (float*)&xyz[0][0], xyz.size(),
-                          3 * sizeof(float));
-    dataReader.bindBuffer("cartesianY", (float*)&xyz[0][1], xyz.size(),
-                          3 * sizeof(float));
-    dataReader.bindBuffer("cartesianZ", (float*)&xyz[0][2], xyz.size(),
-                          3 * sizeof(float));
-
-    bool hasColor = false;
-    bool hasIntensity = false;
-
-    std::vector<std::array<float, 3>> rgb(0);
-    if (std::any_of(dataInfo.begin(), dataInfo.end(), [](const auto& info)
-                    { return info.identifier == "colorRed"; }))
-    {
-        rgb.resize(BUFFER_SIZE);
-        hasColor = true;
-        dataReader.bindBuffer("colorRed", (float*)&rgb[0][0], rgb.size(),
-                              3 * sizeof(float));
-        dataReader.bindBuffer("colorGreen", (float*)&rgb[0][1], rgb.size(),
-                              3 * sizeof(float));
-        dataReader.bindBuffer("colorBlue", (float*)&rgb[0][2], rgb.size(),
-                              3 * sizeof(float));
-    }
-
-    std::vector<float> intensity(0);
-    if (std::any_of(dataInfo.begin(), dataInfo.end(), [](const auto& info)
-                    { return info.identifier == "intensity"; }))
-    {
-        intensity.resize(BUFFER_SIZE);
-        hasIntensity = true;
-        dataReader.bindBuffer("intensity", (float*)&intensity[0],
-                              intensity.size());
-    }
-
-    auto pointCloud = std::make_shared<PointCloud>(nullptr, e57Data3D);
-
-    uint64_t count;
-    uint64_t totalCount = 0;
-    while ((count = dataReader.read()) > 0)
-    {
-        std::vector<PointData> pointData;
-        for (size_t i = 0; i < count; ++i)
-        {
-            PointData pd{};
-            pd.xyz = xyz[i];
-            if (hasColor)
-            {
-                pd.rgb = rgb[i];
-                pd.rgb[0] /= 255.0;
-                pd.rgb[1] /= 255.0;
-                pd.rgb[2] /= 255.0;
-            }
-            else
-            {
-                pd.rgb[0] = 1.0;
-                pd.rgb[1] = 1.0;
-                pd.rgb[2] = 1.0;
-            }
-
-            if (hasIntensity)
-            {
-                pd.intensity = intensity[i];
-            }
-            else
-            {
-                pd.intensity = 1.0f;
-            }
-
-            pointData.push_back(pd);
-        }
-        pointCloud->insertPoints(pointData);
-        totalCount += count;
-    }
-
-    pointCloud->setPose(E57Utils::getPose(*e57Data3D));
-    pointCloud->doneInserting();
-    sceneView->scene().addNode(pointCloud);
-
-    ui->twScene->init(sceneView->scene());
-    ui->twViewProperties->clear();
 }
 
 SceneView* MainWindow::findSceneView()

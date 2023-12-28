@@ -7,7 +7,7 @@
 #include <utility>
 
 PointCloud::PointCloud(SceneNode* parent, E57Data3DPtr data3D)
-    : SceneNode(parent), m_data3D(std::move(data3D)), m_octree(),
+    : SceneNode(parent), m_data3D(std::move(data3D)),
       m_shader(ShaderFactory::createShader(":/shaders/default_vertex.glsl",
                                            ":/shaders/default_fragment.glsl")),
       m_lineShader(ShaderFactory::createShader(":/shaders/line_vertex.glsl",
@@ -15,7 +15,14 @@ PointCloud::PointCloud(SceneNode* parent, E57Data3DPtr data3D)
 {
 }
 
-PointCloud::~PointCloud() = default;
+PointCloud::~PointCloud()
+{
+    if (m_vao >= 0)
+    {
+        GLuint vao = m_vao;
+        glDeleteVertexArrays(1, &vao);
+    }
+}
 
 void PointCloud::render()
 {
@@ -32,10 +39,13 @@ void PointCloud::render()
         camera->configureShader();
     }
 
-    for (auto& child : m_childNodes)
+    if (m_vao > 0)
     {
-        child->render();
+        glBindVertexArray(m_vao);
+        glDrawArrays(GL_POINTS, 0, static_cast<int>(m_pointCount));
+        glBindVertexArray(0);
     }
+
     m_shader->release();
 }
 
@@ -92,88 +102,71 @@ void PointCloud::configureShader()
     }
 }
 
-void PointCloud::insertPoints(const std::vector<PointData>& data)
+void PointCloud::setPointCloudData(const PointCloudData& pointCloudData)
 {
-    m_octree.insert(data);
-}
-
-void PointCloud::doneInserting()
-{
-    m_octree.finalize();
-    std::queue<OctreeNode*> visit;
-    visit.push(&m_octree.root());
-    while (!visit.empty())
+    if (m_vao < 0)
     {
-        auto* node = visit.front();
-        visit.pop();
-        if (!node)
-        {
-            continue;
-        }
-        if (node->isLeaf())
-        {
-            m_octreeNodes.push_back(node);
-        }
-        for (int i = 0; i < 8; ++i)
-        {
-            visit.push(node->child(i));
-        }
+        GLuint vao;
+        glGenVertexArrays(1, &vao);
+        m_vao = vao;
     }
-
-    for (auto* node : m_octreeNodes)
-    {
-        addChild(std::make_shared<PointCloudOctreeNode>(this, node));
-    }
-}
-
-PointCloudOctreeNode::PointCloudOctreeNode(SceneNode* parent, OctreeNode* node)
-    : SceneNode(parent), m_node{node}
-{
-    glGenVertexArrays(1, &m_vao);
-    m_boundingBox = m_node->boundingBox();
-}
-
-PointCloudOctreeNode::~PointCloudOctreeNode()
-{
-    glDeleteVertexArrays(1, &m_vao);
-}
-
-void PointCloudOctreeNode::render()
-{
-    SceneNode::render();
-    OpenGLArrayBuffer::Ptr buffer;
-    auto& sc = *scene();
-
-    if (!scene()->bufferCache().contains(id()))
-    {
-        buffer = std::make_shared<OpenGLArrayBuffer>(
-            m_node->elements().data(), GL_FLOAT, 7,
-            (int)m_node->elements().size(), GL_STATIC_DRAW);
-        scene()->bufferCache().addItem(id(), buffer);
-    }
-    else
-    {
-        buffer = scene()->bufferCache().getItem(id()).value();
-    }
-
-    GLsizei stride = 7 * sizeof(GLfloat);
 
     glBindVertexArray(m_vao);
-    glBindBuffer(GL_ARRAY_BUFFER, buffer->buffer());
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride,
-                          (char*)0 + 0 * sizeof(GLfloat));
-    glEnableVertexAttribArray(0);
+    if (!pointCloudData.xyz.empty())
+    {
+        m_bufferXYZ = std::make_shared<OpenGLArrayBuffer>(
+            pointCloudData.xyz.data(), GL_FLOAT, 3, pointCloudData.xyz.size(),
+            GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, m_bufferXYZ->buffer());
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat),
+                              (char*)0);
+        glEnableVertexAttribArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        m_pointCount = pointCloudData.xyz.size();
 
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride,
-                          (char*)0 + 3 * sizeof(GLfloat));
-    glEnableVertexAttribArray(1);
+        m_boundingBox.reset();
+        for (const auto& point : pointCloudData.xyz)
+        {
+            m_boundingBox.update(Vector3d(point[0], point[1], point[2]));
+        }
+    }
 
-    glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, stride,
-                          (char*)0 + 6 * sizeof(GLfloat));
-    glEnableVertexAttribArray(2);
+    if (!pointCloudData.normal.empty())
+    {
+        m_bufferNormal = std::make_shared<OpenGLArrayBuffer>(
+            pointCloudData.normal.data(), GL_FLOAT, 3,
+            pointCloudData.normal.size(), GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, m_bufferNormal->buffer());
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat),
+                              (char*)0);
+        glEnableVertexAttribArray(1);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
 
-    glDrawArrays(GL_POINTS, 0, buffer->elementCount());
+    if (!pointCloudData.intensity.empty())
+    {
+        m_bufferIntensity = std::make_shared<OpenGLArrayBuffer>(
+            pointCloudData.intensity.data(), GL_FLOAT, 1,
+            pointCloudData.intensity.size(), GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, m_bufferIntensity->buffer());
+        glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, 1 * sizeof(GLfloat),
+                              (char*)0);
+        glEnableVertexAttribArray(2);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+
+    if (!pointCloudData.rgba.empty())
+    {
+        m_bufferRGBA = std::make_shared<OpenGLArrayBuffer>(
+            pointCloudData.rgba.data(), GL_FLOAT, 4, pointCloudData.rgba.size(),
+            GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, m_bufferRGBA->buffer());
+        glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat),
+                              (char*)0);
+        glEnableVertexAttribArray(3);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+
     glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
