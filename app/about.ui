@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>647</width>
-    <height>485</height>
+    <width>838</width>
+    <height>586</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -64,7 +64,7 @@
           <number>6</number>
          </property>
          <item>
-          <widget class="QLabel" name="label">
+          <widget class="QLabel" name="headerLabel">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
              <horstretch>0</horstretch>
@@ -73,7 +73,7 @@
            </property>
            <property name="font">
             <font>
-             <pointsize>26</pointsize>
+             <pointsize>11</pointsize>
             </font>
            </property>
            <property name="text">
@@ -112,7 +112,7 @@
        <property name="currentIndex">
         <number>0</number>
        </property>
-       <widget class="QWidget" name="tab">
+       <widget class="QWidget" name="aboutTab">
         <attribute name="title">
          <string>About</string>
         </attribute>
@@ -127,13 +127,13 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>585</width>
-              <height>251</height>
+              <width>776</width>
+              <height>352</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_4">
              <item>
-              <widget class="QLabel" name="label_2">
+              <widget class="QLabel" name="aboutLabel">
                <property name="text">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open-source ASTM E57 file viewer. Licensed under GNU GPLv3.&lt;/p&gt;&lt;p&gt;Project page: &lt;a href=&quot;https://github.com/sisakat/e57inspector&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#308cc6;&quot;&gt;https://github.com/sisakat/e57inspector&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;You have received copies of the GNU GPLv3 license with this product.&lt;/p&gt;&lt;hr /&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Copyright (C) 2023 Stefan Isak&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
@@ -157,7 +157,7 @@
          </item>
         </layout>
        </widget>
-       <widget class="QWidget" name="tab_2">
+       <widget class="QWidget" name="licensesTab">
         <attribute name="title">
          <string>Licenses</string>
         </attribute>
@@ -172,24 +172,21 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>585</width>
-              <height>251</height>
+              <width>776</width>
+              <height>352</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_5">
              <item>
-              <widget class="QLabel" name="label_4">
-               <property name="text">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;You have received copies of each license with this product.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;https://doc.qt.io/qt-6/gpl.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#308cc6;&quot;&gt;Qt GPL&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;http://libe57.org/license.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#308cc6;&quot;&gt;libE57 Libraries&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              <widget class="QTabWidget" name="licenseTabWidget">
+               <property name="tabPosition">
+                <enum>QTabWidget::North</enum>
                </property>
-               <property name="alignment">
-                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+               <property name="tabShape">
+                <enum>QTabWidget::Rounded</enum>
                </property>
-               <property name="wordWrap">
-                <bool>true</bool>
-               </property>
-               <property name="openExternalLinks">
-                <bool>true</bool>
+               <property name="currentIndex">
+                <number>-1</number>
                </property>
               </widget>
              </item>

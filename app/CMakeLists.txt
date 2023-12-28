@@ -1,10 +1,12 @@
-
 find_package(Qt6 COMPONENTS Widgets OpenGL OpenGLWidgets REQUIRED)
 find_package(OpenGL REQUIRED)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
+
+set_property(SOURCE ${CMAKE_CURRENT_BINARY_DIR}/version.h PROPERTY SKIP_AUTOGEN ON)
+set_source_files_properties(version.h.in PROPERTIES HEADER_FILE_ONLY TRUE)
 
 add_executable(${PROJECT_NAME}
         main.cpp
@@ -88,7 +90,8 @@ add_executable(${PROJECT_NAME}
         E57Utils.cpp
         E57Utils.h
         ShaderFactory.cpp
-        ShaderFactory.h)
+        ShaderFactory.h
+        version.h)
 target_link_libraries(${PROJECT_NAME} PRIVATE
         E57Format
         Qt6::Widgets
@@ -99,7 +102,21 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 target_include_directories(${PROJECT_NAME} PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/propertyeditor
+        ${CMAKE_CURRENT_BINARY_DIR}
         ../external/glm/)
+
+add_custom_command(
+        DEPENDS version.h.in
+        OUTPUT version.h
+        COMMAND ${CMAKE_COMMAND}
+        -DREPO_DIR="${CMAKE_CURRENT_SOURCE_DIR}/.."
+        -DVERSION_SOURCE="${CMAKE_CURRENT_SOURCE_DIR}/version.h.in"
+        -DVERSION_DESTINATION="${CMAKE_CURRENT_BINARY_DIR}/version.h"
+        -DCMAKE_PROJECT_VERSION_MAJOR=${CMAKE_PROJECT_VERSION_MAJOR}
+        -DCMAKE_PROJECT_VERSION_MINOR=${CMAKE_PROJECT_VERSION_MINOR}
+        -DCMAKE_PROJECT_VERSION_PATCH=${CMAKE_PROJECT_VERSION_PATCH}
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/gitversion.cmake"
+)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_compile_definitions(${PROJECT_NAME} PRIVATE DEBUG)

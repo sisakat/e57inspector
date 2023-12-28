@@ -69,7 +69,6 @@
     <qresource>
         <file>icons/logo256.png</file>
     </qresource>
-
     <qresource>
         <file>shaders/default_vertex.glsl</file>
     </qresource>
@@ -81,5 +80,23 @@
     </qresource>
     <qresource>
         <file>shaders/line_fragment.glsl</file>
+    </qresource>
+    <qresource>
+        <file>text/about.md</file>
+    </qresource>
+    <qresource>
+        <file>text/licenses/e57inspector.md</file>
+    </qresource>
+    <qresource>
+        <file>text/licenses/GLM.md</file>
+    </qresource>
+    <qresource>
+        <file>text/licenses/libE57format.md</file>
+    </qresource>
+    <qresource>
+        <file>text/licenses/Qt.md</file>
+    </qresource>
+    <qresource>
+        <file>text/licenses/Xerces-C.md</file>
     </qresource>
 </RCC>
