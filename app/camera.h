@@ -71,6 +71,8 @@ public:
         m_center = Vector4d(center, 1.0f);
     }
 
+    void setUp(const Vector3d& up) { m_up = Vector4d(up, 1.0f); }
+
     void topView();
 
 protected:
