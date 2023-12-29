@@ -102,4 +102,7 @@
     <qresource>
         <file>text/help/help.html</file>
     </qresource>
+    <qresource>
+        <file>text/welcome.html</file>
+    </qresource>
 </RCC>
