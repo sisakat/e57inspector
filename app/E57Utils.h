@@ -9,6 +9,14 @@
 
 #include "geometry.h"
 
+struct PointCloudData
+{
+    std::vector<std::array<float, 3>> xyz;
+    std::vector<std::array<float, 3>> normal;
+    std::vector<float> intensity;
+    std::vector<std::array<float, 4>> rgba;
+};
+
 class E57Utils
 {
 public:
@@ -35,6 +43,7 @@ public:
     std::optional<uint32_t> getImageBlobId(const E57NodePtr& node) const;
     std::optional<ImageFormat> getImageFormat(const E57NodePtr& node) const;
     std::optional<ImageParameters> getImageParameters(const E57Image2D& image2D) const;
+    std::optional<PointCloudData> getData3D(E57Data3D& data3D) const;
 
     static Matrix4d getPose(const E57Data3D& node) ;
     static Matrix4d getPose(const E57Image2D& node) ;

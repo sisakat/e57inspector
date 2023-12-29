@@ -9,19 +9,13 @@
 #include <array>
 #include <vector>
 
+#include "E57Utils.h"
+
 enum class PointCloudViewType
 {
     COLOR = 0,
     INTENSITY = 1,
     SINGLECOLOR = 2
-};
-
-struct PointCloudData
-{
-    std::vector<std::array<float, 3>> xyz;
-    std::vector<std::array<float, 3>> normal;
-    std::vector<float> intensity;
-    std::vector<std::array<float, 4>> rgba;
 };
 
 class PointCloud : public SceneNode
