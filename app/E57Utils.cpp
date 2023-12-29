@@ -193,6 +193,23 @@ std::optional<PointCloudData> E57Utils::getData3D(E57Data3D& data3D) const
                               xyz.size(), 3 * sizeof(float));
     }
 
+    bool hasInvalidPoints = false;
+    std::vector<int> invalid(0);
+    if (hasAttribute("cartesianInvalidState"))
+    {
+        hasInvalidPoints = true;
+        invalid.resize(BUFFER_SIZE);
+        dataReader.bindBuffer("cartesianInvalidState", (int*)&invalid[0],
+                              invalid.size(), 1 * sizeof(int));
+    }
+    else if (hasAttribute("sphericalInvalidState"))
+    {
+        hasInvalidPoints = true;
+        invalid.resize(BUFFER_SIZE);
+        dataReader.bindBuffer("sphericalInvalidState", (int*)&invalid[0],
+                              invalid.size(), 1 * sizeof(int));
+    }
+
     bool hasColor = false;
     bool hasIntensity = false;
     std::vector<std::array<float, 3>> rgb(0);
@@ -225,6 +242,11 @@ std::optional<PointCloudData> E57Utils::getData3D(E57Data3D& data3D) const
     {
         for (size_t i = 0; i < count; ++i)
         {
+            if (hasInvalidPoints && invalid[i] > 0)
+            {
+                continue;
+            }
+
             if (isSpherical)
             {
                 data.xyz.push_back(sphericalToCartesian(xyz[i]));
