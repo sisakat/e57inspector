@@ -99,4 +99,7 @@
     <qresource>
         <file>text/licenses/Xerces-C.md</file>
     </qresource>
+    <qresource>
+        <file>text/help/help.html</file>
+    </qresource>
 </RCC>

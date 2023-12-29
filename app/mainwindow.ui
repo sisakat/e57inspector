@@ -196,6 +196,7 @@
      <string>Help</string>
     </property>
     <addaction name="actionAbout"/>
+    <addaction name="actionHelp"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
@@ -288,6 +289,11 @@
   <action name="actionCamera_Back">
    <property name="text">
     <string>Camera Back</string>
+   </property>
+  </action>
+  <action name="actionHelp">
+   <property name="text">
+    <string>Help</string>
    </property>
   </action>
  </widget>

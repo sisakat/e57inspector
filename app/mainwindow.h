@@ -32,6 +32,7 @@ private slots:
     void actionOpen_triggered();
     void actionClose_triggered();
     void actionAbout_triggered();
+    void actionHelp_triggered();
     void actionCamera_Top_triggered();
     void actionCamera_Bottom_triggered();
     void actionCamera_Left_triggered();
