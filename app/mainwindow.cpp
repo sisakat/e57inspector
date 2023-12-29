@@ -421,7 +421,8 @@ void MainWindow::sceneView_itemDropped(SceneView* sender, QObject* source)
             auto dataInfo =
                 m_reader->dataInfo(e57NodeData3D->data().at("points"));
 
-            if (sender->scene().nodes().size() < 2)
+            bool isFirstObject = sender->scene().nodes().size() < 2;
+            if (isFirstObject)
             {
                 sender->scene().setPose(
                     InverseMatrix(E57Utils::getPose(*e57NodeData3D)));
@@ -457,14 +458,6 @@ void MainWindow::sceneView_itemDropped(SceneView* sender, QObject* source)
                 pointCloud->setPose(E57Utils::getPose(*e57NodeData3D));
                 pointCloud->setPointCloudData(*data);
                 sender->scene().addNode(pointCloud);
-
-                auto camera = sender->scene().findNode<Camera>();
-                if (camera)
-                {
-                    camera->setUp(Z_AXIS);
-                    camera->setConstrainedUp(Z_AXIS4d);
-                    camera->setPickpointNavigation(true);
-                }
             }
         }
     }
