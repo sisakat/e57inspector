@@ -28,6 +28,14 @@ As of now scans are loaded synchronously (blocking UI). Depending on the size it
 Double-clicking a second scan while one is already opened, will add it to the current view.
 Point size and color can be adjusted in the "View" tab on the right hand side.
 
+## Features
+- Explore contents in a tree.
+- Inspect all meta-data and fields of the stored objects.
+- View the point cloud in 3D.
+- View images in 2D and 3D (view-cone and position).
+- View spherical images in 2D and 3D.
+- Supports cartesian and spherical point coordinates.
+
 ## Controls
 
 *3D view:* Left click to rotate, Right click to zoom, Mouse-wheel to zoom, Mouse-middle click to pan.
@@ -40,6 +48,11 @@ To build the project from source you will need the following dependencies instal
 
 * Qt6
 * Xerces-C for XML parsing
+
+On Ubuntu 22.04 you can use the following snippet to install the dependencies:
+```
+sudo apt install qt6-base-dev libxerces-c-dev
+```
 
 ## License and copyright
 
