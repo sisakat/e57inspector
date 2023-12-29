@@ -6,6 +6,7 @@
 #include "SceneView.h"
 #include "about.h"
 #include "siimageviewer.h"
+#include "version.h"
 #include "welcome.h"
 
 #include <QBuffer>
@@ -71,6 +72,10 @@ MainWindow::MainWindow(QWidget* parent)
 
     ui->tabWidgetMain->setHidden(true);
     ui->tabWidgetScene->setHidden(true);
+
+    std::string statusBarText = std::string(INFO_PRODUCTNAME_STRING) + " " +
+                                std::string(INFO_PRODUCTVERSION_STRING);
+    ui->statusbar->showMessage(QString::fromStdString(statusBarText));
 }
 
 MainWindow::~MainWindow()
@@ -348,6 +353,13 @@ void MainWindow::sceneView_itemDropped(SceneView* sender, QObject* source)
             auto e57NodeImage2D =
                 std::dynamic_pointer_cast<E57Image2D>(nodeImage2D->node());
 
+            if (sceneViewCreated)
+            {
+                ui->tabWidget->setTabText(
+                    ui->tabWidget->currentIndex(),
+                    QString::fromStdString(e57NodeImage2D->name()));
+            }
+
             if (sender->scene().nodes().size() < 2)
             {
                 if (associatedData3D)
@@ -413,6 +425,13 @@ void MainWindow::sceneView_itemDropped(SceneView* sender, QObject* source)
             {
                 sender->scene().setPose(
                     InverseMatrix(E57Utils::getPose(*e57NodeData3D)));
+            }
+
+            if (sceneViewCreated)
+            {
+                ui->tabWidget->setTabText(
+                    ui->tabWidget->currentIndex(),
+                    QString::fromStdString(e57NodeData3D->name()));
             }
 
             auto pointCloud =
