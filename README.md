@@ -11,6 +11,8 @@ For bug reports or feature requests please open an issue.
 Feedback of all sort is appreciated.
 
 ![Screenshot](docs/e57inspector_screenshot.png)
+![Screenshot OpenPitMine](docs/e57inspector_screenshot_openpitmine.png)
+![Screenshot Spherical Imagery](docs/e57inspector_screenshot_spherical.png)
 *(the visualized point cloud is part of the sample data provided by [libE57.org](http://libe57.org/data.html))*
 
 ## Overview
