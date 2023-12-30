@@ -1,3 +1,5 @@
+![Title](docs/e57inspector_title.png)
+
 # E57 Inspector
 
 E57 Inspector is cross-platform E57 file viewer.
