@@ -8,12 +8,12 @@
 
 inline float deg2rad(float deg)
 {
-    return deg * M_PIf / 180.0f;
+    return deg * M_PI / 180.0f;
 }
 
 inline float rad2deg(float rad)
 {
-    return rad * 180.0f / M_PIf;
+    return rad * 180.0f / M_PI;
 }
 
 using Vector2d = glm::vec2;

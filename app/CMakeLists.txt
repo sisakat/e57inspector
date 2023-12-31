@@ -122,4 +122,5 @@ endif ()
 
 if (WIN32)
     set_property(TARGET ${PROJECT_NAME} PROPERTY WIN32_EXECUTABLE true)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC _USE_MATH_DEFINES)
 endif ()
