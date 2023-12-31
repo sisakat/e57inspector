@@ -73,7 +73,8 @@ void Camera::configureShader()
 }
 void Camera::yaw(float angle)
 {
-    Vector3d rotationAxis = m_constrainedCamera ? Vector3d(m_constrainedUp) : Vector3d(m_up);
+    Vector3d rotationAxis =
+        m_constrainedCamera ? Vector3d(m_constrainedUp) : Vector3d(m_up);
     Matrix4d transformation = TranslationMatrix(m_pickpoint) *
                               RotationMatrix(angle, rotationAxis) *
                               TranslationMatrix(VectorNegate(m_pickpoint));
@@ -90,7 +91,8 @@ void Camera::pitch(float angle)
         RotationMatrix(angle, VectorCross(Vector3d(m_up), viewVec)) *
         TranslationMatrix(VectorNegate(m_pickpoint));
     Vector3d newUp = transformation * m_up;
-    if (!m_constrainedCamera || VectorDot(Vector3d(m_constrainedUp), newUp) >= 0.0f)
+    if (!m_constrainedCamera ||
+        VectorDot(Vector3d(m_constrainedUp), newUp) >= 0.0f)
     {
         m_position = transformation * m_position;
         m_center = transformation * m_center;
@@ -143,10 +145,12 @@ Vector3d Camera::project(const Vector4d& object) const
     result = m_projection * result;
     result /= result.w;
 
-    result.x = ((result.x + 1.0f) / 2.0f + static_cast<float>(m_viewportX)) *
-               static_cast<float>(m_viewportWidth);
-    result.y = ((result.y + 1.0f) / 2.0f + static_cast<float>(m_viewportY)) *
-               static_cast<float>(m_viewportHeight);
+    result.x =
+        ((result.x + 1.0f) / 2.0f) * static_cast<float>(m_viewportWidth) +
+        static_cast<float>(m_viewportX);
+    result.y =
+        ((result.y + 1.0f) / 2.0f) * static_cast<float>(m_viewportHeight) +
+        static_cast<float>(m_viewportY);
     result.z = (result.z + 1.0f) / 2.0f;
     return result;
 }
