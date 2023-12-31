@@ -28,9 +28,9 @@ void Camera::render2D(QPainter& painter)
     {
         auto pp = pickpoint();
         const int x =
-            static_cast<int>(pp.x - 2.0 * scene()->devicePixelRatio());
+            static_cast<int>((pp.x - 2.0) * scene()->devicePixelRatio());
         const int y =
-            static_cast<int>(pp.y - 2.0 * scene()->devicePixelRatio());
+            static_cast<int>((pp.y - 2.0) * scene()->devicePixelRatio());
         const int d = static_cast<int>(4 * scene()->devicePixelRatio());
         painter.fillRect(x, y, d, d, Qt::red);
     }
