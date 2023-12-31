@@ -27,11 +27,11 @@ void Camera::render2D(QPainter& painter)
     if (m_pickpointNavigation)
     {
         auto pp = pickpoint();
-        const int x =
-            static_cast<int>((pp.x - 2.0) * scene()->devicePixelRatio());
-        const int y =
-            static_cast<int>((pp.y - 2.0) * scene()->devicePixelRatio());
-        const int d = static_cast<int>(4 * scene()->devicePixelRatio());
+        pp.x /= scene()->devicePixelRatio();
+        pp.y /= scene()->devicePixelRatio();
+        const int x = static_cast<int>(pp.x - 2.0);
+        const int y = static_cast<int>(pp.y - 2.0);
+        const int d = static_cast<int>(4);
         painter.fillRect(x, y, d, d, Qt::red);
     }
 }
@@ -233,8 +233,8 @@ void Camera::mousePressEvent(QMouseEvent* event)
         m_panning = true;
     }
 
-    m_originalMousePosition.x = event->pos().x();
-    m_originalMousePosition.y = event->pos().y();
+    m_originalMousePosition.x = event->pos().x() * scene()->devicePixelRatio();
+    m_originalMousePosition.y = event->pos().y() * scene()->devicePixelRatio();
     updatePickpoint(m_originalMousePosition);
 }
 
@@ -253,13 +253,14 @@ void Camera::mouseReleaseEvent(QMouseEvent* event)
         m_panning = false;
     }
 
-    m_originalMousePosition.x = event->pos().x();
-    m_originalMousePosition.y = event->pos().y();
+    m_originalMousePosition.x = event->pos().x() * scene()->devicePixelRatio();
+    m_originalMousePosition.y = event->pos().y() * scene()->devicePixelRatio();
 }
 
 void Camera::mouseMoveEvent(QMouseEvent* event)
 {
-    Vector2d pos(event->pos().x(), event->pos().y());
+    Vector2d pos(event->pos().x() * scene()->devicePixelRatio(),
+                 event->pos().y() * scene()->devicePixelRatio());
 
     if (m_mouseDown)
     {
@@ -287,8 +288,9 @@ void Camera::mouseMoveEvent(QMouseEvent* event)
 
     if (m_panning && m_pickpointNavigation)
     {
-        int u = event->pos().x();
-        int v = m_viewportHeight - 1 - event->pos().y();
+        int u = event->pos().x() * scene()->devicePixelRatio();
+        int v = m_viewportHeight - 1 -
+                event->pos().y() * scene()->devicePixelRatio();
 
         int uOriginal = m_originalMousePosition.x;
         int vOriginal = m_viewportHeight - 1 - m_originalMousePosition.y;
@@ -307,8 +309,8 @@ void Camera::mouseMoveEvent(QMouseEvent* event)
         m_center -= delta;
     }
 
-    m_originalMousePosition.x = event->pos().x();
-    m_originalMousePosition.y = event->pos().y();
+    m_originalMousePosition.x = event->pos().x() * scene()->devicePixelRatio();
+    m_originalMousePosition.y = event->pos().y() * scene()->devicePixelRatio();
 }
 
 void Camera::wheelEvent(QWheelEvent* event)
@@ -317,7 +319,8 @@ void Camera::wheelEvent(QWheelEvent* event)
         return;
 
     auto qPoint = event->position().toPoint();
-    Vector2d point(qPoint.x(), qPoint.y());
+    Vector2d point(qPoint.x() * scene()->devicePixelRatio(),
+                   qPoint.y() * scene()->devicePixelRatio());
     updatePickpoint(point);
     auto viewDir = VectorNormalize(m_position - m_pickpoint);
     auto lengthToTarget = VectorLength(m_position - m_pickpoint);

@@ -112,15 +112,19 @@ void Image2d::render2D(QPainter& painter)
         painter.setPen(Qt::black);
         painter.setBrush(Qt::white);
         painter.drawEllipse(
-            static_cast<int>(positionScreen.x) - 5,
-            static_cast<int>(camera->viewportHeight() - 1 - positionScreen.y) -
-                5,
+            static_cast<int>((positionScreen.x - 5) /
+                             scene()->devicePixelRatio()),
+            static_cast<int>(
+                ((camera->viewportHeight() - 1 - positionScreen.y) - 5) /
+                scene()->devicePixelRatio()),
             10, 10);
 
         painter.setPen(Qt::white);
         painter.drawText(
-            static_cast<int>(positionScreen.x) + 10,
-            static_cast<int>(camera->viewportHeight() - 1 - positionScreen.y),
+            static_cast<int>((positionScreen.x + 10) /
+                             scene()->devicePixelRatio()),
+            static_cast<int>((camera->viewportHeight() - 1 - positionScreen.y) /
+                             scene()->devicePixelRatio()),
             QString::fromStdString(name()));
     }
 }
