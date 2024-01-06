@@ -76,6 +76,12 @@ MainWindow::MainWindow(QWidget* parent)
     std::string statusBarText = std::string(INFO_PRODUCTNAME_STRING) + " " +
                                 std::string(INFO_PRODUCTVERSION_STRING);
     ui->statusbar->showMessage(QString::fromStdString(statusBarText));
+
+    // workaround for closing and reopening window
+    auto* sceneView = new SceneView();
+    int index = ui->tabWidget->addTab(sceneView, "");
+    ui->tabWidget->removeTab(index);
+    sceneView->deleteLater();
 }
 
 MainWindow::~MainWindow()
