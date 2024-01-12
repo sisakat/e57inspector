@@ -116,6 +116,9 @@ add_custom_command(
         -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/gitversion.cmake"
 )
 
+add_custom_target(versionh ALL DEPENDS version.h)
+add_dependencies(${PROJECT_NAME} versionh)
+
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_compile_definitions(${PROJECT_NAME} PRIVATE DEBUG)
 endif ()
