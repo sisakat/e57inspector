@@ -85,7 +85,7 @@ private:
     bool m_showCoordinateSystemAxes{true};
     int m_lastRevision{-1};
     int m_revision{0};
-    int m_segments{20};
+    int m_segments{100};
     bool m_backfaceCulling{false};
 
     OpenGLArrayBuffer::Ptr m_lineBuffer;
