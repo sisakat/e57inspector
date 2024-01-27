@@ -34,6 +34,7 @@ About::About(QWidget* parent) : QDialog(parent), ui(new Ui::About)
                                  QDirIterator::NoIteratorFlags);
     while (licenseIterator.hasNext())
     {
+        licenseIterator.next();
         auto fileInfo = licenseIterator.fileInfo();
         QFile licenseFile(fileInfo.absoluteFilePath());
         if (licenseFile.open(QIODevice::ReadOnly))
