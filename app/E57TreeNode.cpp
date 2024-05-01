@@ -1,5 +1,6 @@
 #include "E57TreeNode.h"
 
+#include "E57Tree.h"
 #include <utility>
 
 TE57Node::TE57Node(E57NodePtr node) : m_node(std::move(node))
@@ -7,7 +8,10 @@ TE57Node::TE57Node(E57NodePtr node) : m_node(std::move(node))
     setText(0, QString::fromStdString(m_node->name()));
 }
 
-E57NodePtr TE57Node::node() { return m_node; }
+E57NodePtr TE57Node::node() const
+{
+    return m_node;
+}
 
 TNodeE57::TNodeE57(const E57RootPtr& root) : TE57Node(root)
 {
@@ -22,6 +26,14 @@ TNodeData3D::TNodeData3D(const E57Data3DPtr& node) : TE57Node(node)
 
     m_images = new TNodeImages();
     addChild(m_images);
+
+    m_contextMenu.addAction(
+        "Open scan panorama",
+        [this]()
+        {
+            auto* tree = dynamic_cast<E57Tree*>(this->treeWidget());
+            tree->onAction(this, NodeAction::opScanPanorama);
+        });
 }
 
 TNodeImages::TNodeImages() : TNode()

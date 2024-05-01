@@ -1,6 +1,7 @@
 #ifndef E57INSPECTOR_E57TREENODE_H
 #define E57INSPECTOR_E57TREENODE_H
 
+#include <QMenu>
 #include <QTreeWidgetItem>
 #include <e57inspector/E57Node.h>
 
@@ -20,13 +21,18 @@ public:
         }
         return nullptr;
     }
+
+    [[nodiscard]] QMenu& contextMenu() { return m_contextMenu; }
+
+protected:
+    QMenu m_contextMenu;
 };
 
 class TE57Node : public TNode
 {
 public:
     explicit TE57Node(E57NodePtr node);
-    E57NodePtr node();
+    E57NodePtr node() const;
 
 private:
     E57NodePtr m_node;

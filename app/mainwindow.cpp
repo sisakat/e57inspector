@@ -3,6 +3,7 @@
 #include "E57TreeNode.h"
 #include "E57Utils.h"
 #include "Image2d.h"
+#include "PanoramaImageThread.h"
 #include "SceneView.h"
 #include "about.h"
 #include "siimageviewer.h"
@@ -15,8 +16,10 @@
 #include <QGraphicsView>
 #include <QImageReader>
 #include <QLabel>
+#include <QMessageBox>
 #include <QMimeData>
 #include <QTextEdit>
+#include <QThread>
 
 static const int BUFFER_SIZE = 10000;
 
@@ -48,6 +51,7 @@ MainWindow::MainWindow(QWidget* parent)
             &MainWindow::actionCamera_Back_triggered);
     connect(ui->twMain, &E57Tree::nodeSelected, this,
             &MainWindow::twMain_nodeSelected);
+    connect(ui->twMain, &E57Tree::onAction, this, &MainWindow::twMain_onAction);
     connect(ui->tabWidget, &QTabWidget::tabCloseRequested, this,
             &MainWindow::tabWidget_tabClosesRequested);
     connect(ui->twMain, &E57Tree::itemDoubleClicked, this,
@@ -230,6 +234,7 @@ void MainWindow::openFile()
 
 void MainWindow::loadE57(const std::string& filename)
 {
+    m_filename = filename;
     m_reader = std::make_unique<E57Reader>(filename);
     ui->twMain->init(m_reader->root());
     ui->twViewProperties->init(nullptr);
@@ -269,6 +274,51 @@ void MainWindow::twMain_nodeSelected(TNode* node)
     if (dynamic_cast<TE57Node*>(node) != nullptr)
     {
         ui->twProperties->init(dynamic_cast<TE57Node*>(node));
+    }
+}
+
+void MainWindow::onPanoramaImageThreadFinished(const std::string& title,
+                                               QImage image)
+{
+    if (title.empty())
+    {
+        QMessageBox::critical(
+            this, "Error",
+            "Could not create scan data panorama. This may be due to "
+            "missing fields in the Data3D item.");
+        return;
+    }
+
+    auto* imageViewer = new SiImageViewer(ui->tabWidget);
+    int tabIndex =
+        ui->tabWidget->addTab(imageViewer, QString::fromStdString(title));
+    ui->tabWidget->setCurrentIndex(tabIndex);
+    imageViewer->setImage(image);
+}
+
+void MainWindow::twMain_onAction(const TNode* node, NodeAction action)
+{
+    if (dynamic_cast<const TNodeData3D*>(node) != nullptr)
+    {
+        const auto* data3DNode = dynamic_cast<const TNodeData3D*>(node);
+
+        QThread* thread = new QThread();
+        PanoramaImageThread* worker = new PanoramaImageThread(
+            m_filename, data3DNode->node()->getString("guid"),
+            data3DNode->node()->name() + std::string(" Scan Panorama"));
+        worker->moveToThread(thread);
+
+        connect(worker, SIGNAL(error(QString)), this,
+                SLOT(errorString(QString)));
+        connect(thread, &QThread::started, worker,
+                &PanoramaImageThread::process);
+        connect(worker, &PanoramaImageThread::panoramaImageResult, this,
+                &MainWindow::onPanoramaImageThreadFinished);
+        connect(worker, &PanoramaImageThread::finished, thread, &QThread::quit);
+        connect(worker, &PanoramaImageThread::finished, worker,
+                &PanoramaImageThread::deleteLater);
+        connect(thread, &QThread::finished, thread, &QThread::deleteLater);
+        thread->start();
     }
 }
 

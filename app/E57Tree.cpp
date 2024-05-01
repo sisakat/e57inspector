@@ -5,6 +5,9 @@ E57Tree::E57Tree(QWidget* parent) : QTreeWidget(parent)
     setColumnCount(1);
     setHeaderHidden(true);
     setIconSize(QSize(16, 16));
+    setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(this, &QTreeWidget::customContextMenuRequested, this,
+            &E57Tree::onCustomContextMenuRequested);
 }
 
 void E57Tree::init(const E57RootPtr& root)
@@ -96,4 +99,23 @@ TNodeData3D* E57Tree::findData3DNode(QTreeWidgetItem* item,
     }
 
     return nullptr;
+}
+
+void E57Tree::onCustomContextMenuRequested(const QPoint& pos)
+{
+    QTreeWidgetItem* item = itemAt(pos);
+    if (!item)
+        return;
+
+    if (!dynamic_cast<TNode*>(item))
+        return;
+
+    auto* sceneTreeNode = dynamic_cast<TNode*>(item);
+    auto& menu = sceneTreeNode->contextMenu();
+    menu.exec(viewport()->mapToGlobal(pos));
+}
+
+void E57Tree::emitOnAction(const TNode* node, NodeAction action)
+{
+    emit onAction(node, action);
 }

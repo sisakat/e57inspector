@@ -13,5 +13,6 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(libE57Format)
 
 add_subdirectory(lib)
+add_subdirectory(panorama)
 add_subdirectory(app)
 

@@ -7,6 +7,7 @@
 #include <e57inspector/E57Reader.h>
 
 #include "E57TreeNode.h"
+#include "NodeAction.h"
 #include "SceneView.h"
 
 QT_BEGIN_NAMESPACE
@@ -40,14 +41,17 @@ private slots:
     void actionCamera_Front_triggered();
     void actionCamera_Back_triggered();
     void twMain_nodeSelected(TNode* node);
+    void twMain_onAction(const TNode* node, NodeAction action);
     void tabWidget_tabClosesRequested(int index);
     void tabWidget_currentChanged(int index);
     void twMain_itemDoubleClicked(QTreeWidgetItem* item, int column);
     void twViewProperties_itemChanged(QTreeWidgetItem* item, int column);
     void sceneView_itemDropped(SceneView* sender, QObject* source);
+    void onPanoramaImageThreadFinished(const std::string& title, QImage image);
 
 private:
     Ui::MainWindow* ui;
+    std::string m_filename;
     std::unique_ptr<E57Reader> m_reader;
 
     void openFile();
