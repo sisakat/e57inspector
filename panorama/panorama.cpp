@@ -5,6 +5,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <utility>
+#include <cmath>
 
 static const int BUFFER_SIZE = 10000;
 
