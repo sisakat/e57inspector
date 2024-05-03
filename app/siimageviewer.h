@@ -105,6 +105,7 @@ private:
     int32_t m_imageWidth{1};
     int32_t m_imageHeight{1};
     QColor m_backgroundColor;
+    bool m_imageAssigned{false};
 
     QMatrix4x4 m_pre;        // used to transform the vertex coordinates to match the image dimension
     QMatrix4x4 m_model;      // used for global transformations (user rotation, scaling, ...)

@@ -70,6 +70,9 @@ SiImageViewer::SiImageViewer(QWidget *parent) : QOpenGLWidget(parent)
 
 SiImageViewer::~SiImageViewer()
 {
+    if (!m_imageAssigned)
+        return;
+
     glDeleteTextures(1, &m_texture);
 
     glDeleteVertexArrays(1, &m_vao);
@@ -102,6 +105,7 @@ void SiImageViewer::setImage(const QImage &image)
         tmpImage.bits());
     setupMatrices();
     update();
+    m_imageAssigned = true;
 }
 
 void SiImageViewer::setBackground(const QColor &color)
