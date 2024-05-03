@@ -91,11 +91,11 @@ Shader::Shader(const std::string& vertexShaderFilename,
 
 Shader::~Shader()
 {
-    glDetachShader(m_shaderProgram, m_vertexShader);
-    glDetachShader(m_shaderProgram, m_fragmentShader);
-    glDeleteShader(m_vertexShader);
-    glDeleteShader(m_fragmentShader);
-    glDeleteProgram(m_shaderProgram);
+//    glDetachShader(m_shaderProgram, m_vertexShader);
+//    glDetachShader(m_shaderProgram, m_fragmentShader);
+//    glDeleteShader(m_vertexShader);
+//    glDeleteShader(m_fragmentShader);
+//    glDeleteProgram(m_shaderProgram);
 }
 
 void Shader::use()
