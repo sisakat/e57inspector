@@ -14,6 +14,11 @@ Welcome::Welcome(QWidget* parent) : QWidget(parent), ui(new Ui::Welcome)
         document->setDocumentMargin(10);
         ui->textBrowser->setDocument(document);
         ui->textBrowser->setReadOnly(true);
+
+        // scroll to top
+        QTextCursor cursor = ui->textBrowser->textCursor();
+        cursor.setPosition(0);
+        ui->textBrowser->setTextCursor(cursor);
     }
 }
 
