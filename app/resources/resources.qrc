@@ -73,6 +73,9 @@
         <file>icons/XmlDump.png</file>
     </qresource>
     <qresource>
+        <file>icons/Header.png</file>
+    </qresource>
+    <qresource>
         <file>shaders/default_vertex.glsl</file>
     </qresource>
     <qresource>
