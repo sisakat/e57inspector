@@ -315,6 +315,7 @@ void MainWindow::twMain_onAction(const TNode* node, NodeAction action)
             showXMLDump();
         }
     }
+
     if (dynamic_cast<const TNodeData3D*>(node) != nullptr)
     {
         const auto* data3DNode = dynamic_cast<const TNodeData3D*>(node);
@@ -339,6 +340,30 @@ void MainWindow::twMain_onAction(const TNode* node, NodeAction action)
                     &PanoramaImageThread::deleteLater);
             connect(thread, &QThread::finished, thread, &QThread::deleteLater);
             thread->start();
+        }
+        else if (action == NodeAction::opView3d)
+        {
+            auto e57Data3D =
+                std::dynamic_pointer_cast<E57Data3D>(data3DNode->node());
+            if (e57Data3D->data().contains("points"))
+            {
+                sceneView_itemDropped(nullptr, ui->twMain);
+            }
+        }
+    }
+
+    if (dynamic_cast<const TNodeImage2D*>(node) != nullptr)
+    {
+        const auto* dataImage2D = dynamic_cast<const TNodeImage2D*>(node);
+        if (action == NodeAction::opView2d)
+        {
+            auto e57Image2D =
+                std::dynamic_pointer_cast<E57Image2D>(dataImage2D->node());
+            openImage(*e57Image2D, e57Image2D->name());
+        }
+        else if (action == NodeAction::opView3d)
+        {
+            sceneView_itemDropped(nullptr, ui->twMain);
         }
     }
 }
@@ -641,10 +666,7 @@ void MainWindow::dropEvent(QDropEvent* event)
     }
 }
 
-void MainWindow::closeEvent(QCloseEvent* event)
-{
-
-}
+void MainWindow::closeEvent(QCloseEvent* event) {}
 
 SceneView* MainWindow::createSceneView(const std::string& name)
 {

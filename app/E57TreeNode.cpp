@@ -35,6 +35,13 @@ TNodeData3D::TNodeData3D(const E57Data3DPtr& node) : TE57Node(node)
     m_images = new TNodeImages();
     addChild(m_images);
 
+    m_contextMenu.addAction("Open in 3D view",
+                            [this]()
+                            {
+                                auto* tree =
+                                    dynamic_cast<E57Tree*>(this->treeWidget());
+                                tree->onAction(this, NodeAction::opView3d);
+                            });
     m_contextMenu.addAction(
         "Open scan panorama",
         [this]()
@@ -54,6 +61,21 @@ TNodeImage2D::TNodeImage2D(const E57Image2DPtr& node) : TE57Node(node)
 {
     setText(0, QString::fromStdString(node->name()));
     setIcon(0, QIcon(":/icons/Image.png"));
+
+    m_contextMenu.addAction("Open in 2D view",
+                            [this]()
+                            {
+                                auto* tree =
+                                    dynamic_cast<E57Tree*>(this->treeWidget());
+                                tree->onAction(this, NodeAction::opView2d);
+                            });
+    m_contextMenu.addAction("Open in 3D view",
+                            [this]()
+                            {
+                                auto* tree =
+                                    dynamic_cast<E57Tree*>(this->treeWidget());
+                                tree->onAction(this, NodeAction::opView3d);
+                            });
 }
 
 TNode* createTNode(const E57NodePtr& e57Node)
