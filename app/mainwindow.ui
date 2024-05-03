@@ -189,6 +189,7 @@
      <string>File</string>
     </property>
     <addaction name="actionOpen"/>
+	<addaction name="actionShow_XML_dump"/>
     <addaction name="actionClose"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
@@ -243,6 +244,7 @@
    <addaction name="actionCamera_Right"/>
    <addaction name="actionCamera_Front"/>
    <addaction name="actionCamera_Back"/>
+   <addaction name="actionShow_XML_dump"/>
    <addaction name="actionAbout"/>
    <addaction name="actionClose"/>
   </widget>
@@ -294,6 +296,11 @@
   <action name="actionHelp">
    <property name="text">
     <string>Help</string>
+   </property>
+  </action>
+  <action name="actionShow_XML_dump">
+   <property name="text">
+    <string>Show XML dump</string>
    </property>
   </action>
  </widget>

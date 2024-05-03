@@ -28,6 +28,7 @@ public:
 protected:
     void dragEnterEvent(QDragEnterEvent* event) override;
     void dropEvent(QDropEvent* event) override;
+    void closeEvent(QCloseEvent* event) override;
 
 private slots:
     void actionOpen_triggered();
@@ -40,6 +41,7 @@ private slots:
     void actionCamera_Right_triggered();
     void actionCamera_Front_triggered();
     void actionCamera_Back_triggered();
+    void actionShow_XML_dump_triggered();
     void twMain_nodeSelected(TNode* node);
     void twMain_onAction(const TNode* node, NodeAction action);
     void tabWidget_tabClosesRequested(int index);
@@ -58,6 +60,7 @@ private:
     void loadE57(const std::string& filename);
     void openImage(const E57Image2D& node, const std::string& tabName);
     void createEditor(const std::string& title, const std::string& content);
+    void showXMLDump();
     SceneView* createSceneView(const std::string& name = "New View");
 
     SceneView* findSceneView();

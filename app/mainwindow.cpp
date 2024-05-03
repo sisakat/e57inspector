@@ -50,6 +50,8 @@ MainWindow::MainWindow(QWidget* parent)
             &MainWindow::actionCamera_Front_triggered);
     connect(ui->actionCamera_Back, &QAction::triggered, this,
             &MainWindow::actionCamera_Back_triggered);
+    connect(ui->actionShow_XML_dump, &QAction::triggered, this,
+            &MainWindow::actionShow_XML_dump_triggered);
     connect(ui->twMain, &E57Tree::nodeSelected, this,
             &MainWindow::twMain_nodeSelected);
     connect(ui->twMain, &E57Tree::onAction, this, &MainWindow::twMain_onAction);
@@ -69,8 +71,9 @@ MainWindow::MainWindow(QWidget* parent)
     ui->actionCamera_Right->setIcon(QIcon(":/icons/SideViewRight.png"));
     ui->actionCamera_Front->setIcon(QIcon(":/icons/SideViewFront.png"));
     ui->actionCamera_Back->setIcon(QIcon(":/icons/SideViewBack.png"));
-    ui->actionClose->setIcon(QIcon(":/icons/Close.png"));
+    ui->actionShow_XML_dump->setIcon(QIcon(":/icons/XmlDump.png"));
     ui->actionAbout->setIcon(QIcon(":/icons/About.png"));
+    ui->actionClose->setIcon(QIcon(":/icons/Close.png"));
 
     ui->twScene->setScenePropertyEditor(ui->twViewProperties);
     ui->tabWidget->addTab(new Welcome(ui->tabWidget), tr("Welcome"));
@@ -219,6 +222,11 @@ void MainWindow::actionCamera_Back_triggered()
     }
 }
 
+void MainWindow::actionShow_XML_dump_triggered()
+{
+    showXMLDump();
+}
+
 void MainWindow::openFile()
 {
     QFileDialog dialog(this);
@@ -304,7 +312,7 @@ void MainWindow::twMain_onAction(const TNode* node, NodeAction action)
         const auto* e57node = dynamic_cast<const TNodeE57*>(node);
         if (action == NodeAction::opXmlDump)
         {
-            createEditor("XML Dump", m_reader->dumpXML(2));
+            showXMLDump();
         }
     }
     if (dynamic_cast<const TNodeData3D*>(node) != nullptr)
@@ -576,6 +584,14 @@ void MainWindow::createEditor(const std::string& title,
     editor->setFont(fixedFont);
 }
 
+void MainWindow::showXMLDump()
+{
+    if (m_reader)
+    {
+        createEditor("XML Dump", m_reader->dumpXML(2));
+    }
+}
+
 SceneView* MainWindow::findSceneView()
 {
     for (int i = 0; i < ui->tabWidget->count(); ++i)
@@ -623,6 +639,11 @@ void MainWindow::dropEvent(QDropEvent* event)
             sceneView_itemDropped(nullptr, event->source());
         }
     }
+}
+
+void MainWindow::closeEvent(QCloseEvent* event)
+{
+
 }
 
 SceneView* MainWindow::createSceneView(const std::string& name)
