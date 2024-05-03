@@ -17,6 +17,14 @@ TNodeE57::TNodeE57(const E57RootPtr& root) : TE57Node(root)
 {
     setText(0, QString::fromStdString(root->name()));
     setIcon(0, QIcon(":/icons/E57.png"));
+
+    m_contextMenu.addAction("Show XML dump",
+                            [this]()
+                            {
+                                auto* tree =
+                                    dynamic_cast<E57Tree*>(this->treeWidget());
+                                tree->onAction(this, NodeAction::opXmlDump);
+                            });
 }
 
 TNodeData3D::TNodeData3D(const E57Data3DPtr& node) : TE57Node(node)

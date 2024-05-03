@@ -10,7 +10,9 @@ set(SOURCES
         src/E57ReaderImpl.h
         src/E57Utils.h
         include/e57inspector/E57Node.h
-        src/E57Utils.h)
+        src/E57Utils.h
+        src/PagedBinaryFileReader.cpp
+        src/PagedBinaryFileReader.h)
 
 add_library(${library_name} ${HEADERS} ${SOURCES})
 target_include_directories(${library_name} PUBLIC include)

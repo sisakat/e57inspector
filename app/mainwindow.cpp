@@ -12,6 +12,7 @@
 
 #include <QBuffer>
 #include <QFileDialog>
+#include <QFontDatabase>
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QImageReader>
@@ -298,27 +299,39 @@ void MainWindow::onPanoramaImageThreadFinished(const std::string& title,
 
 void MainWindow::twMain_onAction(const TNode* node, NodeAction action)
 {
+    if (dynamic_cast<const TNodeE57*>(node) != nullptr)
+    {
+        const auto* e57node = dynamic_cast<const TNodeE57*>(node);
+        if (action == NodeAction::opXmlDump)
+        {
+            createEditor("XML Dump", m_reader->dumpXML(2));
+        }
+    }
     if (dynamic_cast<const TNodeData3D*>(node) != nullptr)
     {
         const auto* data3DNode = dynamic_cast<const TNodeData3D*>(node);
 
-        QThread* thread = new QThread();
-        PanoramaImageThread* worker = new PanoramaImageThread(
-            m_filename, data3DNode->node()->getString("guid"),
-            data3DNode->node()->name() + std::string(" Scan Panorama"));
-        worker->moveToThread(thread);
+        if (action == NodeAction::opScanPanorama)
+        {
+            QThread* thread = new QThread();
+            PanoramaImageThread* worker = new PanoramaImageThread(
+                m_filename, data3DNode->node()->getString("guid"),
+                data3DNode->node()->name() + std::string(" Scan Panorama"));
+            worker->moveToThread(thread);
 
-        connect(worker, SIGNAL(error(QString)), this,
-                SLOT(errorString(QString)));
-        connect(thread, &QThread::started, worker,
-                &PanoramaImageThread::process);
-        connect(worker, &PanoramaImageThread::panoramaImageResult, this,
-                &MainWindow::onPanoramaImageThreadFinished);
-        connect(worker, &PanoramaImageThread::finished, thread, &QThread::quit);
-        connect(worker, &PanoramaImageThread::finished, worker,
-                &PanoramaImageThread::deleteLater);
-        connect(thread, &QThread::finished, thread, &QThread::deleteLater);
-        thread->start();
+            connect(worker, SIGNAL(error(QString)), this,
+                    SLOT(errorString(QString)));
+            connect(thread, &QThread::started, worker,
+                    &PanoramaImageThread::process);
+            connect(worker, &PanoramaImageThread::panoramaImageResult, this,
+                    &MainWindow::onPanoramaImageThreadFinished);
+            connect(worker, &PanoramaImageThread::finished, thread,
+                    &QThread::quit);
+            connect(worker, &PanoramaImageThread::finished, worker,
+                    &PanoramaImageThread::deleteLater);
+            connect(thread, &QThread::finished, thread, &QThread::deleteLater);
+            thread->start();
+        }
     }
 }
 
@@ -545,6 +558,22 @@ void MainWindow::openImage(const E57Image2D& node, const std::string& tabName)
         ui->tabWidget->addTab(imageViewer, QString::fromStdString(tabName));
     ui->tabWidget->setCurrentIndex(tabIndex);
     imageViewer->setImage(*image);
+}
+
+void MainWindow::createEditor(const std::string& title,
+                              const std::string& content)
+{
+    auto* imageViewer = new SiImageViewer(ui->tabWidget);
+    auto* editor = new QTextEdit(ui->tabWidget);
+    int tabIndex = ui->tabWidget->addTab(editor, QString::fromStdString(title));
+    ui->tabWidget->setCurrentIndex(tabIndex);
+    editor->setText(QString::fromStdString(content));
+    editor->setHorizontalScrollBarPolicy(
+        Qt::ScrollBarPolicy::ScrollBarAsNeeded);
+    editor->setWordWrapMode(QTextOption::WrapMode::NoWrap);
+
+    const QFont fixedFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+    editor->setFont(fixedFont);
 }
 
 SceneView* MainWindow::findSceneView()

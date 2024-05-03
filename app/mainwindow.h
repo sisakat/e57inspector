@@ -57,6 +57,7 @@ private:
     void openFile();
     void loadE57(const std::string& filename);
     void openImage(const E57Image2D& node, const std::string& tabName);
+    void createEditor(const std::string& title, const std::string& content);
     SceneView* createSceneView(const std::string& name = "New View");
 
     SceneView* findSceneView();

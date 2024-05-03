@@ -7,9 +7,15 @@ E57Reader::E57Reader(const std::string& filename)
 {
 }
 
-E57Reader::~E57Reader() { delete m_impl; }
+E57Reader::~E57Reader()
+{
+    delete m_impl;
+}
 
-const E57RootPtr& E57Reader::root() const { return m_impl->root(); }
+const E57RootPtr& E57Reader::root() const
+{
+    return m_impl->root();
+}
 
 std::vector<uint8_t> E57Reader::blobData(uint32_t blobId) const
 {
@@ -24,6 +30,11 @@ std::vector<E57DataInfo> E57Reader::dataInfo(uint32_t dataId) const
 E57DataReader E57Reader::dataReader(uint32_t dataId) const
 {
     return E57DataReader(m_impl->dataReader(dataId));
+}
+
+std::string E57Reader::dumpXML(int indent) const
+{
+    return m_impl->dumpXML(indent);
 }
 
 void E57DataReader::bindBuffer(const std::string& identifier, float* buffer,
@@ -80,4 +91,7 @@ void E57DataReader::bindBuffer(const std::string& identifier, uint32_t* buffer,
     m_impl->bindBuffer(identifier, buffer, bufferSize, stride);
 }
 
-uint64_t E57DataReader::read() { return m_impl->read(); }
+uint64_t E57DataReader::read()
+{
+    return m_impl->read();
+}

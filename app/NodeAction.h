@@ -3,7 +3,8 @@
 
 enum class NodeAction
 {
-    opScanPanorama
+    opScanPanorama,
+    opXmlDump
 };
 
 #endif // E57INSPECTOR_NODEACTION_H

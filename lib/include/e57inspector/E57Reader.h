@@ -32,6 +32,7 @@ public:
     [[nodiscard]] std::vector<uint8_t> blobData(uint32_t blobId) const;
     [[nodiscard]] std::vector<E57DataInfo> dataInfo(uint32_t dataId) const;
     [[nodiscard]] E57DataReader dataReader(uint32_t dataId) const;
+    [[nodiscard]] std::string dumpXML(int indent = 4) const;
 
 private:
     E57ReaderImpl* m_impl;

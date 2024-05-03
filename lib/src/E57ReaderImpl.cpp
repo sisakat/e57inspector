@@ -2,8 +2,11 @@
 
 #include <exception>
 #include <filesystem>
+#include <fstream>
+#include <vector>
 
 #include "E57Utils.h"
+#include "PagedBinaryFileReader.h"
 
 void E57ReaderImpl::parseFields(E57NodePtr result,
                                 const e57::StructureNode& node,
@@ -241,6 +244,44 @@ std::vector<E57DataInfo> E57ReaderImpl::dataInfo(uint32_t dataId) const
     }
 
     return result;
+}
+
+std::string readFileSignature(std::ifstream& ifs)
+{
+    char data[8];
+    ifs.read(data, 8);
+    return {data, data + 8};
+}
+
+std::string readVersion(std::ifstream& ifs)
+{
+    uint32_t versionMajor, versionMinor;
+    ifs.read((char*)&versionMajor, sizeof(uint32_t));
+    ifs.read((char*)&versionMinor, sizeof(uint32_t));
+    return std::to_string(versionMajor) + "." + std::to_string(versionMinor);
+}
+
+std::string E57ReaderImpl::dumpXML(int indent) const
+{
+    std::ifstream ifs(m_imageFile.fileName(), std::ios::binary);
+    std::string fileSignature = readFileSignature(ifs);
+    std::string version = readVersion(ifs);
+
+    uint64_t fileLength, xmlOffset, xmlLength, pageSize;
+    ifs.read((char*)&fileLength, sizeof(uint64_t));
+    ifs.read((char*)&xmlOffset, sizeof(uint64_t));
+    ifs.read((char*)&xmlLength, sizeof(uint64_t));
+    ifs.read((char*)&pageSize, sizeof(uint64_t));
+    ifs.close();
+
+    const int8_t CRC_LEN = 4;
+    std::vector<char> xml(xmlLength, 0);
+    PagedBinaryFileReader bfr(m_imageFile.fileName(), pageSize,
+                              pageSize - CRC_LEN);
+    bfr.seek(xmlOffset);
+    bfr.readBytes(xml, xml.size());
+
+    return std::string(xml.begin(), xml.end());
 }
 
 std::shared_ptr<E57DataReaderImpl> E57ReaderImpl::dataReader(uint32_t dataId)
