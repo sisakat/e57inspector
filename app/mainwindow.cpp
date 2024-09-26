@@ -7,6 +7,7 @@
 #include "SceneView.h"
 #include "about.h"
 #include "siimageviewer.h"
+#include "utils.h"
 #include "version.h"
 #include "welcome.h"
 
@@ -365,6 +366,10 @@ void MainWindow::twMain_onAction(const TNode* node, NodeAction action)
         {
             sceneView_itemDropped(nullptr, ui->twMain);
         }
+        else if (action == NodeAction::opSaveImage)
+        {
+            saveImages();
+        }
     }
 }
 
@@ -591,6 +596,63 @@ void MainWindow::openImage(const E57Image2D& node, const std::string& tabName)
         ui->tabWidget->addTab(imageViewer, QString::fromStdString(tabName));
     ui->tabWidget->setCurrentIndex(tabIndex);
     imageViewer->setImage(*image);
+}
+
+void MainWindow::saveImages()
+{
+    if (ui->twMain->selectedItems().count() > 1)
+    {
+        QFileDialog qfd(this);
+        qfd.setViewMode(QFileDialog::Detail);
+        qfd.setAcceptMode(QFileDialog::AcceptSave);
+        qfd.setFileMode(QFileDialog::FileMode::Directory);
+        if (qfd.exec())
+        {
+            for (auto* item : ui->twMain->selectedItems())
+            {
+                if (auto* nodeImage2D = dynamic_cast<TNodeImage2D*>(item))
+                {
+                    std::string filename =
+                        makeFilename(nodeImage2D->node()->name() + ".jpg");
+                    saveImage(*std::dynamic_pointer_cast<E57Image2D>(
+                                  nodeImage2D->node()),
+                              (std::filesystem::path(
+                                   qfd.selectedFiles().front().toStdString()) /
+                               std::filesystem::path(filename))
+                                  .string());
+                }
+            }
+        }
+    }
+    else if (ui->twMain->selectedItems().count() == 1)
+    {
+        auto selectedItems = ui->twMain->selectedItems();
+        if (auto* nodeImage2D =
+                dynamic_cast<TNodeImage2D*>(selectedItems.front()))
+        {
+            QFileDialog qfd(this);
+            qfd.setDefaultSuffix("jpg");
+            qfd.setNameFilter(tr("Image (*.jpg)"));
+            qfd.setViewMode(QFileDialog::Detail);
+            qfd.setAcceptMode(QFileDialog::AcceptSave);
+            qfd.setFileMode(QFileDialog::FileMode::AnyFile);
+            if (qfd.exec())
+            {
+                const auto filename = qfd.selectedFiles().front();
+                saveImage(
+                    *std::dynamic_pointer_cast<E57Image2D>(nodeImage2D->node()),
+                    filename.toStdString());
+            }
+        }
+    }
+}
+
+void MainWindow::saveImage(const E57Image2D& node, const std::string& filename)
+{
+    auto image = E57Utils(*m_reader).getImage(node);
+    if (!image)
+        return;
+    image->save(QString::fromStdString(filename));
 }
 
 void MainWindow::createEditor(const std::string& title,
