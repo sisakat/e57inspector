@@ -4,14 +4,14 @@
 #include <algorithm>
 #include <string>
 
-inline std::string to_lower(std::string str)
+std::string to_lower(std::string str)
 {
     std::transform(str.begin(), str.end(), str.begin(),
                    [](char c) { return std::tolower(c); });
     return str;
 }
 
-inline std::string camelCaseToPascalCase(const std::string& str,
+std::string camelCaseToPascalCase(const std::string& str,
                                   const char* separator = " ")
 {
     std::string result;
@@ -36,21 +36,6 @@ inline std::string camelCaseToPascalCase(const std::string& str,
         previous = ch;
     }
     return result;
-}
-
-inline std::string makeFilename(const std::string& filename)
-{
-    std::string s = filename;
-    std::string illegalChars = "\\/:?\"<>|";
-    for (auto it = s.begin(); it < s.end(); ++it)
-    {
-        bool found = illegalChars.find(*it) != std::string::npos;
-        if (found)
-        {
-            *it = ' ';
-        }
-    }
-    return s;
 }
 
 #endif // E57INSPECTOR_UTILS_H

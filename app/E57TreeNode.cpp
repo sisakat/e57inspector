@@ -76,11 +76,6 @@ TNodeImage2D::TNodeImage2D(const E57Image2DPtr& node) : TE57Node(node)
                                     dynamic_cast<E57Tree*>(this->treeWidget());
                                 tree->onAction(this, NodeAction::opView3d);
                             });
-    m_contextMenu.addAction("Save image...",
-                            [this]() {
-                                auto* tree = dynamic_cast<E57Tree*>(this->treeWidget());
-                                tree->onAction(this, NodeAction::opSaveImage);
-                            });
 }
 
 TNode* createTNode(const E57NodePtr& e57Node)
