@@ -60,6 +60,30 @@ std::optional<QImage> E57Utils::getImage(const E57Image2D& image2D) const
                             rawData.size(), *imageFormat);
 }
 
+std::optional<QImage> E57Utils::getImageMask(const E57Image2D& image2D) const
+{
+    auto imageRepresentation = getImageRepresentation(image2D);
+    if (!imageRepresentation)
+        return std::nullopt;
+    auto blobId = getBlobId(*imageRepresentation, "imageMask");
+    if (!blobId)
+        return std::nullopt;
+
+    auto rawData = m_reader.blobData(*blobId);
+    return imageFromRawData(reinterpret_cast<const uchar*>(rawData.data()),
+                            rawData.size(), ImageFormat::PNG);
+}
+
+std::optional<uint32_t> E57Utils::getBlobId(const E57NodePtr& node,
+                                            const std::string& name) const
+{
+    if (node->blobs().contains(name))
+    {
+        return node->blobs().at(name);
+    }
+    return std::nullopt;
+}
+
 std::optional<uint32_t> E57Utils::getImageBlobId(const E57NodePtr& node) const
 {
     if (node->blobs().contains("jpegImage"))

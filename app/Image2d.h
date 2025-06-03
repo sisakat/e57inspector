@@ -23,6 +23,7 @@ public:
     void configureShader() override;
 
     void setImage(const QImage& image);
+    void setImageMask(const QImage& image);
 
     float coneLength() const { return m_coneLength; }
     void setConeLength(float coneLength)
@@ -44,6 +45,9 @@ public:
 
     bool isVisible() const;
     void setVisible(bool visible);
+
+    bool applyImageMask() const;
+    void setApplyImageMask(bool value);
 
     bool isShowCoordinateSystemAxes() const { return m_showCoordinateSystemAxes; }
     void setShowCoordinateSystemAxes(bool showCoordinateAxes)
@@ -79,9 +83,12 @@ public:
 private:
     Shader::Ptr m_shader;
     QImage m_image;
+    QImage m_imageMask;
     GLuint m_texture;
+    GLuint m_imageMaskTexture;
     float m_coneLength{1.0f};
     bool m_visible{true};
+    bool m_applyImageMask{true};
     bool m_showCoordinateSystemAxes{true};
     int m_lastRevision{-1};
     int m_revision{0};

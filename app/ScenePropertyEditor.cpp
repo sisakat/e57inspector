@@ -117,6 +117,10 @@ void ScenePropertyEditor::initFromImage2d()
         new CBoolProperty("visible", "Visible", image2d->isVisible(), true);
     add(visible);
 
+    auto* applyImageMask = new CBoolProperty(
+        "applyImageMask", "Apply Image Mask", image2d->applyImageMask(), true);
+    add(applyImageMask);
+
     auto* showCoordinateSystemAxes =
         new CBoolProperty("showCoordinateSystemAxes", "Show Axes",
                           image2d->isShowCoordinateSystemAxes(), true);
@@ -195,6 +199,12 @@ void ScenePropertyEditor::changeFromImage2d(QTreeWidgetItem* item)
     if (visible)
     {
         image2d->setVisible(*visible);
+    }
+
+    auto applyImageMask = getBooleanValue(item, "applyImageMask");
+    if (applyImageMask)
+    {
+        image2d->setApplyImageMask(*applyImageMask);
     }
 
     auto showCoordinateSystemAxes =

@@ -52,6 +52,8 @@ public:
     std::optional<int> getCurrentShaderProgram();
     std::optional<int> getUniformLocation(const std::string& name);
 
+    [[nodiscard]] bool transparent() const;
+
     friend class Scene;
 
 protected:
@@ -61,6 +63,7 @@ protected:
     Scene* m_scene;
     SceneNode* m_parent{nullptr};
     BoundingBox m_boundingBox{};
+    bool m_transparent{false};
 
     void setScene(Scene* scene);
 

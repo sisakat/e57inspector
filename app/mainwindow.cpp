@@ -482,6 +482,11 @@ void MainWindow::sceneView_itemDropped(SceneView* sender, QObject* source)
             if (!image)
                 return;
             image2d->setImage(*image);
+            auto imageMask = utils.getImageMask(*e57NodeImage2D);
+            if (imageMask)
+            {
+                image2d->setImageMask(*imageMask);
+            }
             auto imageParameters = utils.getImageParameters(*e57NodeImage2D);
             if (!imageParameters)
                 return;

@@ -9,7 +9,17 @@ void Scene::render()
 {
     for (auto& child : m_nodes)
     {
-        child->render();
+        if (!child->transparent())
+        {
+            child->render();
+        }
+    }
+    for (auto& child : m_nodes)
+    {
+        if (child->transparent())
+        {
+            child->render();
+        }
     }
 }
 
@@ -155,6 +165,11 @@ std::optional<int> SceneNode::getUniformLocation(const std::string& name)
         return std::nullopt;
     }
     return location;
+}
+
+bool SceneNode::transparent() const
+{
+    return m_transparent;
 }
 
 void Scene::addNode(SceneNode::Ptr node)

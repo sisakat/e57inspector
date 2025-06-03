@@ -7,6 +7,7 @@ Image2d::Image2d(SceneNode* parent)
       m_shader(ShaderFactory::createShader(":/shaders/line_vertex.glsl",
                                            ":/shaders/line_fragment.glsl"))
 {
+    m_transparent = true;
 }
 
 void Image2d::render()
@@ -60,6 +61,8 @@ void Image2d::render()
 
     if (m_image.sizeInBytes() > 0)
     {
+        bool useImageMask = m_applyImageMask && (m_imageMask.sizeInBytes() > 0);
+
         if (auto location = getUniformLocation("useTexture"))
         {
             glUniform1i(location.value(), 1);
@@ -70,6 +73,19 @@ void Image2d::render()
             glUniform1i(location.value(), 0);
         }
 
+        if (auto location = getUniformLocation("useImageMaskTexture"))
+        {
+            glUniform1i(location.value(), useImageMask ? 1 : 0);
+        }
+
+        if (useImageMask)
+        {
+            if (auto location = getUniformLocation("imageMaskTexture"))
+            {
+                glUniform1i(location.value(), 1);
+            }
+        }
+
         if (m_backfaceCulling)
         {
             glEnable(GL_CULL_FACE);
@@ -77,7 +93,15 @@ void Image2d::render()
         }
 
         vao = createVAO(m_triangleBuffer);
+        glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, m_texture);
+        if (useImageMask)
+        {
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, m_imageMaskTexture);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            glEnable(GL_BLEND);
+        }
         glDrawArrays(GL_TRIANGLES, 0, m_triangleBuffer->elementCount());
         glBindTexture(GL_TEXTURE_2D, 0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -85,6 +109,7 @@ void Image2d::render()
 
         glCullFace(GL_NONE);
         glDisable(GL_CULL_FACE);
+        glDisable(GL_BLEND);
     }
 
     m_shader->release();
@@ -155,11 +180,37 @@ void Image2d::setImage(const QImage& image)
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+void Image2d::setImageMask(const QImage& image)
+{
+    m_imageMask = image.convertToFormat(QImage::Format_RGBA8888);
+    m_imageMask.mirror(false, true);
+    if (m_imageMask.sizeInBytes() <= 0)
+        return;
+
+    glGenTextures(1, &m_imageMaskTexture);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, m_imageMaskTexture);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_imageMask.width(),
+                 m_imageMask.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE,
+                 m_imageMask.bits());
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 Image2d::~Image2d()
 {
     if (m_image.sizeInBytes() > 0)
     {
         glDeleteTextures(1, &m_texture);
+    }
+    if (m_imageMask.sizeInBytes() > 0)
+    {
+        glDeleteTextures(1, &m_imageMaskTexture);
     }
 }
 
@@ -171,6 +222,16 @@ bool Image2d::isVisible() const
 void Image2d::setVisible(bool visible)
 {
     m_visible = visible;
+}
+
+bool Image2d::applyImageMask() const
+{
+    return m_applyImageMask;
+}
+
+void Image2d::setApplyImageMask(bool value)
+{
+    m_applyImageMask = value;
 }
 
 void Image2d::createBuffers()

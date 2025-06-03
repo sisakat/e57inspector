@@ -40,6 +40,8 @@ public:
 
     std::optional<E57NodePtr> getImageRepresentation(const E57Image2D& image2D) const;
     std::optional<QImage> getImage(const E57Image2D& image2D) const;
+    std::optional<QImage> getImageMask(const E57Image2D& image2D) const;
+    std::optional<uint32_t> getBlobId(const E57NodePtr& node, const std::string& name) const;
     std::optional<uint32_t> getImageBlobId(const E57NodePtr& node) const;
     std::optional<ImageFormat> getImageFormat(const E57NodePtr& node) const;
     std::optional<ImageParameters> getImageParameters(const E57Image2D& image2D) const;
