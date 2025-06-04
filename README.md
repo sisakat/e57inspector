@@ -74,4 +74,4 @@ sudo apt install qt6-base-dev libxerces-c-dev
 The project is licensed under the GNU GPLv3.
 It uses the Qt Framework for the user interface and libE57 for reading and parsing E57 files.
 
-*Copyright (C) 2023-2024 Stefan Isak*
+*Copyright (C) 2023-2025 Stefan Isak*
