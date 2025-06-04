@@ -9,6 +9,7 @@ include(FetchContent)
 FetchContent_Declare(
         libE57Format
         SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/libE57Format
+        EXCLUDE_FROM_ALL
 )
 FetchContent_MakeAvailable(libE57Format)
 
