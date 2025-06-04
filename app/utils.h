@@ -11,13 +11,24 @@ std::string to_lower(std::string str)
     return str;
 }
 
-std::string camelCaseToPascalCase(const std::string& str,
-                                  const char* separator = " ")
+std::string formatE57XMLName(const std::string& str,
+                             const char* separator = " ")
 {
     std::string result;
+    std::string token = str;
+    auto pos = token.find(":");
+    if (pos != std::string::npos)
+    {
+        std::string ns = token.substr(0, pos); // token before namespace
+        for (auto& c : ns)
+            c = (char)std::toupper(c);
+        token = token.substr(pos + 1);
+        result = "(" + ns + ") ";
+    }
+
     bool first = true;
     char previous = ' ';
-    for (const auto& ch : str)
+    for (const auto& ch : token)
     {
         if ((std::tolower(ch) != ch || first) &&
             (previous < '0' || previous > '9'))
