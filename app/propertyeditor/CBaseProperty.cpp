@@ -1,5 +1,6 @@
 #include "CBaseProperty.h"
 
+#include <QKeyEvent>
 
 CBaseProperty::CBaseProperty(const QByteArray &id, const QString &name):
     QTreeWidgetItem(),
@@ -54,6 +55,15 @@ void CBaseProperty::setTextColor(const QColor &color)
 {
     // QTreeWidgetItem::setTextColor(0, color);
     // QTreeWidgetItem::setTextColor(1, color);
+}
+
+
+bool CBaseProperty::onKeyPressed(QKeyEvent* event, QWidget* editWidget)
+{
+    if (event->key() == Qt::Key_Enter) {
+        this->finishEdit(false);
+    }
+    return false;
 }
 
 

@@ -26,7 +26,7 @@ public:
     virtual void onLeave() { finishEdit(); }
     virtual void onShowEditor(QWidget* /*editWidget*/) {}
     virtual void onHideEditor(QWidget* /*editWidget*/) {}
-    virtual bool onKeyPressed(QKeyEvent* /*event*/, QWidget* /*editWidget*/) { return false; }
+    virtual bool onKeyPressed(QKeyEvent* event, QWidget* editWidget);
 
     // actions to reimplement
     virtual QVariant getVariantValue() const = 0;
