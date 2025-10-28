@@ -255,11 +255,13 @@ void Image2d::createViewConeLines()
 {
     std::vector<Image2d::VertexData> data;
 
-    double imageWidthMeter = m_imageWidth * m_pixelWidth;
-    double imageHeightMeter = m_imageHeight * m_pixelHeight;
+    double fx = m_focalLength / m_pixelWidth;
+    double fy = m_focalLength / m_pixelHeight;
 
-    double tanX = (imageWidthMeter / 2.0) / m_focalLength;
-    double tanY = (imageHeightMeter / 2.0) / m_focalLength;
+    double left = (0 - m_principalPointX) / fx;
+    double right = (m_imageWidth - m_principalPointX) / fx;
+    double bottom = (0 - m_principalPointY) / fy;
+    double top = (m_imageHeight - m_principalPointY) / fy;
 
     Vector3d rgb{1.0f, 1.0f, 1.0f};
     Vector2d tex{0.0f, 0.0f};
@@ -267,29 +269,29 @@ void Image2d::createViewConeLines()
     // clang-format off
     // cone lines
     data.push_back({NullPoint3d, rgb, tex});
-    data.push_back({{ tanX * m_coneLength,  tanY * m_coneLength, -m_coneLength}, rgb, tex});
+    data.push_back({{right * m_coneLength,  top * m_coneLength, -m_coneLength}, rgb, tex});
 
     data.push_back({NullPoint3d, rgb, tex});
-    data.push_back({{-tanX * m_coneLength,  tanY * m_coneLength, -m_coneLength}, rgb, tex});
+    data.push_back({{left * m_coneLength,  top * m_coneLength, -m_coneLength}, rgb, tex});
 
     data.push_back({NullPoint3d, rgb, tex});
-    data.push_back({{ tanX * m_coneLength, -tanY * m_coneLength, -m_coneLength}, rgb, tex});
+    data.push_back({{right * m_coneLength, bottom * m_coneLength, -m_coneLength}, rgb, tex});
 
     data.push_back({NullPoint3d, rgb, tex});
-    data.push_back({{-tanX * m_coneLength, -tanY * m_coneLength, -m_coneLength}, rgb, tex});
+    data.push_back({{left * m_coneLength, bottom * m_coneLength, -m_coneLength}, rgb, tex});
 
     // image rectangle
-    data.push_back({{ tanX * m_coneLength, tanY * m_coneLength, -m_coneLength}, rgb, tex});
-    data.push_back({{-tanX * m_coneLength, tanY * m_coneLength, -m_coneLength}, rgb, tex});
+    data.push_back({{right * m_coneLength, top * m_coneLength, -m_coneLength}, rgb, tex});
+    data.push_back({{left * m_coneLength, top * m_coneLength, -m_coneLength}, rgb, tex});
 
-    data.push_back({{-tanX * m_coneLength,  tanY * m_coneLength, -m_coneLength}, rgb, tex});
-    data.push_back({{-tanX * m_coneLength, -tanY * m_coneLength, -m_coneLength}, rgb, tex});
+    data.push_back({{left * m_coneLength, top * m_coneLength, -m_coneLength}, rgb, tex});
+    data.push_back({{left * m_coneLength, bottom * m_coneLength, -m_coneLength}, rgb, tex});
 
-    data.push_back({{-tanX * m_coneLength, -tanY * m_coneLength, -m_coneLength}, rgb, tex});
-    data.push_back({{ tanX * m_coneLength, -tanY * m_coneLength, -m_coneLength}, rgb, tex});
+    data.push_back({{left * m_coneLength, bottom * m_coneLength, -m_coneLength}, rgb, tex});
+    data.push_back({{right * m_coneLength, bottom * m_coneLength, -m_coneLength}, rgb, tex});
 
-    data.push_back({{tanX * m_coneLength, -tanY * m_coneLength, -m_coneLength}, rgb, tex});
-    data.push_back({{tanX * m_coneLength,  tanY * m_coneLength, -m_coneLength}, rgb, tex});
+    data.push_back({{right * m_coneLength, bottom * m_coneLength, -m_coneLength}, rgb, tex});
+    data.push_back({{right * m_coneLength, top * m_coneLength, -m_coneLength}, rgb, tex});
     // clang-format on
 
     m_boundingBox.reset();
@@ -323,22 +325,24 @@ void Image2d::createViewConeImage()
 {
     std::vector<Image2d::VertexData> data;
 
-    double imageWidthMeter = m_imageWidth * m_pixelWidth;
-    double imageHeightMeter = m_imageHeight * m_pixelHeight;
+    double fx = m_focalLength / m_pixelWidth;
+    double fy = m_focalLength / m_pixelHeight;
 
-    double tanX = (imageWidthMeter / 2.0) / m_focalLength;
-    double tanY = (imageHeightMeter / 2.0) / m_focalLength;
+    double left = (0 - m_principalPointX) / fx;
+    double right = (m_imageWidth - m_principalPointX) / fx;
+    double bottom = (0 - m_principalPointY) / fy;
+    double top = (m_imageHeight - m_principalPointY) / fy;
 
     Vector3d rgb{1.0f, 1.0f, 1.0f};
 
     // clang-format off
-    data.push_back({{-tanX * m_coneLength, -tanY * m_coneLength, -m_coneLength}, rgb, {0.0f, 0.0f}});
-    data.push_back({{tanX * m_coneLength, -tanY * m_coneLength, -m_coneLength}, rgb, {1.0f, 0.0f}});
-    data.push_back({{tanX * m_coneLength, tanY * m_coneLength, -m_coneLength}, rgb, {1.0f, 1.0f}});
+    data.push_back({{left * m_coneLength, bottom * m_coneLength, -m_coneLength}, rgb, {0.0f, 0.0f}});
+    data.push_back({{right * m_coneLength, bottom * m_coneLength, -m_coneLength}, rgb, {1.0f, 0.0f}});
+    data.push_back({{right * m_coneLength, top * m_coneLength, -m_coneLength}, rgb, {1.0f, 1.0f}});
 
-    data.push_back({{-tanX * m_coneLength, -tanY * m_coneLength, -m_coneLength}, rgb, {0.0f, 0.0f}});
-    data.push_back({{tanX * m_coneLength, tanY * m_coneLength, -m_coneLength}, rgb, {1.0f, 1.0f}});
-    data.push_back({{-tanX * m_coneLength, tanY * m_coneLength, -m_coneLength}, rgb, {0.0f, 1.0f}});
+    data.push_back({{left * m_coneLength, bottom * m_coneLength, -m_coneLength}, rgb, {0.0f, 0.0f}});
+    data.push_back({{right * m_coneLength, top * m_coneLength, -m_coneLength}, rgb, {1.0f, 1.0f}});
+    data.push_back({{left * m_coneLength, top * m_coneLength, -m_coneLength}, rgb, {0.0f, 1.0f}});
     // clang-format on
 
     m_triangleBuffer = std::make_shared<OpenGLArrayBuffer>(

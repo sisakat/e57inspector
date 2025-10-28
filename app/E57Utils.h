@@ -33,6 +33,8 @@ public:
         double pixelWidth;
         double pixelHeight;
         double focalLength;
+        double principalPointX;
+        double principalPointY;
         bool isSpherical{false};
     };
 

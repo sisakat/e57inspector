@@ -131,6 +131,10 @@ E57Utils::getImageParameters(const E57Image2D& image2D) const
     {
         parameters.focalLength =
             representation.value()->getDouble("focalLength");
+        parameters.principalPointX = 
+            representation.value()->getDouble("principalPointX");
+        parameters.principalPointY = 
+            representation.value()->getDouble("principalPointY");
     }
 
     parameters.width = representation.value()->getInteger("imageWidth");

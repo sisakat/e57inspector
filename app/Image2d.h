@@ -42,6 +42,10 @@ public:
     void setPixelHeight(double pixelHeight) { m_pixelHeight = pixelHeight; }
     double getFocalLength() const { return m_focalLength; }
     void setFocalLength(double focalLength) { m_focalLength = focalLength; }
+    double getPrincipalPointX() const { return m_principalPointX; }
+    void setPrincipalPointX(double principalPointX) { m_principalPointX = principalPointX; }
+    double getPrincipalPointY() const { return m_principalPointY; }
+    void setPrincipalPointY(double principalPointY) { m_principalPointY = principalPointY; }
 
     bool isVisible() const;
     void setVisible(bool visible);
@@ -103,6 +107,8 @@ private:
     double m_pixelWidth;
     double m_pixelHeight;
     double m_focalLength;
+    double m_principalPointX;
+    double m_principalPointY;
     bool m_isSpherical{false};
 
     struct VertexData
