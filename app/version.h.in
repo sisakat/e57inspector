@@ -17,7 +17,7 @@
 #define INFO_COMPANYNAME_STRING         "sisakat"
 #define INFO_FILEDESCRIPTION_STRING     "sisakat e57inspector"
 #define INFO_INTERNALNAME_STRING        "e57inspector"
-#define INFO_LEGALCOPYRIGHT_STRING      "Copyright (c) 2024 Stefan Isak"
+#define INFO_LEGALCOPYRIGHT_STRING      "Copyright (c) 2025 Stefan Isak"
 #define INFO_LEGALTRADEMARKS1_STRING    "All Rights Reserved"
 #define INFO_LEGALTRADEMARKS2_STRING    "All Rights Reserved"
 #define INFO_ORIGINALFILENAME_STRING    "e57inspector.exe"
