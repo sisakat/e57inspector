@@ -1,6 +1,6 @@
 #!/bin/bash
 
 sudo apt update
-sudo apt install -y build-essential qt6-base-dev libxerces-c-dev
+sudo apt install -y build-essential qt6-base-dev qt6-tools-dev libxerces-c-dev
 cmake -B build -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 cmake --build build --config $BUILD_TYPE
