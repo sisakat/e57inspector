@@ -1,0 +1,56 @@
+name: Build
+
+on: [push, pull_request]
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Linux (GCC - Release)
+            os: ubuntu-22.04
+            platform: linux
+          - name: Windows (MSVC 2022 - Release)
+            os: windows-2022
+            arch: x86_64
+            platform: windows
+
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Install miniconda (Windows)
+        if: matrix.platform == 'windows'
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          channels: conda-forge,defaults
+      - name: Install dependencies (Windows)
+        if: matrix.platform == 'windows'
+        shell: bash -el {0}
+        run: |
+          conda install conda-forge::xerces-c
+      - name: Install Qt (Windows)
+        if: matrix.platform == 'windows'
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.9.*'
+
+      - name: Make script executable
+        if: matrix.platform == 'linux'
+        run: chmod +x ci/build_ubuntu.sh
+
+      - name: Build (Windows)
+        if: matrix.platform == 'windows'
+        run: ci\build_windows.bat
+      - name: Build (Linux)
+        if: matrix.platform == 'linux'
+        run: sh ci/build_ubuntu.sh
