@@ -4,9 +4,152 @@
     <title>e57inspector</title>
     <meta charset="utf-8">
     <style>
+        body {
+            max-width: 900px;
+            margin: 0 auto;
+            font-family: sans-serif;
+        }
+
+        header {
+            text-align: center;
+            background-color: #592894;
+            color: #FFFFFF;
+            padding: 2rem;
+            margin: 0;
+        }
+
+        header > h1, p {
+            padding: 0;
+            margin: 0;
+        }
+
+        header img {
+            max-width: 100%;
+        }
+
+        nav {
+            text-align: center;
+            background-color: #8A5AC3;
+            padding: 1px;
+        }
+
+        nav > ul {
+            list-style-type: none;
+        }
+
+        nav > ul > li {
+            display: inline;
+            padding-right: 1em;
+        }
+
+        nav a {
+            color: #FFFFFF;
+        }
+
+        main {
+            padding: 20px 50px 50px;
+            background-color: #F5F5F5;
+        }
+
+        main img {
+            max-width: 100%;
+        }
+
+        .wrapper {
+            display: flex;
+            flex-wrap: wrap; /* allow wrapping */
+        }
+
+        .image-div,
+        .text-div {
+            flex: 1 1 300px; /* grow, shrink, base width */
+        }
+
+        .image-div > img {
+            width: 100%;
+            display: block;
+        }
+
+        .text-div {
+            padding: 10px;
+        }
     </style>
 </head>
 <body>
-<h1>e57inspector</h1>
+<header>
+    <img src="logo128.png" alt="e57inspector"/>
+    <h1>e57inspector</h1>
+    <p>Open-source E57 file viewer</p>
+</header>
+<nav>
+    <ul>
+        <li><a href="https://github.com/sisakat/e57inspector">GitHub</a></li>
+        <li><a href="https://github.com/sisakat/e57inspector/releases">Download</a></li>
+    </ul>
+</nav>
+<main>
+    <p>
+        E57 Inspector is a cross-platform E57 file viewer.
+        An E57 file is a vendor-neutral format for storing point clouds, images and metadata.
+        It is documented in the <a href="https://www.astm.org/e2807-11r19e01.html">ASTM E2807</a> standard.
+    </p>
+    <br/>
+    <p>
+        The application can visualize the attributes and fields defined in the file, as well as view the contained point
+        clouds and images.
+        The program is open-source under the GPLv3 license.
+    </p>
+    <h3>Features</h3>
+    <ul>
+        <li>Explore contents in a tree.</li>
+        <li>Inspect all meta-data and fields of the stored objects.</li>
+        <li>View the point cloud in 3D.</li>
+        <li>View images in 2D and 3D (view-cone and position).</li>
+        <li>View spherical images in 2D and 3D.</li>
+        <li>Supports cartesian and spherical point coordinates.</li>
+    </ul>
+    <div class="wrapper">
+        <div class="image-div">
+            <img src="e57inspector_screenshot.png"/>
+        </div>
+        <div class="text-div">
+            <h3>Inspect contents and attributes</h3>
+            <p>
+                Open the e57 file and view point clouds and images in a tree view.
+                Clicking on the objects reveals their attributes (such as point count, image width, ...) on the right
+                side.
+            </p>
+        </div>
+
+        <div class="image-div">
+            <img src="e57inspector_screenshot_openpitmine.png"/>
+        </div>
+        <div class="text-div">
+            <h3>View pinhole images in 3d and 2d</h3>
+            <p>
+                Double clicking the pinhole images opens them in a regular image viewer.
+                Dropping them into an existing 3d view renders the image in 3d with a view cone.
+            </p>
+        </div>
+
+        <div class="image-div">
+            <img src="e57inspector_screenshot_spherical.png"/>
+        </div>
+        <div class="text-div">
+            <h3>Panorama images</h3>
+            <p>
+                Double clicking the panorama images opens them in a regular image viewer.
+                Right click and select "Open in 3d view" opens them in a panorama viewer.
+                Dropping them into an existing 3d view renders the spherical image as a sphere with texture.
+            </p>
+        </div>
+    </div>
+
+    <h3>License</h3>
+    <p>
+        The project is licensed under the GNU GPLv3.
+        It uses the Qt Framework for the user interface and libE57 for reading and parsing E57 files.
+    </p>
+</main>
 </body>
 </html>
