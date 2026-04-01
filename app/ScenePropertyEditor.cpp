@@ -69,6 +69,10 @@ void ScenePropertyEditor::initFromCamera()
         new CBoolProperty("pickpointNavigation", "Pickpoint Navigation",
                           camera->isPickpointNavigation(), true);
     add(pickpointNavigation);
+
+    auto* perspectiveCamera = new CBoolProperty(
+        "perspectiveCamera", "Perspective", camera->perspective(), true);
+    add(perspectiveCamera);
 }
 
 void ScenePropertyEditor::initFromPointcloud()
@@ -155,6 +159,12 @@ void ScenePropertyEditor::changeFromCamera(QTreeWidgetItem* item)
     if (pickpointNavigation)
     {
         camera->setPickpointNavigation(*pickpointNavigation);
+    }
+
+    auto perspectiveCamera = getBooleanValue(item, "perspectiveCamera");
+    if (perspectiveCamera)
+    {
+        camera->setPerspective(*perspectiveCamera);
     }
 }
 

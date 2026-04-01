@@ -39,9 +39,8 @@ void Camera::render2D(QPainter& painter)
 void Camera::renderBoundingBox(QPainter& painter,
                                const BoundingBox& boundingBox)
 {
-    auto toWindow = [this](const Vector3d& window) {
-        return Vector3d{window.x, m_viewportHeight - 1 - window.y, window.z};
-    };
+    auto toWindow = [this](const Vector3d& window)
+    { return Vector3d{window.x, m_viewportHeight - 1 - window.y, window.z}; };
 
     auto bbPoints = boundingBox.points();
 
@@ -57,9 +56,18 @@ void Camera::configureShader()
     m_view =
         glm::lookAt(Vector3d(m_position), Vector3d(m_center), Vector3d(m_up));
     updateNearFar();
-    m_projection = glm::perspective(deg2rad(m_fieldOfView),
-                                    1.0f * m_viewportWidth / m_viewportHeight,
-                                    m_near, m_far);
+    if (m_perspectiveCamera)
+    {
+        m_projection = glm::perspective(
+            deg2rad(m_fieldOfView), 1.0f * m_viewportWidth / m_viewportHeight,
+            m_near, m_far);
+    }
+    else
+    {
+        float aspect = (float)m_viewportWidth / (float)m_viewportHeight;
+        m_projection = glm::ortho(-m_orthoSize * aspect, m_orthoSize * aspect,
+                                  -m_orthoSize, m_orthoSize, m_near, m_far);
+    }
 
     if (auto location = getUniformLocation("view"))
     {
@@ -271,18 +279,33 @@ void Camera::mouseMoveEvent(QMouseEvent* event)
 
     if (m_zooming && m_pickpointNavigation)
     {
-        auto deltaY = pos.y - m_originalMousePosition.y;
-        auto viewDir = VectorNormalize(m_position - m_pickpoint);
-        auto lengthToTarget = VectorLength(m_position - m_pickpoint);
-        if (deltaY < 0)
+        if (m_perspectiveCamera)
         {
-            m_position -= lengthToTarget * viewDir * ZOOM_FRAC * 0.5f;
-            m_center -= lengthToTarget * viewDir * ZOOM_FRAC * 0.5f;
+            auto deltaY = pos.y - m_originalMousePosition.y;
+            auto viewDir = VectorNormalize(m_position - m_pickpoint);
+            auto lengthToTarget = VectorLength(m_position - m_pickpoint);
+            if (deltaY < 0)
+            {
+                m_position -= lengthToTarget * viewDir * ZOOM_FRAC * 0.5f;
+                m_center -= lengthToTarget * viewDir * ZOOM_FRAC * 0.5f;
+            }
+            else if (deltaY > 0)
+            {
+                m_position += lengthToTarget * viewDir * ZOOM_FRAC * 0.5f;
+                m_center += lengthToTarget * viewDir * ZOOM_FRAC * 0.5f;
+            }
         }
-        else if (deltaY > 0)
+        else
         {
-            m_position += lengthToTarget * viewDir * ZOOM_FRAC * 0.5f;
-            m_center += lengthToTarget * viewDir * ZOOM_FRAC * 0.5f;
+            auto deltaY = pos.y - m_originalMousePosition.y;
+            if (deltaY < 0)
+            {
+                m_orthoSize *= 1.0f - ZOOM_FRAC * 0.5f;
+            }
+            else if (deltaY > 0)
+            {
+                m_orthoSize *= 1.0f + ZOOM_FRAC * 0.5f;
+            }
         }
     }
 
@@ -318,21 +341,35 @@ void Camera::wheelEvent(QWheelEvent* event)
     if (!m_pickpointNavigation)
         return;
 
-    auto qPoint = event->position().toPoint();
-    Vector2d point(qPoint.x() * scene()->devicePixelRatio(),
-                   qPoint.y() * scene()->devicePixelRatio());
-    updatePickpoint(point);
-    auto viewDir = VectorNormalize(m_position - m_pickpoint);
-    auto lengthToTarget = VectorLength(m_position - m_pickpoint);
-    if (event->angleDelta().y() > 0)
+    if (m_perspectiveCamera)
     {
-        m_position -= lengthToTarget * viewDir * WHEEL_ZOOM_FRAC;
-        m_center -= lengthToTarget * viewDir * WHEEL_ZOOM_FRAC;
+        auto qPoint = event->position().toPoint();
+        Vector2d point(qPoint.x() * scene()->devicePixelRatio(),
+                       qPoint.y() * scene()->devicePixelRatio());
+        updatePickpoint(point);
+        auto viewDir = VectorNormalize(m_position - m_pickpoint);
+        auto lengthToTarget = VectorLength(m_position - m_pickpoint);
+        if (event->angleDelta().y() > 0)
+        {
+            m_position -= lengthToTarget * viewDir * WHEEL_ZOOM_FRAC;
+            m_center -= lengthToTarget * viewDir * WHEEL_ZOOM_FRAC;
+        }
+        else if (event->angleDelta().y() < 0)
+        {
+            m_position += lengthToTarget * viewDir * WHEEL_ZOOM_FRAC;
+            m_center += lengthToTarget * viewDir * WHEEL_ZOOM_FRAC;
+        }
     }
-    else if (event->angleDelta().y() < 0)
+    else
     {
-        m_position += lengthToTarget * viewDir * WHEEL_ZOOM_FRAC;
-        m_center += lengthToTarget * viewDir * WHEEL_ZOOM_FRAC;
+        if (event->angleDelta().y() > 0)
+        {
+            m_orthoSize *= 1.0f - WHEEL_ZOOM_FRAC;
+        }
+        else if (event->angleDelta().y() < 0)
+        {
+            m_orthoSize *= 1.0f + WHEEL_ZOOM_FRAC;
+        }
     }
 }
 
@@ -342,6 +379,34 @@ void Camera::keyReleaseEvent(QKeyEvent* event) {}
 
 void Camera::updateNearFar()
 {
+    if (!m_perspectiveCamera)
+    {
+        auto bb = scene()->boundingBox();
+        auto corners = bb.points();
+
+        // view direction (camera forward)
+        Vector3d viewDir = VectorNormalize(m_center - m_position);
+
+        double minZ = std::numeric_limits<double>::max();
+        double maxZ = std::numeric_limits<double>::lowest();
+
+        for (const auto& c : corners)
+        {
+            // project point onto view direction
+            double z = VectorDot(c - Vector3d(m_position), viewDir);
+
+            minZ = std::min(minZ, z);
+            maxZ = std::max(maxZ, z);
+        }
+
+        // add small margin
+        double margin = 0.1 * (maxZ - minZ);
+
+        m_near = minZ - margin;
+        m_far = maxZ + margin;
+        return;
+    }
+
     Vector3d cameraPosition = m_position;
     Vector3d cameraCenter = m_center;
 

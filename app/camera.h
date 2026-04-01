@@ -56,6 +56,9 @@ public:
         m_constrainedUp = Vector4d(Z_AXIS, 0.0f);
     }
 
+    bool perspective() const { return m_perspectiveCamera; }
+    void setPerspective(bool perspective) { m_perspectiveCamera = perspective; }
+
     const Vector4d& getConstrainedUp() const { return m_constrainedUp; }
     void setConstrainedUp(const Vector4d& constrainedUp)
     {
@@ -116,8 +119,10 @@ private:
 
     bool m_constrainedCamera{true};
     bool m_pickpointNavigation{true};
+    bool m_perspectiveCamera{true};
 
     bool m_topView{false};
+    float m_orthoSize{10.0f};
 
     struct FieldOfView
     {
