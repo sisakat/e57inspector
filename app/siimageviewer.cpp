@@ -73,6 +73,8 @@ SiImageViewer::~SiImageViewer()
     if (!m_imageAssigned)
         return;
 
+    makeCurrent();
+
     glDeleteTextures(1, &m_texture);
 
     glDeleteVertexArrays(1, &m_vao);
@@ -84,6 +86,8 @@ SiImageViewer::~SiImageViewer()
     glDeleteShader(m_vertexShader);
     glDeleteShader(m_fragmentShader);
     glDeleteProgram(m_shaderProgram);
+
+    doneCurrent();
 }
 
 void SiImageViewer::setImage(const QImage &image)

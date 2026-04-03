@@ -26,7 +26,11 @@ SceneView::SceneView(QWidget* parent) : QOpenGLWidget(parent)
     setAcceptDrops(true);
 }
 
-SceneView::~SceneView() = default;
+SceneView::~SceneView()
+{
+    makeCurrent();
+    doneCurrent();
+}
 
 Scene& SceneView::scene()
 {
@@ -124,7 +128,7 @@ void SceneView::keyReleaseEvent(QKeyEvent* event)
 
 void SceneView::onMessageLogged(const QOpenGLDebugMessage& debugMessage)
 {
-    qDebug() << debugMessage.message();
+    qWarning() << debugMessage.message();
 }
 
 void SceneView::setupScene()
