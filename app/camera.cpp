@@ -409,19 +409,18 @@ void Camera::updateNearFar()
 
     Vector3d cameraPosition = m_position;
     Vector3d cameraCenter = m_center;
+    Vector3d viewDir = VectorNormalize(cameraCenter - cameraPosition);
 
     auto bb = scene()->boundingBox();
     auto bbPoints = bb.points();
-    float maxLength = std::numeric_limits<float>::min();
+    float maxLength = std::numeric_limits<float>::lowest();
     float minLength = std::numeric_limits<float>::max();
     for (const auto& point : bbPoints)
     {
-        auto dot = VectorDot(point - cameraPosition,
-                             VectorNormalize(cameraCenter - cameraPosition));
-        float length = std::abs(dot);
-        if (length > maxLength)
+        auto dot = VectorDot(point - cameraPosition, viewDir);
+        if (dot > maxLength)
         {
-            maxLength = length;
+            maxLength = dot;
         }
         if (dot < minLength)
         {
@@ -429,8 +428,18 @@ void Camera::updateNearFar()
         }
     }
 
-    m_near = minLength < 0.001f ? 0.001f : minLength;
-    m_far = maxLength < 0.0f ? 100.0f : maxLength;
+    m_far = maxLength > 0.0f ? maxLength : 100.0f;
+    m_near = minLength > 0.0f ? minLength : 0.001f;
+
+    // Keep the near/far ratio bounded so the depth buffer retains enough
+    // precision; otherwise distant geometry z-fights and flickers while
+    // navigating (near can collapse towards 0 as the camera approaches the
+    // point cloud while far stays large).
+    const float minNear = m_far * 0.0001f;
+    if (m_near < minNear)
+    {
+        m_near = minNear;
+    }
 }
 
 Vector2d Camera::pickpoint() const
