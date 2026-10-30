@@ -1,6 +1,7 @@
 #ifndef E57INSPECTOR_E57NODE_H
 #define E57INSPECTOR_E57NODE_H
 
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <unordered_map>
